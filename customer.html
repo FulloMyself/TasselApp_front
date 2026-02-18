@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Same Head -->
+    <title>My Account | Tassel</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- ... same styles ... -->
+</head>
+<body>
+    <aside class="dash-sidebar">
+        <div class="dash-logo">MY TASSEL</div>
+        <nav>
+            <ul class="dash-nav">
+                <li><a href="#" class="active"><i class="fas fa-history"></i> My Bookings</a></li>
+                <li><a href="index.html#services"><i class="fas fa-plus-circle"></i> New Booking</a></li>
+                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="dash-main">
+        <header class="dash-header">
+            <h1>My Profile</h1>
+            <div>Welcome back, <strong id="user-name">Guest</strong></div>
+        </header>
+
+        <section class="dash-cards">
+            <div class="dash-card">
+                <h3>Upcoming Appointment</h3>
+                <p>You have no upcoming appointments.</p>
+                <a href="index.html#services" class="btn btn-primary" style="margin-top:1rem">Book Now</a>
+            </div>
+        </section>
+    </main>
+    <script src="dashboard.js"></script>
+</body>
+</html>

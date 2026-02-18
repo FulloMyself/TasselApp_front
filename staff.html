@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Same Head as Admin -->
+    <title>Staff Portal | Tassel</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- ... same styles as admin.html ... -->
+</head>
+<body>
+    <aside class="dash-sidebar">
+        <div class="dash-logo">TASSEL STAFF</div>
+        <nav>
+            <ul class="dash-nav">
+                <li><a href="#" class="active"><i class="fas fa-calendar-alt"></i> My Schedule</a></li>
+                <li><a href="#"><i class="fas fa-clock"></i> Availability</a></li>
+                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="dash-main">
+        <header class="dash-header">
+            <h1>My Schedule</h1>
+            <div>Welcome, <strong id="user-name">Staff</strong></div>
+        </header>
+
+        <section class="dash-cards">
+            <div class="dash-card">
+                <h3>Today's Appointments</h3>
+                <div class="number" id="stat-today">6</div>
+            </div>
+        </section>
+        
+        <!-- List of appointments specific to this staff member would go here -->
+    </main>
+    <script src="dashboard.js"></script>
+</body>
+</html>

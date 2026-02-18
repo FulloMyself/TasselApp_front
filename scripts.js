@@ -4,7 +4,7 @@
 
 const API_URL = 'https://tasselapp-back.onrender.com';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     // ===== DOM Elements =====
     const loadingScreen = document.getElementById('loading-screen');
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             if (this.getAttribute('href').startsWith('#')) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 dot.onclick = () => goToHero(i);
                 heroDots.appendChild(dot);
             });
-            
+
             const goToHero = (index) => {
                 heroSlides[currentHero].classList.remove('active');
                 document.querySelectorAll('.hero-dot')[currentHero].classList.remove('active');
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             document.querySelector('.hero-prev').onclick = () => goToHero((currentHero - 1 + heroSlides.length) % heroSlides.length);
             document.querySelector('.hero-next').onclick = () => goToHero((currentHero + 1) % heroSlides.length);
-            
+
             const heroContainer = document.querySelector('.hero-slider');
             let heroInterval = setInterval(() => goToHero((currentHero + 1) % heroSlides.length), 5000);
             heroContainer.onmouseenter = () => clearInterval(heroInterval);
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function initGallery() {
         const filterBtns = document.querySelectorAll('.filter-btn');
         const items = document.querySelectorAll('.gallery-item');
-        
-        filterBtns.forEach(btn => btn.addEventListener('click', function() {
+
+        filterBtns.forEach(btn => btn.addEventListener('click', function () {
             filterBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             const filter = this.dataset.filter;
@@ -122,14 +122,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Lightbox
         const images = [];
         items.forEach((item, i) => images.push({ src: item.querySelector('img').src, cap: item.querySelector('h4')?.textContent || '' }));
-        
+
         items.forEach((item, i) => item.onclick = () => showLightbox(i));
-        
+
         document.querySelector('.lightbox-close').onclick = () => lightbox.classList.remove('active');
         document.querySelector('.lightbox-prev').onclick = () => showLightbox((parseInt(lightbox.dataset.idx) - 1 + images.length) % images.length);
         document.querySelector('.lightbox-next').onclick = () => showLightbox((parseInt(lightbox.dataset.idx) + 1) % images.length);
-        lightbox.onclick = (e) => { if(e.target === lightbox) lightbox.classList.remove('active'); };
-        
+        lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); };
+
         document.addEventListener('keydown', (e) => {
             if (!lightbox.classList.contains('active')) return;
             if (e.key === 'Escape') lightbox.classList.remove('active');
@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
     bookBtn.addEventListener('click', () => openModal(bookingModal));
     loginBtn.addEventListener('click', () => openModal(loginModal));
     document.querySelectorAll('.modal-close').forEach(btn => btn.onclick = () => closeModal(btn.closest('.modal')));
-    [bookingModal, loginModal].forEach(m => m.onclick = (e) => { if(e.target === m) closeModal(m); });
-    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') [bookingModal, loginModal].forEach(m => closeModal(m)); });
+    [bookingModal, loginModal].forEach(m => m.onclick = (e) => { if (e.target === m) closeModal(m); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') [bookingModal, loginModal].forEach(m => closeModal(m)); });
 
     document.querySelectorAll('.service-overlay .btn').forEach(btn => btn.addEventListener('click', () => openModal(bookingModal)));
 
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Booking Form
         const bookingForm = document.getElementById('booking-form');
-        bookingForm.addEventListener('submit', async function(e) {
+        bookingForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const data = {
                 name: this.querySelector('#booking-name').value,
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Contact Form
         const contactForm = document.getElementById('contact-form');
-        contactForm.addEventListener('submit', async function(e) {
+        contactForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const data = {
                 name: this.querySelector('#name').value,
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Login Form
         const loginForm = document.getElementById('login-form');
-        loginForm.addEventListener('submit', async function(e) {
+        loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const data = {
                 email: this.querySelector('#login-email').value,
@@ -221,17 +221,52 @@ document.addEventListener('DOMContentLoaded', function() {
             const origText = btn.textContent;
             btn.textContent = 'Logging in...';
             btn.disabled = true;
-            
-            const success = await postData('/api/auth/login', data, 'Login successful!');
-            if (success) { closeModal(loginModal); this.reset(); }
-            
-            btn.textContent = origText;
-            btn.disabled = false;
+
+            try {
+                const res = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok && result.token) {
+                    // Save Token & User Data
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+
+                    showNotification('Login successful! Redirecting...', 'success');
+
+                    // Redirect based on Role
+                    setTimeout(() => {
+                        redirectToDashboard(result.user.role);
+                    }, 1000);
+                } else {
+                    showNotification(result.error || 'Login failed', 'error');
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('Network error', 'error');
+                btn.textContent = origText;
+                btn.disabled = false;
+            }
         });
+
+        // Helper function to redirect
+        function redirectToDashboard(role) {
+            switch (role) {
+                case 'admin': window.location.href = 'admin.html'; break;
+                case 'staff': window.location.href = 'staff.html'; break;
+                default: window.location.href = 'customer.html';
+            }
+        }
 
         // Newsletter
         const newsletterForm = document.querySelector('.newsletter-form');
-        newsletterForm.addEventListener('submit', async function(e) {
+        newsletterForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const email = this.querySelector('input[type="email"]').value;
             const success = await postData('/api/newsletter', { email }, 'Subscribed successfully!');
@@ -256,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.className = `notification notification-${type}`;
         notification.style.cssText = `position: fixed; top: 100px; right: 20px; background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'}; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; animation: slideIn 0.3s ease;`;
         notification.innerHTML = `<div style="display:flex;align-items:center;gap:0.75rem"><i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${message}</span></div><button style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:10px">&times;</button>`;
-        
+
         document.body.appendChild(notification);
         notification.querySelector('button').onclick = () => notification.remove();
         setTimeout(() => notification.remove(), 5000);
