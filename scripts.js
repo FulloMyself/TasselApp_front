@@ -2,6 +2,9 @@
 // TASSEL HAIR & BEAUTY STUDIO - SCRIPTS
 // ===============================================
 
+// CONFIGURATION
+const API_URL = 'https://tasselapp-back.onrender.com';
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // ===== Loading Screen =====
