@@ -1,85 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Tassel</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Basic Dashboard Layout Styles */
-        body { margin: 0; display: flex; height: 100vh; font-family: 'Montserrat', sans-serif; background: #F5F1E8; }
-        .dash-sidebar { width: 250px; background: #6B5D52; color: white; padding: 2rem 1rem; display: flex; flex-direction: column; }
-        .dash-logo { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; text-align: center; color: #E8B4C8; }
-        .dash-nav { list-style: none; padding: 0; }
-        .dash-nav li { margin-bottom: 1rem; }
-        .dash-nav a { color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 5px; transition: 0.3s; }
-        .dash-nav a:hover, .dash-nav a.active { background: rgba(255,255,255,0.1); }
-        .dash-main { flex: 1; padding: 2rem; overflow-y: auto; }
-        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .dash-card { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .dash-card h3 { margin: 0 0 0.5rem 0; color: #6B5D52; font-size: 0.9rem; }
-        .dash-card .number { font-size: 2rem; font-weight: 700; color: #E8B4C8; }
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background: #F5F1E8;
+        }
+
+        .dash-sidebar {
+            width: 260px;
+            background: #6B5D52;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .dash-logo {
+            padding: 2rem 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #E8B4C8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dash-nav {
+            list-style: none;
+            padding: 1rem;
+            flex-grow: 1;
+        }
+
+        .dash-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .dash-nav a {
+            color: #ddd;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .dash-nav a:hover,
+        .dash-nav a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .dash-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background: #F5F1E8;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dash-header h1 {
+            margin: 0;
+            color: #6B5D52;
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-info h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .stat-info p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4A4139;
+        }
+
+        /* Tables & Content Boxes */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .box-header h3 {
+            margin: 0;
+            color: #6B5D52;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            color: #4A4139;
+        }
+
+        th {
+            font-weight: 600;
+            color: #888;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-approved,
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        /* Action Buttons */
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #E8B4C8;
+            color: #4A4139;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
     </style>
 </head>
+
 <body>
     <aside class="dash-sidebar">
         <div class="dash-logo">TASSEL ADMIN</div>
         <nav>
             <ul class="dash-nav">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#" id="nav-bookings"><i class="fas fa-calendar-check"></i> Bookings</a></li>
-                <li><a href="#"><i class="fas fa-users"></i> Staff</a></li>
-                <li><a href="#"><i class="fas fa-chart-line"></i> Reports</a></li>
-                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i>
+                        Dashboard</a></li>
+                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-check"></i> Bookings</a>
+                </li>
+                <li><a href="#" onclick="showSection('staff-leave')"><i class="fas fa-plane-departure"></i> Leave
+                        Requests</a></li>
+                <li><a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="#" onclick="showSection('products')"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="#" onclick="showSection('vouchers')"><i class="fas fa-ticket-alt"></i> Vouchers</a></li>
+                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                <li><a href="#" id="logout-btn" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
             </ul>
         </nav>
     </aside>
 
     <main class="dash-main">
         <header class="dash-header">
-            <h1>Dashboard Overview</h1>
-            <div class="user-info">
-                Welcome, <strong id="user-name">Admin</strong>
-            </div>
+            <h1 id="page-title">Dashboard Overview</h1>
+            <div class="user-info">Welcome, <strong id="user-name">Admin</strong></div>
         </header>
 
-        <section class="dash-cards">
-            <div class="dash-card">
-                <h3>Total Bookings (Today)</h3>
-                <div class="number" id="stat-bookings">12</div>
+        <!-- Dashboard Section -->
+        <section id="sec-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #E8B4C8;"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Bookings</h3>
+                        <p id="stat-bookings">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #6B5D52;"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Users</h3>
+                        <p id="stat-users">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #4CAF50;"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="stat-info">
+                        <h3>Revenue</h3>
+                        <p id="stat-revenue">R0</p>
+                    </div>
+                </div>
             </div>
-            <div class="dash-card">
-                <h3>Revenue (Today)</h3>
-                <div class="number" id="stat-revenue">R4,500</div>
-            </div>
-            <div class="dash-card">
-                <h3>Pending Confirmations</h3>
-                <div class="number" id="stat-pending">3</div>
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Revenue Overview</h3>
+                </div>
+                <div class="chart-container"><canvas id="revenueChart"></canvas></div>
             </div>
         </section>
 
-        <section style="margin-top: 2rem;">
-            <div class="dash-card">
-                <h3>Recent Appointments</h3>
-                <table style="width:100%; margin-top: 1rem; border-collapse: collapse;">
+        <!-- Bookings Section -->
+        <section id="sec-bookings" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>All Bookings</h3>
+                </div>
+                <table>
                     <thead>
-                        <tr style="border-bottom: 2px solid #eee;">
-                            <th style="text-align:left; padding: 8px;">Client</th>
-                            <th style="text-align:left; padding: 8px;">Service</th>
-                            <th style="text-align:left; padding: 8px;">Time</th>
-                            <th style="text-align:left; padding: 8px;">Status</th>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="appointments-table">
-                        <!-- Data loaded via JS -->
-                    </tbody>
+                    <tbody id="bookings-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Leave Requests Section -->
+        <section id="sec-staff-leave" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Staff Leave Requests</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leave-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="sec-users" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>User Management</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Products & Vouchers -->
+        <section id="sec-products" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Product Inventory</h3>
+                    <button class="btn btn-primary" onclick="openProductModal()">Add New Product</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="sec-vouchers" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Discount Vouchers</h3>
+                    <button class="btn btn-primary" onclick="openVoucherModal()">Create Voucher</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount (R)</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vouchers-table"></tbody>
                 </table>
             </div>
         </section>
     </main>
 
+    <!-- Universal Profile Modal -->
+    <div id="profile-modal" class="modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div class="modal-content"
+            style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
+            <button onclick="closeProfileModal()"
+                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
+            <form id="profile-form">
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Full Name</label>
+                    <input type="text" id="profile-name" class="form-control"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Email Address</label>
+                    <input type="email" id="profile-email" class="form-control"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
+                <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current
+                    password</p>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>New Password</label>
+                    <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="profile-pass-confirm" class="form-control"
+                        placeholder="Confirm new password"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"
+                    style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
+                    Profile</button>
+            </form>
+        </div>
+    </div>
+
+
     <script src="dashboard.js"></script>
+
+    <div id="admin-modal" class="modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div class="modal-content"
+            style="background:white; padding:2rem; border-radius:10px; width:400px; position:relative;">
+            <button onclick="closeAdminModal()"
+                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <h2 id="modal-title" style="margin-bottom:1.5rem; color:#6B5D52;">Form</h2>
+            <form id="admin-form">
+                <!-- Dynamic Fields will be injected here by JS -->
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:1rem;">Save</button>
+            </form>
+        </div>
+    </div>
 </body>
+
 </html>

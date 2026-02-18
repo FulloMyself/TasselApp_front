@@ -1,38 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <!-- Same Head as Admin -->
     <title>Staff Portal | Tassel</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- ... same styles as admin.html ... -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Same Layout Styles as Admin */
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background: #F5F1E8;
+        }
+
+        .dash-sidebar {
+            width: 250px;
+            background: #6B5D52;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dash-logo {
+            padding: 2rem 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: #E8B4C8;
+        }
+
+        .dash-nav {
+            list-style: none;
+            padding: 1rem;
+            flex-grow: 1;
+        }
+
+        .dash-nav a {
+            color: #ddd;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .dash-nav a:hover,
+        .dash-nav a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .dash-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Search Input Style */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #E8B4C8;
+            color: #4A4139;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
+
 <body>
     <aside class="dash-sidebar">
         <div class="dash-logo">TASSEL STAFF</div>
         <nav>
             <ul class="dash-nav">
-                <li><a href="#" class="active"><i class="fas fa-calendar-alt"></i> My Schedule</a></li>
-                <li><a href="#"><i class="fas fa-clock"></i> Availability</a></li>
-                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" class="active" onclick="showSection('schedule')"><i class="fas fa-calendar-alt"></i> My
+                        Schedule</a></li>
+                <li><a href="#" onclick="showSection('search')"><i class="fas fa-search"></i> Find User</a></li>
+                <li><a href="#" onclick="showSection('leave')"><i class="fas fa-paper-plane"></i> Request Leave</a></li>
+                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                <li><a href="#" id="logout-btn" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
             </ul>
         </nav>
     </aside>
 
     <main class="dash-main">
-        <header class="dash-header">
-            <h1>My Schedule</h1>
+        <header class="dash-header" style="margin-bottom: 2rem; display:flex; justify-content:space-between;">
+            <h1 id="page-title">My Schedule</h1>
             <div>Welcome, <strong id="user-name">Staff</strong></div>
         </header>
 
-        <section class="dash-cards">
-            <div class="dash-card">
-                <h3>Today's Appointments</h3>
-                <div class="number" id="stat-today">6</div>
+        <!-- Schedule Section -->
+        <section id="sec-schedule">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Today's Appointments</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointments-table"></tbody>
+                </table>
             </div>
         </section>
-        
-        <!-- List of appointments specific to this staff member would go here -->
+
+        <!-- Search Users Section -->
+        <section id="sec-search" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Search Customers</h3>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Enter customer name or email...">
+                    <button class="btn-primary" onclick="searchUsers()"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-results"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Leave Request Section -->
+        <section id="sec-leave" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Submit Leave Request</h3>
+                </div>
+                <form id="leave-form" style="display:grid; gap: 1rem; max-width: 400px;">
+                    <input type="date" id="leave-start" class="form-control" required>
+                    <input type="date" id="leave-end" class="form-control" required>
+                    <textarea id="leave-reason" placeholder="Reason for leave..." class="form-control"
+                        required></textarea>
+                    <button type="submit" class="btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </section>
     </main>
+
+    <!-- Universal Profile Modal -->
+    <div id="profile-modal" class="modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+        <div class="modal-content"
+            style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
+            <button onclick="closeProfileModal()"
+                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
+            <form id="profile-form">
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Full Name</label>
+                    <input type="text" id="profile-name" class="form-control"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Email Address</label>
+                    <input type="email" id="profile-email" class="form-control"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
+                <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current
+                    password</p>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>New Password</label>
+                    <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="profile-pass-confirm" class="form-control"
+                        placeholder="Confirm new password"
+                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"
+                    style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
+                    Profile</button>
+            </form>
+        </div>
+    </div>
+
+
     <script src="dashboard.js"></script>
 </body>
+
 </html>
