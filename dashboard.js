@@ -5,6 +5,12 @@ const API_URL = 'https://tasselapp-back.onrender.com';
 let productsData = [];
 let vouchersData = [];
 let servicesData = [];
+let bookingsData = [];
+let staffData = [];
+let transactionsData = [];
+let notificationsData = [];
+let scheduleData = [];
+let revenueChart, bookingPieChart, popularServicesChart, staffPerformanceChart, peakHoursChart;
 
 document.addEventListener('DOMContentLoaded', () => {
     try {
@@ -12,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         initLogout();
         initProfile();
         initPageLogic();
+        initDateTime();
+        initNotifications();
+        initDataTables();
     } catch (e) {
         console.error("Initialization Error:", e);
         alert("Critical Error: " + e.message);
@@ -47,7 +56,12 @@ function checkAuth() {
         }
 
         const userNameEl = document.getElementById('user-name');
-        if (userNameEl && user) userNameEl.textContent = user.name;
+        if (userNameEl && user) {
+            userNameEl.textContent = user.name;
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            const userInitials = document.getElementById('user-initials');
+            if (userInitials) userInitials.textContent = initials;
+        }
     } catch (e) {
         console.error("Auth Check Failed", e);
         localStorage.clear();
@@ -66,27 +80,11 @@ function initLogout() {
     }
 }
 
-// Helper function to validate JSON format for service items
-function validateServiceItems(jsonString) {
-    try {
-        const items = JSON.parse(jsonString);
-        if (!Array.isArray(items)) {
-            return { valid: false, error: 'Items must be an array' };
-        }
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            if (!item.name || typeof item.name !== 'string') {
-                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'name'` };
-            }
-            if (!item.price || typeof item.price !== 'number') {
-                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'price' (must be a number)` };
-            }
-        }
-
-        return { valid: true, items };
-    } catch (e) {
-        return { valid: false, error: e.message };
+function initDateTime() {
+    const dateElement = document.getElementById('current-date');
+    if (dateElement) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = new Date().toLocaleDateString('en-ZA', options);
     }
 }
 
@@ -149,6 +147,64 @@ async function deleteData(endpoint) {
     }
 }
 
+// == NOTIFICATIONS ==
+function initNotifications() {
+    const notifBell = document.querySelector('.notification-badge');
+    if (notifBell) {
+        notifBell.addEventListener('click', showNotifications);
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+    }
+}
+
+async function loadNotifications() {
+    const notifications = await getData('/api/notifications');
+    notificationsData = notifications;
+    
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const countBadge = document.getElementById('notification-count');
+    if (countBadge) {
+        countBadge.textContent = unreadCount;
+        countBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+    }
+}
+
+function showNotifications() {
+    let notifHtml = '<div class="notifications-dropdown" style="position:absolute; top:100%; right:0; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px; width:300px; z-index:1000;">';
+    notifHtml += '<h4 style="padding:1rem; margin:0; border-bottom:1px solid #eee;">Notifications</h4>';
+    
+    if (notificationsData.length === 0) {
+        notifHtml += '<p style="padding:1rem; text-align:center;">No notifications</p>';
+    } else {
+        notificationsData.slice(0, 5).forEach(n => {
+            notifHtml += `
+                <div class="notification-item ${n.isRead ? '' : 'unread'}" onclick="markNotificationRead('${n._id}')" style="padding:1rem; border-bottom:1px solid #eee; cursor:pointer; ${!n.isRead ? 'background:#f0f7ff;' : ''}">
+                    <strong style="display:block; margin-bottom:0.25rem;">${n.title}</strong>
+                    <p style="margin:0 0 0.25rem; font-size:0.9rem; color:#666;">${n.message}</p>
+                    <small style="color:#999;">${new Date(n.createdAt).toLocaleString()}</small>
+                </div>
+            `;
+        });
+    }
+    notifHtml += '</div>';
+    
+    const existing = document.querySelector('.notifications-dropdown');
+    if (existing) {
+        existing.remove();
+    } else {
+        const div = document.createElement('div');
+        div.innerHTML = notifHtml;
+        document.querySelector('.notification-badge').style.position = 'relative';
+        document.querySelector('.notification-badge').appendChild(div.firstChild);
+    }
+}
+
+async function markNotificationRead(id) {
+    await putData(`/api/notifications/${id}`, { isRead: true });
+    loadNotifications();
+    document.querySelector('.notifications-dropdown')?.remove();
+}
+
 // == PROFILE LOGIC ==
 function initProfile() {
     const form = document.getElementById('profile-form');
@@ -183,7 +239,6 @@ function initProfile() {
     }
 }
 
-// Profile Modal Functions
 window.openProfileModal = function () {
     try {
         const userStr = localStorage.getItem('user');
@@ -193,24 +248,11 @@ window.openProfileModal = function () {
             return;
         }
 
-        const nameInput = document.getElementById('profile-name');
-        const emailInput = document.getElementById('profile-email');
-        const passInput = document.getElementById('profile-pass');
-        const passConfirmInput = document.getElementById('profile-pass-confirm');
-        const modal = document.getElementById('profile-modal');
-
-        if (!nameInput || !emailInput || !modal) {
-            console.error('Profile modal elements not found');
-            alert('Profile modal elements not found in the DOM');
-            return;
-        }
-
-        nameInput.value = user.name || '';
-        emailInput.value = user.email || '';
-        if (passInput) passInput.value = '';
-        if (passConfirmInput) passConfirmInput.value = '';
-
-        modal.classList.add('active');
+        document.getElementById('profile-name').value = user.name || '';
+        document.getElementById('profile-email').value = user.email || '';
+        document.getElementById('profile-pass').value = '';
+        document.getElementById('profile-pass-confirm').value = '';
+        document.getElementById('profile-modal').classList.add('active');
     } catch (e) {
         console.error('Error opening profile modal:', e);
         alert("Error opening profile: " + e.message);
@@ -219,9 +261,7 @@ window.openProfileModal = function () {
 
 window.closeProfileModal = function () {
     const modal = document.getElementById('profile-modal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    if (modal) modal.classList.remove('active');
 };
 
 // == PAGE LOGIC ROUTER ==
@@ -232,34 +272,87 @@ function initPageLogic() {
     if (path.includes('customer')) initCustomer();
 }
 
-// == ADMIN LOGIC ==
-let revenueChart;
+function initDataTables() {
+    if (typeof $.fn !== 'undefined' && $.fn.DataTable) {
+        $.extend($.fn.dataTable.defaults, {
+            pageLength: 25,
+            language: {
+                search: "Search:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "→",
+                    previous: "←"
+                }
+            }
+        });
+    }
+}
 
+// == ADMIN LOGIC ==
 async function initAdmin() {
-    window.showSection = (sectionId) => {
+    window.showSection = async (sectionId) => {
         document.querySelectorAll('main > section').forEach(el => el.style.display = 'none');
         const section = document.getElementById(`sec-${sectionId}`);
         if (section) section.style.display = 'block';
 
         const titles = {
             'dashboard': 'Dashboard',
-            'bookings': 'Bookings',
+            'analytics': 'Business Analytics',
+            'bookings': 'Booking Management',
+            'schedule': 'Staff Schedule',
             'staff-leave': 'Leave Requests',
-            'users': 'Users',
-            'products': 'Products',
-            'services': 'Services',
-            'vouchers': 'Vouchers'
+            'reports': 'Financial Reports',
+            'transactions': 'Transaction History',
+            'users': 'User Management',
+            'staff-management': 'Staff Management',
+            'services': 'Service Management',
+            'products': 'Product Inventory',
+            'vouchers': 'Voucher Management'
         };
         const titleEl = document.getElementById('page-title');
         if (titleEl) titleEl.textContent = titles[sectionId] || 'Dashboard';
 
-        if (sectionId === 'dashboard') loadAdminStats();
-        if (sectionId === 'bookings') loadBookings();
-        if (sectionId === 'staff-leave') loadLeaveRequests();
-        if (sectionId === 'users') loadUsers();
-        if (sectionId === 'products') loadProducts();
-        if (sectionId === 'services') loadServices();
-        if (sectionId === 'vouchers') loadVouchers();
+        switch(sectionId) {
+            case 'dashboard':
+                await loadDashboardData();
+                break;
+            case 'analytics':
+                await loadAnalyticsData();
+                break;
+            case 'bookings':
+                await loadAllBookings();
+                break;
+            case 'schedule':
+                await loadStaffSchedule();
+                break;
+            case 'staff-leave':
+                await loadLeaveRequests();
+                break;
+            case 'reports':
+                await loadFinancialReports('month');
+                break;
+            case 'transactions':
+                await loadTransactions();
+                break;
+            case 'users':
+                await loadUsers();
+                break;
+            case 'staff-management':
+                await loadStaffList();
+                break;
+            case 'services':
+                await loadServices();
+                break;
+            case 'products':
+                await loadProducts();
+                break;
+            case 'vouchers':
+                await loadVouchers();
+                break;
+        }
     };
 
     const adminForm = document.getElementById('admin-form');
@@ -273,7 +366,6 @@ async function initAdmin() {
 
             console.log('Form submission:', { type, id, data });
 
-            // Convert types based on form type
             if (type === 'product') {
                 data.price = parseFloat(data.price);
                 data.stock = parseInt(data.stock) || 0;
@@ -285,7 +377,6 @@ async function initAdmin() {
                 }
                 console.log('Processed voucher data:', data);
             } else if (type === 'service') {
-                // Collect all service items from the form
                 const items = [];
                 let index = 0;
 
@@ -356,50 +447,853 @@ async function initAdmin() {
         });
     }
 
-    // Load initial data
-    loadAdminStats();
-    loadProducts();
-    loadVouchers();
-    loadServices();
+    await loadDashboardData();
 }
 
-async function loadAdminStats() {
-    const stats = await getData('/api/stats');
-    const bookingsEl = document.getElementById('stat-bookings');
-    const usersEl = document.getElementById('stat-users');
-    const revenueEl = document.getElementById('stat-revenue');
+// == DASHBOARD DATA ==
+async function loadDashboardData() {
+    await Promise.all([
+        loadKPIs(),
+        loadTodaySchedule(),
+        loadRecentActivity(),
+        loadRevenueChart('week'),
+        loadBookingDistribution()
+    ]);
+}
 
-    if (bookingsEl) bookingsEl.textContent = stats.bookings || 0;
-    if (usersEl) usersEl.textContent = stats.users || 0;
-    if (revenueEl) revenueEl.textContent = `R${stats.revenue || 0}`;
+async function loadKPIs() {
+    const stats = await getData('/api/stats/detailed');
+    const kpiGrid = document.getElementById('kpi-cards');
+    if (!kpiGrid) return;
 
+    const today = new Date().toISOString().split('T')[0];
+    const todayBookings = bookingsData.filter(b => 
+        b.date && new Date(b.date).toISOString().split('T')[0] === today
+    ).length;
+
+    kpiGrid.innerHTML = `
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#E8B4C8;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="kpi-info">
+                <h3>Today's Bookings</h3>
+                <div class="kpi-main">
+                    <p>${todayBookings || stats.todayBookings || 0}</p>
+                    <span class="kpi-trend">${stats.bookingTrend || 0}%</span>
+                </div>
+                <p class="kpi-sub">${stats.pendingBookings || 0} pending</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#6B5D52;">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="kpi-info">
+                <h3>Total Customers</h3>
+                <div class="kpi-main">
+                    <p>${stats.totalCustomers || 0}</p>
+                    <span class="kpi-trend">+${stats.newCustomers || 0} new</span>
+                </div>
+                <p class="kpi-sub">${stats.activeToday || 0} active today</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#4CAF50;">
+                <i class="fas fa-currency-rand"></i>
+            </div>
+            <div class="kpi-info">
+                <h3>Today's Revenue</h3>
+                <div class="kpi-main">
+                    <p>R${stats.todayRevenue?.toFixed(2) || '0.00'}</p>
+                    <span class="kpi-trend">${stats.revenueTrend || 0}%</span>
+                </div>
+                <p class="kpi-sub">R${stats.weeklyRevenue?.toFixed(2) || '0.00'} this week</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#FF9800;">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="kpi-info">
+                <h3>Staff on Duty</h3>
+                <div class="kpi-main">
+                    <p>${stats.staffOnDuty || 0}</p>
+                    <span class="kpi-trend">${stats.staffAvailable || 0} available</span>
+                </div>
+                <p class="kpi-sub">${stats.staffOnBreak || 0} on break</p>
+            </div>
+        </div>
+    `;
+}
+
+async function loadTodaySchedule() {
+    const today = new Date().toISOString().split('T')[0];
+    const bookings = await getData(`/api/bookings/date/${today}`);
+    const tbody = document.getElementById('today-schedule-body');
+    if (!tbody) return;
+
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No appointments scheduled for today</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = bookings.map(b => {
+        const staffName = b.staffId ? (b.staffId.name || 'Assigned') : 'Unassigned';
+        const statusClass = `status-${b.status || 'pending'}`;
+        const paymentClass = `payment-${b.paymentStatus || 'unpaid'}`;
+        
+        return `
+            <tr>
+                <td>${b.time || 'TBD'}</td>
+                <td>${b.name || 'N/A'}</td>
+                <td>${b.service || 'N/A'}</td>
+                <td>
+                    <span class="staff-badge" onclick="openStaffAssignModal('${b._id}')" style="cursor:pointer; background:#E8B4C8; color:white; padding:0.25rem 0.75rem; border-radius:20px; display:inline-flex; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-user"></i> ${staffName}
+                    </span>
+                </td>
+                <td>${b.duration || '1 hour'}</td>
+                <td><span class="status-badge ${statusClass}">${b.status || 'pending'}</span></td>
+                <td><span class="status-badge ${paymentClass}">${b.paymentStatus || 'unpaid'}</span></td>
+                <td>
+                    <button class="btn-sm btn-info" onclick="viewBooking('${b._id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-sm btn-success" onclick="updateBookingStatus('${b._id}', 'confirmed')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#today-schedule-table')) {
+        $('#today-schedule-table').DataTable({
+            order: [[0, 'asc']],
+            pageLength: 10
+        });
+    }
+}
+
+async function loadRecentActivity() {
+    const activities = await getData('/api/activities/recent');
+    const feed = document.getElementById('activity-feed');
+    if (!feed) return;
+
+    feed.innerHTML = activities.map(a => `
+        <div class="activity-item" style="padding:1rem; border-bottom:1px solid #eee; display:flex; align-items:center; gap:1rem;">
+            <div class="activity-icon" style="width:40px; height:40px; border-radius:50%; background:${getActivityColor(a.type)}; display:flex; align-items:center; justify-content:center; color:white;">
+                <i class="fas ${getActivityIcon(a.type)}"></i>
+            </div>
+            <div style="flex:1;">
+                <strong>${a.title}</strong>
+                <p style="margin:0.25rem 0 0; color:#666;">${a.description}</p>
+                <small style="color:#999;">${timeAgo(a.createdAt)}</small>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getActivityColor(type) {
+    const colors = {
+        'booking': '#E8B4C8',
+        'payment': '#4CAF50',
+        'staff': '#2196F3',
+        'customer': '#FF9800',
+        'system': '#9C27B0'
+    };
+    return colors[type] || '#6B5D52';
+}
+
+function getActivityIcon(type) {
+    const icons = {
+        'booking': 'fa-calendar-plus',
+        'payment': 'fa-credit-card',
+        'staff': 'fa-user-clock',
+        'customer': 'fa-user-plus',
+        'system': 'fa-cog'
+    };
+    return icons[type] || 'fa-bell';
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+    };
+    
+    for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+            return interval + ' ' + unit + (interval === 1 ? '' : 's') + ' ago';
+        }
+    }
+    return 'just now';
+}
+
+// == CHARTS ==
+async function loadRevenueChart(period) {
+    const data = await getData(`/api/revenue/trend/${period}`);
     const ctx = document.getElementById('revenueChart')?.getContext('2d');
-    if (ctx && !revenueChart) {
-        revenueChart = new Chart(ctx, {
-            type: 'line',
+    if (!ctx) return;
+
+    if (revenueChart) revenueChart.destroy();
+
+    revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Revenue (R)',
+                data: data.values || [1200, 1900, 3000, 2500, 4200, 3900, 4500],
+                borderColor: '#E8B4C8',
+                backgroundColor: 'rgba(232, 180, 200, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
+            }
+        }
+    });
+}
+
+async function loadBookingDistribution() {
+    const data = await getData('/api/bookings/distribution');
+    const ctx = document.getElementById('bookingPieChart')?.getContext('2d');
+    if (!ctx) return;
+
+    if (bookingPieChart) bookingPieChart.destroy();
+
+    bookingPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Pending', 'Confirmed', 'Cancelled'],
+            datasets: [{
+                data: [
+                    data.completed || 45,
+                    data.pending || 20,
+                    data.confirmed || 25,
+                    data.cancelled || 10
+                ],
+                backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#F44336'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            },
+            cutout: '60%'
+        }
+    });
+}
+
+window.changeRevenuePeriod = function(period) {
+    document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    loadRevenueChart(period);
+};
+
+// == BOOKING MANAGEMENT ==
+async function loadAllBookings() {
+    bookingsData = await getData('/api/bookings/all');
+    const tbody = document.getElementById('bookings-table-body');
+    if (!tbody) return;
+
+    await loadStaffList();
+
+    tbody.innerHTML = bookingsData.map(b => {
+        const staffName = b.staffId ? (b.staffId.name || 'Assigned') : 'Unassigned';
+        const statusClass = `status-${b.status || 'pending'}`;
+        const paymentClass = `payment-${b.paymentStatus || 'unpaid'}`;
+        const date = b.date ? new Date(b.date).toLocaleDateString() : 'N/A';
+        
+        return `
+            <tr>
+                <td>${b._id ? b._id.slice(-6) : 'N/A'}</td>
+                <td>${b.name || 'N/A'}</td>
+                <td>${b.service || 'N/A'}</td>
+                <td>${date} ${b.time || ''}</td>
+                <td>
+                    <select class="staff-select" onchange="assignStaff('${b._id}', this.value)" style="padding:0.25rem; border-radius:4px; border:1px solid #ddd;">
+                        <option value="">${staffName}</option>
+                        ${staffData.map(s => `<option value="${s._id}">${s.name}</option>`).join('')}
+                    </select>
+                </td>
+                <td><span class="status-badge ${statusClass}">${b.status || 'pending'}</span></td>
+                <td><span class="status-badge ${paymentClass}">${b.paymentStatus || 'unpaid'}</span></td>
+                <td>R${b.amount || 0}</td>
+                <td>
+                    <button class="btn-sm btn-info" onclick="viewBooking('${b._id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-sm btn-success" onclick="updateBookingStatus('${b._id}', 'completed')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#bookings-table')) {
+        $('#bookings-table').DataTable({
+            order: [[3, 'desc']],
+            pageLength: 25
+        });
+    }
+}
+
+window.filterBookings = function() {
+    const filter = document.getElementById('booking-filter').value;
+    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#bookings-table')) {
+        $('#bookings-table').DataTable().column(5).search(filter === 'all' ? '' : filter).draw();
+    }
+};
+
+// == STAFF ASSIGNMENT ==
+window.openStaffAssignModal = function(bookingId) {
+    document.getElementById('assign-booking-id').value = bookingId;
+    loadStaffSelect();
+    document.getElementById('staff-assign-modal').classList.add('active');
+};
+
+window.closeStaffAssignModal = function() {
+    document.getElementById('staff-assign-modal').classList.remove('active');
+};
+
+async function loadStaffSelect() {
+    const staff = await getData('/api/users/staff');
+    const select = document.getElementById('assign-staff-select');
+    if (select) {
+        select.innerHTML = '<option value="">Select staff member...</option>' + 
+            staff.map(s => `<option value="${s._id}">${s.name} - ${s.specialties?.join(', ') || 'General'}</option>`).join('');
+    }
+}
+
+document.getElementById('staff-assign-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const bookingId = document.getElementById('assign-booking-id').value;
+    const staffId = document.getElementById('assign-staff-select').value;
+    const notes = document.getElementById('assign-notes').value;
+
+    if (!staffId) {
+        alert('Please select a staff member');
+        return;
+    }
+
+    try {
+        const res = await putData(`/api/bookings/${bookingId}/assign`, { staffId, notes });
+        if (res.ok) {
+            alert('Staff assigned successfully!');
+            closeStaffAssignModal();
+            loadAllBookings();
+            loadTodaySchedule();
+        } else {
+            alert('Failed to assign staff');
+        }
+    } catch (err) {
+        console.error('Assignment error:', err);
+        alert('Error assigning staff');
+    }
+});
+
+window.assignStaff = async function(bookingId, staffId) {
+    if (!staffId) return;
+    
+    if (confirm('Assign this booking to the selected staff member?')) {
+        try {
+            const res = await putData(`/api/bookings/${bookingId}/assign`, { staffId });
+            if (res.ok) {
+                alert('Staff assigned successfully!');
+                loadAllBookings();
+            }
+        } catch (err) {
+            console.error('Assignment error:', err);
+            alert('Failed to assign staff');
+        }
+    }
+};
+
+// == STAFF SCHEDULE ==
+async function loadStaffSchedule() {
+    const calendarEl = document.getElementById('staff-calendar');
+    if (!calendarEl || typeof FullCalendar === 'undefined') return;
+
+    const events = await getData('/api/staff/schedule');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: events.map(e => ({
+            title: `${e.staffName}: ${e.shift || 'Working'}`,
+            start: e.start,
+            end: e.end,
+            backgroundColor: e.color || '#E8B4C8',
+            borderColor: '#6B5D52',
+            extendedProps: e
+        })),
+        eventClick: function(info) {
+            showScheduleDetails(info.event.extendedProps);
+        },
+        slotMinTime: '08:00:00',
+        slotMaxTime: '20:00:00',
+        allDaySlot: false,
+        height: 'auto'
+    });
+
+    calendar.render();
+}
+
+window.openScheduleModal = function() {
+    loadStaffForSchedule();
+    document.getElementById('schedule-modal').classList.add('active');
+};
+
+window.closeScheduleModal = function() {
+    document.getElementById('schedule-modal').classList.remove('active');
+};
+
+async function loadStaffForSchedule() {
+    const staff = await getData('/api/users/staff');
+    const select = document.getElementById('schedule-staff');
+    if (select) {
+        select.innerHTML = '<option value="">Select staff...</option>' + 
+            staff.map(s => `<option value="${s._id}">${s.name}</option>`).join('');
+    }
+}
+
+document.getElementById('schedule-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        staffId: document.getElementById('schedule-staff').value,
+        date: document.getElementById('schedule-date').value,
+        startTime: document.getElementById('schedule-start').value,
+        endTime: document.getElementById('schedule-end').value,
+        maxBookings: document.getElementById('schedule-max').value
+    };
+
+    try {
+        const res = await postData('/api/staff/schedule', data);
+        if (res.ok) {
+            alert('Schedule saved!');
+            closeScheduleModal();
+            loadStaffSchedule();
+        } else {
+            alert('Failed to save schedule');
+        }
+    } catch (err) {
+        console.error('Schedule error:', err);
+        alert('Error saving schedule');
+    }
+});
+
+function showScheduleDetails(schedule) {
+    alert(`Staff: ${schedule.staffName}\nDate: ${new Date(schedule.start).toLocaleDateString()}\nHours: ${schedule.startTime} - ${schedule.endTime}`);
+}
+
+// == FINANCIAL REPORTS ==
+async function loadFinancialReports(period) {
+    const data = await getData(`/api/reports/financial/${period}`);
+    
+    const statsContainer = document.getElementById('financial-stats');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="finance-card">
+                <h4>Total Revenue</h4>
+                <div class="amount">R${data.totalRevenue?.toFixed(2) || '0.00'}</div>
+                <div class="trend">${data.revenueTrend || 0}% vs last period</div>
+            </div>
+            <div class="finance-card">
+                <h4>Expenses</h4>
+                <div class="amount">R${data.expenses?.toFixed(2) || '0.00'}</div>
+                <div class="trend">${data.expenseTrend || 0}% vs last period</div>
+            </div>
+            <div class="finance-card">
+                <h4>Net Profit</h4>
+                <div class="amount">R${data.netProfit?.toFixed(2) || '0.00'}</div>
+                <div class="trend">Margin: ${data.profitMargin || 0}%</div>
+            </div>
+            <div class="finance-card">
+                <h4>Outstanding</h4>
+                <div class="amount">R${data.outstanding?.toFixed(2) || '0.00'}</div>
+                <div class="trend">${data.outstandingCount || 0} pending payments</div>
+            </div>
+        `;
+    }
+
+    const breakdownCtx = document.getElementById('revenueBreakdownChart')?.getContext('2d');
+    if (breakdownCtx) {
+        new Chart(breakdownCtx, {
+            type: 'pie',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: ['Services', 'Products', 'Vouchers', 'Deposits'],
                 datasets: [{
-                    label: 'Revenue (R)',
-                    data: [1200, 1900, 3000, 2500, 4200, 3900],
-                    borderColor: '#E8B4C8',
-                    backgroundColor: 'rgba(232, 180, 200, 0.1)',
-                    tension: 0.4,
-                    fill: true
+                    data: [
+                        data.serviceRevenue || 0,
+                        data.productRevenue || 0,
+                        data.voucherRevenue || 0,
+                        data.deposits || 0
+                    ],
+                    backgroundColor: ['#E8B4C8', '#6B5D52', '#4CAF50', '#FF9800']
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+}
+
+window.loadFinancialReport = function() {
+    const period = document.getElementById('report-period').value;
+    loadFinancialReports(period);
+};
+
+async function loadTransactions() {
+    transactionsData = await getData('/api/transactions');
+    const tbody = document.getElementById('transactions-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = transactionsData.map(t => `
+        <tr>
+            <td>${new Date(t.transactionDate).toLocaleDateString()}</td>
+            <td>${t._id ? t._id.slice(-8) : 'N/A'}</td>
+            <td>${t.userId?.name || 'N/A'}</td>
+            <td>${t.description || 'N/A'}</td>
+            <td>R${t.amount?.toFixed(2) || '0.00'}</td>
+            <td>${t.paymentMethod || 'Cash'}</td>
+            <td><span class="status-badge status-${t.status || 'completed'}">${t.status || 'completed'}</span></td>
+        </tr>
+    `).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#transactions-table')) {
+        $('#transactions-table').DataTable({
+            order: [[0, 'desc']],
+            pageLength: 25
+        });
+    }
+}
+
+window.exportReport = function() {
+    const period = document.getElementById('report-period').value;
+    window.location.href = `${API_URL}/api/reports/export/${period}`;
+};
+
+// == STAFF MANAGEMENT ==
+async function loadStaffList() {
+    staffData = await getData('/api/users/staff');
+    const tbody = document.getElementById('staff-table-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = staffData.map(s => `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>${s.phone || 'N/A'}</td>
+            <td>${s.specialties?.join(', ') || 'General'}</td>
+            <td><span class="status-badge ${s.isActive ? 'status-confirmed' : 'status-rejected'}">${s.isActive ? 'Active' : 'Inactive'}</span></td>
+            <td>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <span>⭐ ${s.rating || '4.5'}</span>
+                    <small>${s.completedBookings || 0} bookings</small>
+                </div>
+            </td>
+            <td>
+                <button class="btn-sm btn-primary" onclick="editStaff('${s._id}')">Edit</button>
+                <button class="btn-sm btn-danger" onclick="toggleStaffStatus('${s._id}')">${s.isActive ? 'Deactivate' : 'Activate'}</button>
+            </td>
+        </tr>
+    `).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#staff-table')) {
+        $('#staff-table').DataTable();
+    }
+}
+
+window.openStaffModal = function() {
+    alert('Staff creation form - to be implemented');
+};
+
+window.editStaff = function(id) {
+    alert('Edit staff - to be implemented');
+};
+
+window.toggleStaffStatus = async function(id) {
+    const staff = staffData.find(s => s._id === id);
+    if (!staff) return;
+    
+    if (confirm(`${staff.isActive ? 'Deactivate' : 'Activate'} ${staff.name}?`)) {
+        try {
+            const res = await putData(`/api/users/${id}/toggle-status`, { isActive: !staff.isActive });
+            if (res.ok) {
+                await loadStaffList();
+                alert(`Staff ${staff.isActive ? 'deactivated' : 'activated'} successfully!`);
+            }
+        } catch (err) {
+            console.error('Status change error:', err);
+            alert('Failed to update staff status');
+        }
+    }
+};
+
+// == ANALYTICS ==
+async function loadAnalyticsData() {
+    const popularData = await getData('/api/analytics/popular-services');
+    const staffPerfData = await getData('/api/analytics/staff-performance');
+    const peakHoursData = await getData('/api/analytics/peak-hours');
+
+    const popularCtx = document.getElementById('popularServicesChart')?.getContext('2d');
+    if (popularCtx) {
+        if (popularServicesChart) popularServicesChart.destroy();
+        popularServicesChart = new Chart(popularCtx, {
+            type: 'bar',
+            data: {
+                labels: popularData.map(d => d.name),
+                datasets: [{
+                    label: 'Number of Bookings',
+                    data: popularData.map(d => d.count),
+                    backgroundColor: '#E8B4C8'
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+                indexAxis: 'y'
             }
         });
     }
+
+    const staffCtx = document.getElementById('staffPerformanceChart')?.getContext('2d');
+    if (staffCtx) {
+        if (staffPerformanceChart) staffPerformanceChart.destroy();
+        staffPerformanceChart = new Chart(staffCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Completed', 'Rating', 'Punctuality', 'Customer Satisfaction', 'Revenue'],
+                datasets: staffPerfData.map((staff, i) => ({
+                    label: staff.name,
+                    data: [staff.completed, staff.rating, staff.punctuality, staff.satisfaction, staff.revenue],
+                    backgroundColor: `rgba(232, 180, 200, ${0.2 + i*0.2})`,
+                    borderColor: '#E8B4C8'
+                }))
+            },
+            options: { responsive: true }
+        });
+    }
+
+    const peakCtx = document.getElementById('peakHoursChart')?.getContext('2d');
+    if (peakCtx) {
+        if (peakHoursChart) peakHoursChart.destroy();
+        peakHoursChart = new Chart(peakCtx, {
+            type: 'line',
+            data: {
+                labels: peakHoursData.map(d => d.hour),
+                datasets: [{
+                    label: 'Bookings',
+                    data: peakHoursData.map(d => d.count),
+                    borderColor: '#FF9800',
+                    fill: false
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
 }
+
+// == BOOKING STATUS UPDATES ==
+window.updateBookingStatus = async function(id, status) {
+    const statusMessages = {
+        'confirmed': 'Confirm this booking?',
+        'completed': 'Mark this booking as completed?',
+        'cancelled': 'Cancel this booking?',
+        'no-show': 'Mark client as no-show?'
+    };
+
+    if (!confirm(statusMessages[status] || `Update status to ${status}?`)) return;
+
+    try {
+        const res = await putData(`/api/bookings/${id}`, { status });
+        if (res.ok) {
+            alert(`Booking ${status} successfully!`);
+            loadAllBookings();
+            loadTodaySchedule();
+        } else {
+            alert('Failed to update booking');
+        }
+    } catch (err) {
+        console.error('Update error:', err);
+        alert('Error updating booking');
+    }
+};
+
+window.viewBooking = function(id) {
+    const booking = bookingsData.find(b => b._id === id);
+    if (!booking) return;
+
+    const details = `
+        <div style="padding:1rem;">
+            <h3 style="margin-bottom:1rem;">Booking Details</h3>
+            <p><strong>Client:</strong> ${booking.name}</p>
+            <p><strong>Service:</strong> ${booking.service}</p>
+            <p><strong>Date/Time:</strong> ${new Date(booking.date).toLocaleDateString()} at ${booking.time}</p>
+            <p><strong>Staff:</strong> ${booking.staffId?.name || 'Unassigned'}</p>
+            <p><strong>Status:</strong> ${booking.status}</p>
+            <p><strong>Payment:</strong> ${booking.paymentStatus} - R${booking.amount || 0}</p>
+            <p><strong>Notes:</strong> ${booking.notes || 'None'}</p>
+            <div style="text-align:right; margin-top:1rem;">
+                <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Close</button>
+            </div>
+        </div>
+    `;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `<div class="modal-content" style="max-width:500px;">${details}</div>`;
+    document.body.appendChild(modal);
+};
+
+// == EXPORT FUNCTIONS ==
+window.exportBookings = function() {
+    window.location.href = `${API_URL}/api/bookings/export`;
+};
+
+window.refreshSchedule = function() {
+    loadTodaySchedule();
+};
+
+// == LEAVE MANAGEMENT ==
+async function loadLeaveRequests() {
+    const leaves = await getData('/api/leave');
+    const tbody = document.getElementById('leave-table');
+    if (!tbody || !Array.isArray(leaves)) return;
+
+    tbody.innerHTML = leaves.map(l => `
+        <tr>
+            <td>${l.userId?.name || 'Unknown'}</td>
+            <td>${new Date(l.startDate).toLocaleDateString()}</td>
+            <td>${new Date(l.endDate).toLocaleDateString()}</td>
+            <td>${l.reason}</td>
+            <td><span class="status-badge status-${l.status}">${l.status}</span></td>
+            <td>
+                ${l.status === 'pending' ? `
+                    <button class="btn-sm btn-success" onclick="window.approveLeave('${l._id}')">Approve</button>
+                    <button class="btn-sm btn-danger" onclick="window.rejectLeave('${l._id}')">Reject</button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+window.approveLeave = async function (id) {
+    if (!id) return;
+    if (confirm('Approve this leave request?')) {
+        try {
+            const res = await putData(`/api/leave/${id}`, { status: 'approved' });
+            if (res.ok) {
+                await loadLeaveRequests();
+                alert('Leave request approved!');
+            } else {
+                alert('Failed to approve leave request');
+            }
+        } catch (err) {
+            console.error('Approve leave error:', err);
+            alert('Error: ' + err.message);
+        }
+    }
+};
+
+window.rejectLeave = async function (id) {
+    if (!id) return;
+    if (confirm('Reject this leave request?')) {
+        try {
+            const res = await putData(`/api/leave/${id}`, { status: 'rejected' });
+            if (res.ok) {
+                await loadLeaveRequests();
+                alert('Leave request rejected!');
+            } else {
+                alert('Failed to reject leave request');
+            }
+        } catch (err) {
+            console.error('Reject leave error:', err);
+            alert('Error: ' + err.message);
+        }
+    }
+};
+
+// == USER MANAGEMENT ==
+async function loadUsers() {
+    const users = await getData('/api/users');
+    const tbody = document.getElementById('users-table');
+    if (!tbody || !Array.isArray(users)) return;
+
+    tbody.innerHTML = users.map(u => `
+        <tr>
+            <td>${u.name || 'N/A'}</td>
+            <td>${u.email || 'N/A'}</td>
+            <td><span class="status-badge status-${u.role || 'customer'}">${u.role || 'customer'}</span></td>
+            <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
+            <td>
+                <button class="btn-sm btn-primary" onclick="viewUserDetails('${u._id}')">View</button>
+                <button class="btn-sm btn-warning" onclick="resetUserPassword('${u._id}')">Reset Password</button>
+            </td>
+        </tr>
+    `).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#users-table')) {
+        $('#users-table').DataTable();
+    }
+}
+
+window.viewUserDetails = function(userId) {
+    const user = staffData.find(s => s._id === userId) || bookingsData.find(b => b.userId?._id === userId);
+    if (!user) {
+        alert('User details not found');
+        return;
+    }
+    
+    const details = `
+        <div style="padding:1rem;">
+            <h3>User Details</h3>
+            <p><strong>Name:</strong> ${user.name}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Role:</strong> ${user.role}</p>
+            <p><strong>Joined:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
+            <p><strong>Total Bookings:</strong> ${user.bookings?.length || 0}</p>
+        </div>
+    `;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `<div class="modal-content">${details}<div style="text-align:right; margin-top:1rem;"><button class="btn btn-primary" onclick="this.closest('.modal').remove()">Close</button></div></div>`;
+    document.body.appendChild(modal);
+};
+
+window.resetUserPassword = function(userId) {
+    if (confirm('Reset password for this user? They will receive an email with instructions.')) {
+        alert('Password reset functionality - to be implemented with email service');
+    }
+};
 
 // == PRODUCT MANAGEMENT ==
 async function loadProducts() {
@@ -422,6 +1316,10 @@ async function loadProducts() {
             </td>
         </tr>
     `).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#products-table')) {
+        $('#products-table').DataTable();
+    }
 }
 
 window.openProductModal = function (productId = null) {
@@ -535,16 +1433,18 @@ async function loadServices() {
             </tr>
         `;
     }).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#services-table')) {
+        $('#services-table').DataTable();
+    }
 }
 
 window.filterServices = function (category) {
-    // Update active tab
     document.querySelectorAll('[onclick^="filterServices"]').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
 
-    // Filter table rows
     const rows = document.querySelectorAll('#services-table tr');
     rows.forEach(row => {
         if (category === 'all') {
@@ -574,7 +1474,7 @@ window.showServiceItems = function (serviceId) {
     itemsHtml += '<th style="padding:10px; text-align:left;">Description</th>';
     itemsHtml += '</tr></thead><tbody>';
 
-    service.items.forEach((item, index) => {
+    service.items.forEach((item) => {
         const duration = item.duration || 'N/A';
         itemsHtml += `<tr style="border-bottom:1px solid #eee;">
             <td style="padding:10px;">${item.name}</td>
@@ -586,23 +1486,14 @@ window.showServiceItems = function (serviceId) {
 
     itemsHtml += '</tbody></table>';
     itemsHtml += '<div style="text-align:right; margin-top:1rem;">';
-    itemsHtml += '<button class="btn-sm btn-primary" onclick="closeModal()">Close</button>';
+    itemsHtml += '<button class="btn-sm btn-primary" onclick="this.closest(\'.modal\').remove()">Close</button>';
     itemsHtml += '</div></div>';
 
-    // Show in a modal
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'flex';
     modal.innerHTML = `<div class="modal-content" style="max-width:700px;">${itemsHtml}</div>`;
     document.body.appendChild(modal);
-
-    window.closeModal = function () {
-        modal.remove();
-    };
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
 };
 
 window.openServiceModal = function (serviceId = null) {
@@ -626,7 +1517,6 @@ window.openServiceModal = function (serviceId = null) {
         form.dataset.id = service._id || '';
         title.textContent = service._id ? 'Edit Service' : 'Add New Service';
 
-        // Build the items HTML
         let itemsFieldsHtml = '';
         const items = service.items || [];
 
@@ -663,7 +1553,6 @@ window.openServiceModal = function (serviceId = null) {
                 `;
             });
         } else {
-            // Show one empty item by default for new services
             itemsFieldsHtml = `
                 <div class="service-item" style="background:#f9f9f9; padding:20px; margin-bottom:20px; border-radius:8px; border:1px solid #e0e0e0; position:relative;">
                     <div style="position:absolute; top:10px; right:10px;">
@@ -695,9 +1584,7 @@ window.openServiceModal = function (serviceId = null) {
             `;
         }
 
-        // Build the complete unified form
         form.innerHTML = `
-            <!-- Category Selection - Top of form -->
             <div style="margin-bottom:20px; background:white; padding:20px; border-radius:8px; border:1px solid #e0e0e0;">
                 <div style="margin-bottom:15px;">
                     <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
@@ -746,7 +1633,6 @@ window.openServiceModal = function (serviceId = null) {
                 </div>
             </div>
             
-            <!-- Service Items Section -->
             <div style="background:white; padding:20px; border-radius:8px; border:1px solid #e0e0e0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h4 style="margin:0; color:var(--primary-brown);">Service Items / Pricing</h4>
@@ -841,43 +1727,6 @@ window.deleteService = async function (id) {
     }
 };
 
-// Enhanced validation function for service items with duration
-function validateServiceItems(jsonString) {
-    try {
-        const items = JSON.parse(jsonString);
-        if (!Array.isArray(items)) {
-            return { valid: false, error: 'Items must be an array' };
-        }
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-
-            // Check required fields
-            if (!item.name || typeof item.name !== 'string') {
-                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'name'` };
-            }
-
-            if (item.price === undefined || typeof item.price !== 'number') {
-                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'price' (must be a number)` };
-            }
-
-            // Duration is recommended but not required
-            if (item.duration && typeof item.duration !== 'string') {
-                return { valid: false, error: `Item ${i + 1}: 'duration' must be a string (e.g., "60 min")` };
-            }
-
-            // Description is optional
-            if (item.description && typeof item.description !== 'string') {
-                return { valid: false, error: `Item ${i + 1}: 'description' must be a string` };
-            }
-        }
-
-        return { valid: true, items };
-    } catch (e) {
-        return { valid: false, error: e.message };
-    }
-}
-
 // == VOUCHER MANAGEMENT ==
 async function loadVouchers() {
     vouchersData = await getData('/api/vouchers');
@@ -905,6 +1754,10 @@ async function loadVouchers() {
             </tr>
         `;
     }).join('');
+
+    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#vouchers-table')) {
+        $('#vouchers-table').DataTable();
+    }
 }
 
 window.openVoucherModal = function (voucherId = null) {
@@ -922,18 +1775,15 @@ window.openVoucherModal = function (voucherId = null) {
         let voucher = {};
         if (voucherId && Array.isArray(vouchersData)) {
             voucher = vouchersData.find(v => v._id === voucherId) || {};
-            console.log('Loading voucher for edit:', voucher); // Debug log
         }
 
         form.dataset.type = 'voucher';
         form.dataset.id = voucher._id || '';
         title.textContent = voucher._id ? 'Edit Voucher' : 'Create New Voucher';
 
-        // Set default values
         const discountType = voucher.discountType || 'fixed';
         const isPercentage = discountType === 'percentage';
 
-        // Format expiry date for input field
         let expiryDate = '';
         if (voucher.expiry) {
             const date = new Date(voucher.expiry);
@@ -978,7 +1828,6 @@ window.openVoucherModal = function (voucherId = null) {
             </button>
         `;
 
-        // Add event listener to toggle max attribute based on discount type
         const discountTypeSelect = document.getElementById('discount-type-select');
         const discountInput = document.getElementById('discount-value-input');
         const discountHelp = document.getElementById('discount-help');
@@ -1026,161 +1875,7 @@ window.deleteVoucher = async function (id) {
 
 window.closeAdminModal = function () {
     const modal = document.getElementById('admin-modal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-};
-
-// == LEAVE MANAGEMENT ==
-async function loadLeaveRequests() {
-    const leaves = await getData('/api/leave');
-    const tbody = document.getElementById('leave-table');
-    if (!tbody || !Array.isArray(leaves)) return;
-
-    tbody.innerHTML = leaves.map(l => `
-        <tr>
-            <td>${l.userId?.name || 'Unknown'}</td>
-            <td>${new Date(l.startDate).toLocaleDateString()}</td>
-            <td>${new Date(l.endDate).toLocaleDateString()}</td>
-            <td>${l.reason}</td>
-            <td><span class="status-badge status-${l.status}">${l.status}</span></td>
-            <td>
-                ${l.status === 'pending' ? `
-                    <button class="btn-sm btn-success" onclick="window.approveLeave('${l._id}')">Approve</button>
-                    <button class="btn-sm btn-danger" onclick="window.rejectLeave('${l._id}')">Reject</button>
-                ` : ''}
-            </td>
-        </tr>
-    `).join('');
-}
-
-window.approveLeave = async function (id) {
-    if (!id) return;
-    if (confirm('Approve this leave request?')) {
-        try {
-            const res = await putData(`/api/leave/${id}`, { status: 'approved' });
-            if (res.ok) {
-                await loadLeaveRequests();
-                alert('Leave request approved!');
-            } else {
-                alert('Failed to approve leave request');
-            }
-        } catch (err) {
-            console.error('Approve leave error:', err);
-            alert('Error: ' + err.message);
-        }
-    }
-};
-
-window.rejectLeave = async function (id) {
-    if (!id) return;
-    if (confirm('Reject this leave request?')) {
-        try {
-            const res = await putData(`/api/leave/${id}`, { status: 'rejected' });
-            if (res.ok) {
-                await loadLeaveRequests();
-                alert('Leave request rejected!');
-            } else {
-                alert('Failed to reject leave request');
-            }
-        } catch (err) {
-            console.error('Reject leave error:', err);
-            alert('Error: ' + err.message);
-        }
-    }
-};
-
-// == BOOKING MANAGEMENT ==
-async function loadBookings() {
-    const bookings = await getData('/api/bookings');
-    const tbody = document.getElementById('bookings-table');
-    if (!tbody || !Array.isArray(bookings)) return;
-
-    tbody.innerHTML = bookings.map(b => {
-        const date = b.date ? new Date(b.date).toLocaleDateString() : 'N/A';
-        return `
-            <tr>
-                <td>${b.name || 'N/A'}</td>
-                <td>${b.service || 'N/A'}</td>
-                <td>${date} at ${b.time || 'N/A'}</td>
-                <td><span class="status-badge status-${b.status || 'pending'}">${b.status || 'pending'}</span></td>
-                <td>
-                    <button class="btn-sm btn-success" onclick="window.updateBookingStatus('${b._id}', 'confirmed')">Confirm</button>
-                    <button class="btn-sm btn-danger" onclick="window.updateBookingStatus('${b._id}', 'cancelled')">Cancel</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-window.updateBookingStatus = async function (id, status) {
-    if (!id) return;
-    if (confirm(`Mark this booking as ${status}?`)) {
-        try {
-            const res = await putData(`/api/bookings/${id}`, { status });
-            if (res.ok) {
-                await loadBookings();
-                alert(`Booking marked as ${status}!`);
-            } else {
-                alert('Failed to update booking');
-            }
-        } catch (err) {
-            console.error('Update booking error:', err);
-            alert('Error: ' + err.message);
-        }
-    }
-};
-
-// == USER MANAGEMENT ==
-async function loadUsers() {
-    const users = await getData('/api/users');
-    const tbody = document.getElementById('users-table');
-    if (!tbody || !Array.isArray(users)) return;
-
-    tbody.innerHTML = users.map(u => `
-        <tr>
-            <td>${u.name || 'N/A'}</td>
-            <td>${u.email || 'N/A'}</td>
-            <td><span class="status-badge status-${u.role || 'customer'}">${u.role || 'customer'}</span></td>
-            <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
-        </tr>
-    `).join('');
-}
-
-// == SEARCH FUNCTION ==
-window.searchUsers = async function () {
-    const query = document.getElementById('search-input')?.value?.trim();
-    if (!query) {
-        alert('Please enter a search term');
-        return;
-    }
-
-    try {
-        const users = await getData('/api/users');
-        const filtered = users.filter(u =>
-            u.name?.toLowerCase().includes(query.toLowerCase()) ||
-            u.email?.toLowerCase().includes(query.toLowerCase())
-        );
-
-        const tbody = document.getElementById('users-results');
-        if (tbody) {
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No users found</td></tr>';
-            } else {
-                tbody.innerHTML = filtered.map(u => `
-                    <tr>
-                        <td>${u.name}</td>
-                        <td>${u.email}</td>
-                        <td>${u.role}</td>
-                        <td><button class="btn-sm btn-primary" onclick="alert('View bookings for ${u.name}')">View Bookings</button></td>
-                    </tr>
-                `).join('');
-            }
-        }
-    } catch (err) {
-        console.error('Search error:', err);
-        alert('Failed to search users: ' + err.message);
-    }
+    if (modal) modal.classList.remove('active');
 };
 
 // == STAFF LOGIC ==
@@ -1273,7 +1968,6 @@ async function initCustomer() {
     const statVisits = document.getElementById('stat-visits');
     if (statVisits) statVisits.textContent = bookings?.length || 0;
 
-    // Find next appointment
     if (bookings && bookings.length > 0) {
         const now = new Date();
         const futureBookings = bookings
@@ -1292,6 +1986,42 @@ async function initCustomer() {
     }
 }
 
+// == SEARCH FUNCTION ==
+window.searchUsers = async function () {
+    const query = document.getElementById('search-input')?.value?.trim();
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+
+    try {
+        const users = await getData('/api/users');
+        const filtered = users.filter(u =>
+            u.name?.toLowerCase().includes(query.toLowerCase()) ||
+            u.email?.toLowerCase().includes(query.toLowerCase())
+        );
+
+        const tbody = document.getElementById('users-results');
+        if (tbody) {
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No users found</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(u => `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td>${u.role}</td>
+                        <td><button class="btn-sm btn-primary" onclick="viewUserDetails('${u._id}')">View Details</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (err) {
+        console.error('Search error:', err);
+        alert('Failed to search users: ' + err.message);
+    }
+};
+
 // Make all functions globally available
 window.showSection = window.showSection;
 window.openProfileModal = window.openProfileModal;
@@ -1309,3 +2039,20 @@ window.approveLeave = window.approveLeave;
 window.rejectLeave = window.rejectLeave;
 window.updateBookingStatus = window.updateBookingStatus;
 window.searchUsers = window.searchUsers;
+window.assignStaff = window.assignStaff;
+window.openStaffAssignModal = window.openStaffAssignModal;
+window.closeStaffAssignModal = window.closeStaffAssignModal;
+window.openScheduleModal = window.openScheduleModal;
+window.closeScheduleModal = window.closeScheduleModal;
+window.exportBookings = window.exportBookings;
+window.refreshSchedule = window.refreshSchedule;
+window.filterBookings = window.filterBookings;
+window.changeRevenuePeriod = window.changeRevenuePeriod;
+window.loadFinancialReport = window.loadFinancialReport;
+window.exportReport = window.exportReport;
+window.viewBooking = window.viewBooking;
+window.viewUserDetails = window.viewUserDetails;
+window.resetUserPassword = window.resetUserPassword;
+window.editStaff = window.editStaff;
+window.toggleStaffStatus = window.toggleStaffStatus;
+window.openStaffModal = window.openStaffModal;
