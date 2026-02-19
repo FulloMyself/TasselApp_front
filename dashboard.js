@@ -832,11 +832,16 @@ window.assignStaff = async function (bookingId, staffId) {
 };
 
 // == STAFF SCHEDULE ==
+// Load Staff Schedule (for staff view)
 async function loadStaffSchedule() {
     const calendarEl = document.getElementById('staff-calendar');
     if (!calendarEl || typeof FullCalendar === 'undefined') return;
 
-    const events = await getData('/api/staff/schedule');
+    // Use different endpoint based on user role
+    const user = JSON.parse(localStorage.getItem('user'));
+    const endpoint = user.role === 'admin' ? '/api/staff/schedule' : '/api/staff/my-schedule';
+
+    const events = await getData(endpoint);
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
@@ -846,7 +851,7 @@ async function loadStaffSchedule() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         events: events.map(e => ({
-            title: `${e.staffName}: ${e.shift || 'Working'}`,
+            title: e.shift || 'Working',
             start: e.start,
             end: e.end,
             backgroundColor: e.color || '#E8B4C8',
@@ -854,7 +859,9 @@ async function loadStaffSchedule() {
             extendedProps: e
         })),
         eventClick: function (info) {
-            showScheduleDetails(info.event.extendedProps);
+            if (user.role === 'admin') {
+                showScheduleDetails(info.event.extendedProps);
+            }
         },
         slotMinTime: '08:00:00',
         slotMaxTime: '20:00:00',
@@ -1943,6 +1950,7 @@ async function initStaff() {
 }
 
 // Load Staff Dashboard Data
+// Load Staff Dashboard Data
 async function loadStaffDashboard() {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -1956,10 +1964,12 @@ async function loadStaffDashboard() {
         });
 
         // Update KPI cards
-        document.getElementById('today-count').textContent = todayBookings.length;
+        const todayCountEl = document.getElementById('today-count');
+        if (todayCountEl) todayCountEl.textContent = todayBookings.length;
 
         const completedToday = todayBookings.filter(b => b.status === 'completed').length;
-        document.getElementById('completed-today').textContent = completedToday;
+        const completedTodayEl = document.getElementById('completed-today');
+        if (completedTodayEl) completedTodayEl.textContent = completedToday;
 
         // Find next appointment
         const now = new Date();
@@ -1968,8 +1978,10 @@ async function loadStaffDashboard() {
             .sort((a, b) => a.time.localeCompare(b.time));
 
         const nextAppointment = futureBookings[0];
-        document.getElementById('next-appointment').textContent =
-            nextAppointment ? nextAppointment.time : 'No more today';
+        const nextAppointmentEl = document.getElementById('next-appointment');
+        if (nextAppointmentEl) {
+            nextAppointmentEl.textContent = nextAppointment ? nextAppointment.time : 'No more today';
+        }
 
         // Update today's schedule table
         const tbody = document.getElementById('appointments-table');
@@ -2004,11 +2016,16 @@ async function loadStaffDashboard() {
             }
         }
 
-        // Initialize DataTable if available
-        if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#today-schedule')) {
+        // Initialize DataTable only if there are rows and table exists
+        if ($.fn.DataTable && $('#today-schedule').length && todayBookings.length > 0) {
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#today-schedule')) {
+                $('#today-schedule').DataTable().destroy();
+            }
             $('#today-schedule').DataTable({
                 pageLength: 10,
-                order: [[0, 'asc']]
+                order: [[0, 'asc']],
+                retrieve: true
             });
         }
     } catch (err) {
