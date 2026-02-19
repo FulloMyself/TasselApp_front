@@ -285,7 +285,7 @@ async function initAdmin() {
                 }
                 console.log('Processed voucher data:', data);
             } else if (type === 'service') {
-                // Parse and validate items JSON using the helper function
+                // Parse and validate items JSON using the enhanced helper function
                 const validation = validateServiceItems(data.items);
                 if (!validation.valid) {
                     alert('Invalid service items: ' + validation.error);
@@ -550,26 +550,35 @@ window.showServiceItems = function (serviceId) {
     if (!service) return;
 
     let itemsHtml = '<div style="padding:1rem;">';
-    itemsHtml += `<h3 style="margin-bottom:1rem;">${service.title} - Items</h3>`;
-    itemsHtml += '<table style="width:100%;"><thead><tr><th>Item</th><th>Price</th><th>Description</th></tr></thead><tbody>';
+    itemsHtml += `<h3 style="margin-bottom:1rem; color:var(--primary-brown);">${service.title} - Items</h3>`;
+    itemsHtml += '<table style="width:100%; border-collapse:collapse;">';
+    itemsHtml += '<thead><tr style="background:var(--primary-beige);">';
+    itemsHtml += '<th style="padding:10px; text-align:left;">Item</th>';
+    itemsHtml += '<th style="padding:10px; text-align:left;">Duration</th>';
+    itemsHtml += '<th style="padding:10px; text-align:left;">Price</th>';
+    itemsHtml += '<th style="padding:10px; text-align:left;">Description</th>';
+    itemsHtml += '</tr></thead><tbody>';
 
-    service.items.forEach(item => {
-        itemsHtml += `<tr>
-            <td>${item.name}</td>
-            <td><strong>R${item.price}</strong></td>
-            <td>${item.description || ''}</td>
+    service.items.forEach((item, index) => {
+        const duration = item.duration || 'N/A';
+        itemsHtml += `<tr style="border-bottom:1px solid #eee;">
+            <td style="padding:10px;">${item.name}</td>
+            <td style="padding:10px;">${duration}</td>
+            <td style="padding:10px;"><strong>R${item.price}</strong></td>
+            <td style="padding:10px;">${item.description || ''}</td>
         </tr>`;
     });
 
     itemsHtml += '</tbody></table>';
-    itemsHtml += '<div style="text-align:right; margin-top:1rem;"><button class="btn-sm btn-primary" onclick="closeModal()">Close</button></div>';
-    itemsHtml += '</div>';
+    itemsHtml += '<div style="text-align:right; margin-top:1rem;">';
+    itemsHtml += '<button class="btn-sm btn-primary" onclick="closeModal()">Close</button>';
+    itemsHtml += '</div></div>';
 
     // Show in a modal
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'flex';
-    modal.innerHTML = `<div class="modal-content" style="max-width:600px;">${itemsHtml}</div>`;
+    modal.innerHTML = `<div class="modal-content" style="max-width:700px;">${itemsHtml}</div>`;
     document.body.appendChild(modal);
 
     window.closeModal = function () {
@@ -602,13 +611,20 @@ window.openServiceModal = function (serviceId = null) {
         form.dataset.id = service._id || '';
         title.textContent = service._id ? 'Edit Service' : 'Add New Service';
 
-        // Format items for display
-        const itemsJson = service.items ? JSON.stringify(service.items, null, 2) : '[]';
+        // Format items for display with duration
+        const itemsJson = service.items ? JSON.stringify(service.items, null, 2) : JSON.stringify([
+            {
+                "name": "Example Service",
+                "duration": "60 min",
+                "price": 350,
+                "description": "Optional description"
+            }
+        ], null, 2);
 
         form.innerHTML = `
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
-                <select name="category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                <select name="category" id="service-category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     <option value="">Select Category</option>
                     <option value="kiddies" ${service.category === 'kiddies' ? 'selected' : ''}>👧 Kiddies Hair</option>
                     <option value="adult" ${service.category === 'adult' ? 'selected' : ''}>💇‍♀️ Adult Hair</option>
@@ -620,6 +636,7 @@ window.openServiceModal = function (serviceId = null) {
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px; font-weight:600;">Category Display Name *</label>
                 <input type="text" name="categoryDisplay" placeholder="e.g. Kiddies Hair, Adult Hair, etc." value="${service.categoryDisplay || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                <small style="color:#666;">This is what customers will see (e.g., "Kiddies Hair")</small>
             </div>
             
             <div style="margin-bottom:15px;">
@@ -629,7 +646,7 @@ window.openServiceModal = function (serviceId = null) {
             
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px; font-weight:600;">Description *</label>
-                <textarea name="description" placeholder="Brief description of this service" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:80px;">${service.description || ''}</textarea>
+                <textarea name="description" placeholder="Brief description of this service category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:80px;">${service.description || ''}</textarea>
             </div>
             
             <div style="margin-bottom:15px;">
@@ -638,7 +655,7 @@ window.openServiceModal = function (serviceId = null) {
             </div>
             
             <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Order (lower numbers appear first)</label>
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Display Order (lower numbers appear first)</label>
                 <input type="number" name="order" value="${service.order || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
             </div>
             
@@ -650,18 +667,39 @@ window.openServiceModal = function (serviceId = null) {
             </div>
             
             <div style="margin-bottom:20px; border-top:2px solid #eee; padding-top:20px;">
-                <h4 style="margin-bottom:15px;">Service Items (Prices)</h4>
-                <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">Enter items as JSON array. Example:</p>
-                <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:0.85rem; margin-bottom:10px;">
+                <h4 style="margin-bottom:15px; color:var(--primary-brown);">Service Items (with Duration & Price)</h4>
+                <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">Enter items as JSON array. Each item should have:</p>
+                <ul style="color:#666; font-size:0.9rem; margin-bottom:15px; margin-left:20px;">
+                    <li><strong>name</strong> - Name of the service (required)</li>
+                    <li><strong>duration</strong> - How long it takes (e.g., "60 min", "1.5 hours") (recommended)</li>
+                    <li><strong>price</strong> - Price in Rand (required, number only)</li>
+                    <li><strong>description</strong> - Optional details (optional)</li>
+                </ul>
+                <pre style="background:#f5f5f5; padding:15px; border-radius:4px; font-size:0.85rem; margin-bottom:15px; overflow-x:auto;">
 [
-  {"name": "Plain Cornrows", "price": 320, "description": ""},
-  {"name": "Needle Cornrows", "price": 280, "description": ""}
-]
-                </pre>
-                <textarea name="items" placeholder="Enter JSON array of items" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:150px; font-family:monospace;">${itemsJson}</textarea>
+  {
+    "name": "Plain Cornrows",
+    "duration": "2 hours",
+    "price": 420,
+    "description": "Basic cornrow style"
+  },
+  {
+    "name": "Needle Cornrows",
+    "duration": "2.5 hours",
+    "price": 380,
+    "description": "Finer, more detailed cornrows"
+  },
+  {
+    "name": "Box Braids - Short",
+    "duration": "3 hours",
+    "price": 680,
+    "description": "Shoulder-length box braids"
+  }
+]</pre>
+                <textarea name="items" placeholder="Enter JSON array of items" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:200px; font-family:monospace; font-size:0.9rem;">${itemsJson}</textarea>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block" style="padding:12px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer;">
+            <button type="submit" class="btn btn-primary btn-block" style="padding:12px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer; font-size:1rem;">
                 ${service._id ? 'Update' : 'Save'} Service
             </button>
         `;
@@ -691,6 +729,43 @@ window.deleteService = async function (id) {
         }
     }
 };
+
+// Enhanced validation function for service items with duration
+function validateServiceItems(jsonString) {
+    try {
+        const items = JSON.parse(jsonString);
+        if (!Array.isArray(items)) {
+            return { valid: false, error: 'Items must be an array' };
+        }
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            // Check required fields
+            if (!item.name || typeof item.name !== 'string') {
+                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'name'` };
+            }
+
+            if (item.price === undefined || typeof item.price !== 'number') {
+                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'price' (must be a number)` };
+            }
+
+            // Duration is recommended but not required
+            if (item.duration && typeof item.duration !== 'string') {
+                return { valid: false, error: `Item ${i + 1}: 'duration' must be a string (e.g., "60 min")` };
+            }
+
+            // Description is optional
+            if (item.description && typeof item.description !== 'string') {
+                return { valid: false, error: `Item ${i + 1}: 'description' must be a string` };
+            }
+        }
+
+        return { valid: true, items };
+    } catch (e) {
+        return { valid: false, error: e.message };
+    }
+}
 
 // == VOUCHER MANAGEMENT ==
 async function loadVouchers() {
