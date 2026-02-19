@@ -160,7 +160,7 @@ function initNotifications() {
 async function loadNotifications() {
     const notifications = await getData('/api/notifications');
     notificationsData = notifications;
-    
+
     const unreadCount = notifications.filter(n => !n.isRead).length;
     const countBadge = document.getElementById('notification-count');
     if (countBadge) {
@@ -172,7 +172,7 @@ async function loadNotifications() {
 function showNotifications() {
     let notifHtml = '<div class="notifications-dropdown" style="position:absolute; top:100%; right:0; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px; width:300px; z-index:1000;">';
     notifHtml += '<h4 style="padding:1rem; margin:0; border-bottom:1px solid #eee;">Notifications</h4>';
-    
+
     if (notificationsData.length === 0) {
         notifHtml += '<p style="padding:1rem; text-align:center;">No notifications</p>';
     } else {
@@ -187,7 +187,7 @@ function showNotifications() {
         });
     }
     notifHtml += '</div>';
-    
+
     const existing = document.querySelector('.notifications-dropdown');
     if (existing) {
         existing.remove();
@@ -315,7 +315,7 @@ async function initAdmin() {
         const titleEl = document.getElementById('page-title');
         if (titleEl) titleEl.textContent = titles[sectionId] || 'Dashboard';
 
-        switch(sectionId) {
+        switch (sectionId) {
             case 'dashboard':
                 await loadDashboardData();
                 break;
@@ -467,7 +467,7 @@ async function loadKPIs() {
     if (!kpiGrid) return;
 
     const today = new Date().toISOString().split('T')[0];
-    const todayBookings = bookingsData.filter(b => 
+    const todayBookings = bookingsData.filter(b =>
         b.date && new Date(b.date).toISOString().split('T')[0] === today
     ).length;
 
@@ -542,7 +542,7 @@ async function loadTodaySchedule() {
         const staffName = b.staffId ? (b.staffId.name || 'Assigned') : 'Unassigned';
         const statusClass = `status-${b.status || 'pending'}`;
         const paymentClass = `payment-${b.paymentStatus || 'unpaid'}`;
-        
+
         return `
             <tr>
                 <td>${b.time || 'TBD'}</td>
@@ -627,7 +627,7 @@ function timeAgo(date) {
         hour: 3600,
         minute: 60
     };
-    
+
     for (let [unit, secondsInUnit] of Object.entries(intervals)) {
         const interval = Math.floor(seconds / secondsInUnit);
         if (interval >= 1) {
@@ -705,7 +705,7 @@ async function loadBookingDistribution() {
     });
 }
 
-window.changeRevenuePeriod = function(period) {
+window.changeRevenuePeriod = function (period) {
     document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     loadRevenueChart(period);
@@ -724,7 +724,7 @@ async function loadAllBookings() {
         const statusClass = `status-${b.status || 'pending'}`;
         const paymentClass = `payment-${b.paymentStatus || 'unpaid'}`;
         const date = b.date ? new Date(b.date).toLocaleDateString() : 'N/A';
-        
+
         return `
             <tr>
                 <td>${b._id ? b._id.slice(-6) : 'N/A'}</td>
@@ -760,7 +760,7 @@ async function loadAllBookings() {
     }
 }
 
-window.filterBookings = function() {
+window.filterBookings = function () {
     const filter = document.getElementById('booking-filter').value;
     if ($.fn.DataTable && $.fn.DataTable.isDataTable('#bookings-table')) {
         $('#bookings-table').DataTable().column(5).search(filter === 'all' ? '' : filter).draw();
@@ -768,13 +768,13 @@ window.filterBookings = function() {
 };
 
 // == STAFF ASSIGNMENT ==
-window.openStaffAssignModal = function(bookingId) {
+window.openStaffAssignModal = function (bookingId) {
     document.getElementById('assign-booking-id').value = bookingId;
     loadStaffSelect();
     document.getElementById('staff-assign-modal').classList.add('active');
 };
 
-window.closeStaffAssignModal = function() {
+window.closeStaffAssignModal = function () {
     document.getElementById('staff-assign-modal').classList.remove('active');
 };
 
@@ -782,7 +782,7 @@ async function loadStaffSelect() {
     const staff = await getData('/api/users/staff');
     const select = document.getElementById('assign-staff-select');
     if (select) {
-        select.innerHTML = '<option value="">Select staff member...</option>' + 
+        select.innerHTML = '<option value="">Select staff member...</option>' +
             staff.map(s => `<option value="${s._id}">${s.name} - ${s.specialties?.join(', ') || 'General'}</option>`).join('');
     }
 }
@@ -814,9 +814,9 @@ document.getElementById('staff-assign-form')?.addEventListener('submit', async (
     }
 });
 
-window.assignStaff = async function(bookingId, staffId) {
+window.assignStaff = async function (bookingId, staffId) {
     if (!staffId) return;
-    
+
     if (confirm('Assign this booking to the selected staff member?')) {
         try {
             const res = await putData(`/api/bookings/${bookingId}/assign`, { staffId });
@@ -853,7 +853,7 @@ async function loadStaffSchedule() {
             borderColor: '#6B5D52',
             extendedProps: e
         })),
-        eventClick: function(info) {
+        eventClick: function (info) {
             showScheduleDetails(info.event.extendedProps);
         },
         slotMinTime: '08:00:00',
@@ -865,12 +865,12 @@ async function loadStaffSchedule() {
     calendar.render();
 }
 
-window.openScheduleModal = function() {
+window.openScheduleModal = function () {
     loadStaffForSchedule();
     document.getElementById('schedule-modal').classList.add('active');
 };
 
-window.closeScheduleModal = function() {
+window.closeScheduleModal = function () {
     document.getElementById('schedule-modal').classList.remove('active');
 };
 
@@ -878,14 +878,14 @@ async function loadStaffForSchedule() {
     const staff = await getData('/api/users/staff');
     const select = document.getElementById('schedule-staff');
     if (select) {
-        select.innerHTML = '<option value="">Select staff...</option>' + 
+        select.innerHTML = '<option value="">Select staff...</option>' +
             staff.map(s => `<option value="${s._id}">${s.name}</option>`).join('');
     }
 }
 
 document.getElementById('schedule-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const data = {
         staffId: document.getElementById('schedule-staff').value,
         date: document.getElementById('schedule-date').value,
@@ -916,7 +916,7 @@ function showScheduleDetails(schedule) {
 // == FINANCIAL REPORTS ==
 async function loadFinancialReports(period) {
     const data = await getData(`/api/reports/financial/${period}`);
-    
+
     const statsContainer = document.getElementById('financial-stats');
     if (statsContainer) {
         statsContainer.innerHTML = `
@@ -964,7 +964,7 @@ async function loadFinancialReports(period) {
     }
 }
 
-window.loadFinancialReport = function() {
+window.loadFinancialReport = function () {
     const period = document.getElementById('report-period').value;
     loadFinancialReports(period);
 };
@@ -994,7 +994,7 @@ async function loadTransactions() {
     }
 }
 
-window.exportReport = function() {
+window.exportReport = function () {
     const period = document.getElementById('report-period').value;
     window.location.href = `${API_URL}/api/reports/export/${period}`;
 };
@@ -1030,18 +1030,18 @@ async function loadStaffList() {
     }
 }
 
-window.openStaffModal = function() {
+window.openStaffModal = function () {
     alert('Staff creation form - to be implemented');
 };
 
-window.editStaff = function(id) {
+window.editStaff = function (id) {
     alert('Edit staff - to be implemented');
 };
 
-window.toggleStaffStatus = async function(id) {
+window.toggleStaffStatus = async function (id) {
     const staff = staffData.find(s => s._id === id);
     if (!staff) return;
-    
+
     if (confirm(`${staff.isActive ? 'Deactivate' : 'Activate'} ${staff.name}?`)) {
         try {
             const res = await putData(`/api/users/${id}/toggle-status`, { isActive: !staff.isActive });
@@ -1092,7 +1092,7 @@ async function loadAnalyticsData() {
                 datasets: staffPerfData.map((staff, i) => ({
                     label: staff.name,
                     data: [staff.completed, staff.rating, staff.punctuality, staff.satisfaction, staff.revenue],
-                    backgroundColor: `rgba(232, 180, 200, ${0.2 + i*0.2})`,
+                    backgroundColor: `rgba(232, 180, 200, ${0.2 + i * 0.2})`,
                     borderColor: '#E8B4C8'
                 }))
             },
@@ -1120,7 +1120,7 @@ async function loadAnalyticsData() {
 }
 
 // == BOOKING STATUS UPDATES ==
-window.updateBookingStatus = async function(id, status) {
+window.updateBookingStatus = async function (id, status) {
     const statusMessages = {
         'confirmed': 'Confirm this booking?',
         'completed': 'Mark this booking as completed?',
@@ -1145,7 +1145,7 @@ window.updateBookingStatus = async function(id, status) {
     }
 };
 
-window.viewBooking = function(id) {
+window.viewBooking = function (id) {
     const booking = bookingsData.find(b => b._id === id);
     if (!booking) return;
 
@@ -1173,11 +1173,11 @@ window.viewBooking = function(id) {
 };
 
 // == EXPORT FUNCTIONS ==
-window.exportBookings = function() {
+window.exportBookings = function () {
     window.location.href = `${API_URL}/api/bookings/export`;
 };
 
-window.refreshSchedule = function() {
+window.refreshSchedule = function () {
     loadTodaySchedule();
 };
 
@@ -1264,13 +1264,13 @@ async function loadUsers() {
     }
 }
 
-window.viewUserDetails = function(userId) {
+window.viewUserDetails = function (userId) {
     const user = staffData.find(s => s._id === userId) || bookingsData.find(b => b.userId?._id === userId);
     if (!user) {
         alert('User details not found');
         return;
     }
-    
+
     const details = `
         <div style="padding:1rem;">
             <h3>User Details</h3>
@@ -1281,7 +1281,7 @@ window.viewUserDetails = function(userId) {
             <p><strong>Total Bookings:</strong> ${user.bookings?.length || 0}</p>
         </div>
     `;
-    
+
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'flex';
@@ -1289,7 +1289,7 @@ window.viewUserDetails = function(userId) {
     document.body.appendChild(modal);
 };
 
-window.resetUserPassword = function(userId) {
+window.resetUserPassword = function (userId) {
     if (confirm('Reset password for this user? They will receive an email with instructions.')) {
         alert('Password reset functionality - to be implemented with email service');
     }
@@ -1880,14 +1880,35 @@ window.closeAdminModal = function () {
 
 // == STAFF LOGIC ==
 async function initStaff() {
-    window.showSection = (id) => {
+    window.showSection = async (id) => {
         document.querySelectorAll('main > section').forEach(el => el.style.display = 'none');
         const section = document.getElementById(`sec-${id}`);
         if (section) section.style.display = 'block';
 
-        if (id === 'schedule') loadStaffSchedule();
+        const titles = {
+            'dashboard': 'Staff Dashboard',
+            'schedule': 'My Schedule',
+            'appointments': 'My Appointments',
+            'leave': 'Leave Management'
+        };
+        const titleEl = document.getElementById('page-title');
+        if (titleEl) titleEl.textContent = titles[id] || 'Staff Dashboard';
+
+        if (id === 'dashboard') {
+            await loadStaffDashboard();
+        } else if (id === 'schedule') {
+            await loadStaffSchedule();
+        } else if (id === 'appointments') {
+            await loadAllStaffAppointments();
+        } else if (id === 'leave') {
+            await loadStaffLeaveHistory();
+        }
     };
 
+    // Load initial dashboard
+    await loadStaffDashboard();
+
+    // Leave form submission
     const leaveForm = document.getElementById('leave-form');
     if (leaveForm) {
         leaveForm.addEventListener('submit', async (e) => {
@@ -1906,8 +1927,9 @@ async function initStaff() {
             try {
                 const res = await postData('/api/leave', data);
                 if (res.ok) {
-                    alert('Leave Request Submitted!');
+                    alert('Leave Request Submitted Successfully!');
                     e.target.reset();
+                    await loadStaffLeaveHistory(); // Refresh leave history
                 } else {
                     const err = await res.json();
                     alert(err.error || 'Failed to submit leave request');
@@ -1918,33 +1940,223 @@ async function initStaff() {
             }
         });
     }
-    loadStaffSchedule();
 }
 
-async function loadStaffSchedule() {
-    const bookings = await getData('/api/bookings');
-    const tbody = document.getElementById('appointments-table');
-    if (tbody && Array.isArray(bookings)) {
+// Load Staff Dashboard Data
+async function loadStaffDashboard() {
+    try {
         const today = new Date().toISOString().split('T')[0];
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // Get today's appointments
+        const bookings = await getData('/api/bookings');
         const todayBookings = bookings.filter(b => {
             const bookingDate = b.date ? new Date(b.date).toISOString().split('T')[0] : '';
             return bookingDate === today;
         });
 
-        if (todayBookings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No appointments today</td></tr>';
+        // Update KPI cards
+        document.getElementById('today-count').textContent = todayBookings.length;
+
+        const completedToday = todayBookings.filter(b => b.status === 'completed').length;
+        document.getElementById('completed-today').textContent = completedToday;
+
+        // Find next appointment
+        const now = new Date();
+        const futureBookings = todayBookings
+            .filter(b => b.time && new Date(`${today}T${b.time}`) > now)
+            .sort((a, b) => a.time.localeCompare(b.time));
+
+        const nextAppointment = futureBookings[0];
+        document.getElementById('next-appointment').textContent =
+            nextAppointment ? nextAppointment.time : 'No more today';
+
+        // Update today's schedule table
+        const tbody = document.getElementById('appointments-table');
+        if (tbody) {
+            if (todayBookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No appointments scheduled for today</td></tr>';
+            } else {
+                tbody.innerHTML = todayBookings.map(b => `
+                    <tr>
+                        <td>${b.time || 'TBD'}</td>
+                        <td>${b.name || 'N/A'}</td>
+                        <td>${b.service || 'N/A'}</td>
+                        <td>${b.duration || '1 hour'}</td>
+                        <td><span class="status-badge status-${b.status || 'pending'}">${b.status || 'pending'}</span></td>
+                        <td>
+                            <button class="btn-sm btn-info" onclick="viewBookingDetails('${b._id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${b.status === 'pending' ? `
+                                <button class="btn-sm btn-success" onclick="updateBookingStatus('${b._id}', 'confirmed')">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                            ` : ''}
+                            ${b.status === 'in-progress' ? `
+                                <button class="btn-sm btn-success" onclick="updateBookingStatus('${b._id}', 'completed')">
+                                    <i class="fas fa-check-double"></i> Complete
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Initialize DataTable if available
+        if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#today-schedule')) {
+            $('#today-schedule').DataTable({
+                pageLength: 10,
+                order: [[0, 'asc']]
+            });
+        }
+    } catch (err) {
+        console.error('Error loading staff dashboard:', err);
+    }
+}
+
+// Load All Staff Appointments
+async function loadAllStaffAppointments() {
+    try {
+        const bookings = await getData('/api/bookings');
+        const tbody = document.getElementById('all-appointments-table');
+        if (!tbody) return;
+
+        if (bookings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No appointments found</td></tr>';
         } else {
-            tbody.innerHTML = todayBookings.map(b => `
-                <tr>
-                    <td>${b.name || 'N/A'}</td>
-                    <td>${b.service || 'N/A'}</td>
-                    <td>${b.time || 'N/A'}</td>
-                    <td><span class="status-badge status-${b.status || 'pending'}">${b.status || 'pending'}</span></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = bookings.map(b => {
+                const date = b.date ? new Date(b.date).toLocaleDateString() : 'N/A';
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${b.time || 'N/A'}</td>
+                        <td>${b.name || 'N/A'}</td>
+                        <td>${b.service || 'N/A'}</td>
+                        <td>${b.duration || '1 hour'}</td>
+                        <td><span class="status-badge status-${b.status || 'pending'}">${b.status || 'pending'}</span></td>
+                        <td>
+                            <button class="btn-sm btn-info" onclick="viewBookingDetails('${b._id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#appointments-list')) {
+            $('#appointments-list').DataTable({
+                pageLength: 25,
+                order: [[0, 'desc'], [1, 'asc']]
+            });
+        }
+    } catch (err) {
+        console.error('Error loading staff appointments:', err);
+    }
+}
+
+// Load Staff Leave History
+async function loadStaffLeaveHistory() {
+    try {
+        const leaves = await getData('/api/leave/my-requests');
+        const tbody = document.getElementById('leave-history-table');
+        if (!tbody) return;
+
+        if (!leaves || leaves.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No leave requests found</td></tr>';
+        } else {
+            tbody.innerHTML = leaves.map(l => {
+                const statusClass = `status-${l.status}`;
+                const startDate = l.startDate ? new Date(l.startDate).toLocaleDateString() : 'N/A';
+                const endDate = l.endDate ? new Date(l.endDate).toLocaleDateString() : 'N/A';
+
+                return `
+                    <tr>
+                        <td>${startDate}</td>
+                        <td>${endDate}</td>
+                        <td>${l.reason || 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${l.status || 'pending'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Initialize DataTable if not already done
+        if ($.fn.DataTable && $('#leave-history-table').parents('.dataTables_wrapper').length === 0) {
+            $('#leave-history-table').DataTable({
+                pageLength: 10,
+                order: [[0, 'desc']],
+                language: {
+                    emptyTable: "No leave requests found"
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Error loading leave history:', err);
+        const tbody = document.getElementById('leave-history-table');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#dc3545;">Error loading leave history</td></tr>';
         }
     }
 }
+
+// Filter Staff Appointments
+window.filterStaffAppointments = function () {
+    const filter = document.getElementById('appointment-filter').value;
+    const table = $('#appointments-list').DataTable();
+
+    if (filter === 'all') {
+        table.search('').columns().search('').draw();
+    } else if (filter === 'today') {
+        const today = new Date().toLocaleDateString();
+        table.column(0).search(today).draw();
+    } else if (filter === 'upcoming') {
+        const today = new Date();
+        // Custom filtering - get all dates >= today
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex) {
+                const date = new Date(data[0]);
+                return date >= today;
+            }
+        );
+        table.draw();
+        $.fn.dataTable.ext.search.pop();
+    } else if (filter === 'completed') {
+        table.column(5).search('completed').draw();
+    }
+};
+
+// View Booking Details
+window.viewBookingDetails = function (bookingId) {
+    // This function can be expanded to show detailed booking info
+    alert('Viewing booking details - Feature coming soon!');
+};
+
+// Update Booking Status (override for staff)
+window.updateBookingStatus = async function (id, status) {
+    if (!confirm(`Mark this booking as ${status}?`)) return;
+
+    try {
+        const res = await putData(`/api/bookings/${id}`, { status });
+        if (res.ok) {
+            alert(`Booking ${status} successfully!`);
+            // Refresh the current view
+            const activeSection = document.querySelector('main > section:not([style*="none"])')?.id;
+            if (activeSection === 'sec-dashboard') {
+                await loadStaffDashboard();
+            } else if (activeSection === 'sec-appointments') {
+                await loadAllStaffAppointments();
+            }
+        } else {
+            alert('Failed to update booking');
+        }
+    } catch (err) {
+        console.error('Update error:', err);
+        alert('Error updating booking');
+    }
+};
 
 // == CUSTOMER LOGIC ==
 async function initCustomer() {
