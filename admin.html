@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    
+
     <style>
         body {
             margin: 0;
@@ -33,7 +33,7 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
         }
 
@@ -82,7 +82,7 @@
         }
 
         .dash-nav .nav-section {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -104,7 +104,7 @@
             background: white;
             padding: 1rem 2rem;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .dash-header h1 {
@@ -170,7 +170,6 @@
             font-weight: 600;
         }
 
-        /* KPI Cards */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -191,7 +190,7 @@
 
         .kpi-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .kpi-icon {
@@ -250,7 +249,6 @@
             margin: 0;
         }
 
-        /* Charts Grid */
         .charts-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -303,7 +301,6 @@
             width: 100%;
         }
 
-        /* Tables & Content Boxes */
         .content-box {
             background: white;
             border-radius: 12px;
@@ -332,13 +329,6 @@
             gap: 0.5rem;
         }
 
-        /* Staff Assignment */
-        .staff-assignment {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 0.5rem;
-        }
-
         .staff-badge {
             display: inline-flex;
             align-items: center;
@@ -357,7 +347,6 @@
             border: 1px solid #ddd;
         }
 
-        /* Status Badges */
         .status-badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -377,7 +366,6 @@
         .payment-unpaid { background: #F8D7DA; color: #721C24; }
         .payment-deposit { background: #FFF3CD; color: #856404; }
 
-        /* Action Buttons */
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.8rem;
@@ -396,10 +384,9 @@
 
         .btn-sm:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Staff Schedule Calendar */
         #staff-calendar {
             background: white;
             padding: 1rem;
@@ -411,7 +398,6 @@
             cursor: pointer;
         }
 
-        /* Financial Cards */
         .financial-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -447,7 +433,114 @@
             opacity: 0.8;
         }
 
-        /* Responsive */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-close:hover {
+            color: #E8B4C8;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4A4139;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #E8B4C8;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 1.5rem 0;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .service-item {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+
         @media (max-width: 1200px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -477,27 +570,39 @@
         <nav>
             <ul class="dash-nav">
                 <div class="nav-section">MAIN</div>
-                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                <li><a href="#" onclick="showSection('analytics')"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
-                
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span></a></li>
+                <li><a href="#" onclick="showSection('analytics')"><i class="fas fa-chart-line"></i>
+                        <span>Analytics</span></a></li>
+
                 <div class="nav-section">OPERATIONS</div>
-                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-check"></i> <span>Bookings</span></a></li>
-                <li><a href="#" onclick="showSection('schedule')"><i class="fas fa-clock"></i> <span>Staff Schedule</span></a></li>
-                <li><a href="#" onclick="showSection('staff-leave')"><i class="fas fa-plane-departure"></i> <span>Leave Requests</span></a></li>
-                
+                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-check"></i>
+                        <span>Bookings</span></a></li>
+                <li><a href="#" onclick="showSection('schedule')"><i class="fas fa-clock"></i> <span>Staff
+                            Schedule</span></a></li>
+                <li><a href="#" onclick="showSection('staff-leave')"><i class="fas fa-plane-departure"></i> <span>Leave
+                            Requests</span></a></li>
+
                 <div class="nav-section">FINANCIALS</div>
-                <li><a href="#" onclick="showSection('reports')"><i class="fas fa-file-invoice-dollar"></i> <span>Reports</span></a></li>
-                <li><a href="#" onclick="showSection('transactions')"><i class="fas fa-exchange-alt"></i> <span>Transactions</span></a></li>
-                
+                <li><a href="#" onclick="showSection('reports')"><i class="fas fa-file-invoice-dollar"></i>
+                        <span>Reports</span></a></li>
+                <li><a href="#" onclick="showSection('transactions')"><i class="fas fa-exchange-alt"></i>
+                        <span>Transactions</span></a></li>
+
                 <div class="nav-section">MANAGEMENT</div>
                 <li><a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> <span>Users</span></a></li>
-                <li><a href="#" onclick="showSection('staff-management')"><i class="fas fa-user-tie"></i> <span>Staff</span></a></li>
-                <li><a href="#" onclick="showSection('services')"><i class="fas fa-cut"></i> <span>Services</span></a></li>
-                <li><a href="#" onclick="showSection('products')"><i class="fas fa-box"></i> <span>Products</span></a></li>
-                <li><a href="#" onclick="showSection('vouchers')"><i class="fas fa-ticket-alt"></i> <span>Vouchers</span></a></li>
-                
+                <li><a href="#" onclick="showSection('staff-management')"><i class="fas fa-user-tie"></i>
+                        <span>Staff</span></a></li>
+                <li><a href="#" onclick="showSection('services')"><i class="fas fa-cut"></i> <span>Services</span></a>
+                </li>
+                <li><a href="#" onclick="showSection('products')"><i class="fas fa-box"></i> <span>Products</span></a>
+                </li>
+                <li><a href="#" onclick="showSection('vouchers')"><i class="fas fa-ticket-alt"></i>
+                        <span>Vouchers</span></a></li>
+
                 <div class="nav-section">ACCOUNT</div>
-                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> <span>My Profile</span></a></li>
+                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> <span>My
+                            Profile</span></a></li>
                 <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>
         </nav>
@@ -509,7 +614,7 @@
             <div class="header-actions">
                 <div class="notification-badge">
                     <i class="fas fa-bell"></i>
-                    <span class="badge-count" id="notification-count">3</span>
+                    <span class="badge-count" id="notification-count">0</span>
                 </div>
                 <div class="date-picker" id="date-picker">
                     <i class="fas fa-calendar-alt"></i>
@@ -524,12 +629,8 @@
 
         <!-- Dashboard Section -->
         <section id="sec-dashboard">
-            <!-- KPI Cards -->
-            <div class="kpi-grid" id="kpi-cards">
-                <!-- Dynamically populated by JS -->
-            </div>
+            <div class="kpi-grid" id="kpi-cards"></div>
 
-            <!-- Charts Grid -->
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
@@ -554,7 +655,6 @@
                 </div>
             </div>
 
-            <!-- Today's Schedule -->
             <div class="content-box">
                 <div class="box-header">
                     <h3>Today's Schedule</h3>
@@ -577,20 +677,15 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="today-schedule-body">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="today-schedule-body"></tbody>
                 </table>
             </div>
 
-            <!-- Recent Activity -->
             <div class="content-box">
                 <div class="box-header">
                     <h3>Recent Activity</h3>
                 </div>
-                <div id="activity-feed">
-                    <!-- Populated by JS -->
-                </div>
+                <div id="activity-feed"></div>
             </div>
         </section>
 
@@ -600,7 +695,6 @@
                 <div class="box-header">
                     <h3>Business Analytics</h3>
                 </div>
-                <!-- Analytics content -->
                 <div class="charts-grid">
                     <div class="chart-card">
                         <h3>Popular Services</h3>
@@ -618,7 +712,7 @@
             </div>
         </section>
 
-        <!-- Bookings Section with Staff Assignment -->
+        <!-- Bookings Section -->
         <section id="sec-bookings" style="display:none;">
             <div class="content-box">
                 <div class="box-header">
@@ -650,9 +744,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="bookings-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="bookings-table-body"></tbody>
                 </table>
             </div>
         </section>
@@ -670,14 +762,11 @@
                 </div>
                 <div id="staff-calendar"></div>
             </div>
-            
             <div class="content-box">
                 <div class="box-header">
                     <h3>Staff Availability</h3>
                 </div>
-                <div id="staff-availability">
-                    <!-- Populated by JS -->
-                </div>
+                <div id="staff-availability"></div>
             </div>
         </section>
 
@@ -699,11 +788,7 @@
                         </button>
                     </div>
                 </div>
-                
-                <div class="financial-stats" id="financial-stats">
-                    <!-- Populated by JS -->
-                </div>
-                
+                <div class="financial-stats" id="financial-stats"></div>
                 <div class="charts-grid">
                     <div class="chart-card">
                         <h3>Revenue Breakdown</h3>
@@ -714,7 +799,6 @@
                         <canvas id="expensesChart"></canvas>
                     </div>
                 </div>
-                
                 <table id="transactions-table" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -727,9 +811,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="transactions-body">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="transactions-body"></tbody>
                 </table>
             </div>
         </section>
@@ -755,32 +837,134 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="staff-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="staff-table-body"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Other existing sections (Users, Services, Products, Vouchers) remain the same -->
+        <!-- Users Section -->
         <section id="sec-users" style="display:none;">
-            <!-- existing users section -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>User Management</h3>
+                </div>
+                <table id="users-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
         </section>
 
+        <!-- Services Section -->
         <section id="sec-services" style="display:none;">
-            <!-- existing services section -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Service Management</h3>
+                    <button class="btn-sm btn-primary" onclick="openServiceModal()">
+                        <i class="fas fa-plus"></i> Add Service
+                    </button>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                    <button class="filter-btn active" onclick="filterServices('all')">All Services</button>
+                    <button class="filter-btn" onclick="filterServices('kiddies')">👧 Kiddies Hair</button>
+                    <button class="filter-btn" onclick="filterServices('adult')">💇‍♀️ Adult Hair</button>
+                    <button class="filter-btn" onclick="filterServices('nails')">💅 Nails</button>
+                    <button class="filter-btn" onclick="filterServices('beauty')">✨ Skin & Beauty</button>
+                </div>
+                <table id="services-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Category</th>
+                            <th>Service Title</th>
+                            <th>Description</th>
+                            <th>Items</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="services-table-body"></tbody>
+                </table>
+            </div>
         </section>
 
+        <!-- Products Section -->
         <section id="sec-products" style="display:none;">
-            <!-- existing products section -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Product Inventory</h3>
+                    <button class="btn-sm btn-primary" onclick="openProductModal()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <table id="products-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
         </section>
 
+        <!-- Vouchers Section -->
         <section id="sec-vouchers" style="display:none;">
-            <!-- existing vouchers section -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Voucher Management</h3>
+                    <button class="btn-sm btn-primary" onclick="openVoucherModal()">
+                        <i class="fas fa-plus"></i> Create Voucher
+                    </button>
+                </div>
+                <table id="vouchers-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vouchers-table-body"></tbody>
+                </table>
+            </div>
         </section>
 
+        <!-- Leave Requests Section -->
         <section id="sec-staff-leave" style="display:none;">
-            <!-- existing leave requests section -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Staff Leave Requests</h3>
+                </div>
+                <table id="leave-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leave-table-body"></tbody>
+                </table>
+            </div>
         </section>
 
         <!-- Modals -->
@@ -841,14 +1025,44 @@
             </div>
         </div>
 
-        <!-- Profile Modal (existing) -->
+        <!-- Profile Modal -->
         <div id="profile-modal" class="modal">
-            <!-- existing profile modal -->
+            <div class="modal-content" style="max-width:450px;">
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+                <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="profile-email" required>
+                    </div>
+                    <hr>
+                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current password</p>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="profile-pass" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="profile-pass-confirm" placeholder="Confirm new password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Admin Product/Voucher Modal (existing) -->
+        <!-- Admin Modal for Products/Vouchers/Services -->
         <div id="admin-modal" class="modal">
-            <!-- existing admin modal -->
+            <div class="modal-content" style="max-width:600px;">
+                <button class="modal-close" onclick="closeAdminModal()">&times;</button>
+                <h2 id="modal-title" style="margin-bottom:1.5rem; color:#6B5D52;">Add New Item</h2>
+                <form id="admin-form">
+                    <!-- Dynamic content will be injected by JavaScript -->
+                </form>
+            </div>
         </div>
 
     </main>

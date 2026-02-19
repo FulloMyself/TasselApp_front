@@ -2,11 +2,15 @@
 <html lang="en">
 
 <head>
-    <title>Staff Portal | Tassel</title>
+    <title>Staff Portal | Tassel Studio</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- DataTables for better tables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
     <style>
-        /* Same Layout Styles as Admin */
         body {
             margin: 0;
             display: flex;
@@ -16,11 +20,13 @@
         }
 
         .dash-sidebar {
-            width: 250px;
+            width: 260px;
             background: #6B5D52;
             color: white;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .dash-logo {
@@ -29,6 +35,8 @@
             font-weight: 700;
             text-align: center;
             color: #E8B4C8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 2px;
         }
 
         .dash-nav {
@@ -37,13 +45,17 @@
             flex-grow: 1;
         }
 
+        .dash-nav li {
+            margin-bottom: 0.5rem;
+        }
+
         .dash-nav a {
             color: #ddd;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 8px;
             transition: 0.2s;
         }
@@ -54,10 +66,92 @@
             color: white;
         }
 
+        .dash-nav a i {
+            width: 20px;
+            color: #E8B4C8;
+        }
+
         .dash-main {
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .dash-header h1 {
+            margin: 0;
+            color: #6B5D52;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #E8B4C8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* KPI Cards for Staff */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #E8B4C8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .kpi-info h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .kpi-info p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4A4139;
         }
 
         .content-box {
@@ -72,32 +166,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             border-bottom: 1px solid #eee;
-            padding-bottom: 0.5rem;
+            padding-bottom: 1rem;
         }
 
-        /* Search Input Style */
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1rem;
-        }
-
-        .search-box input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            flex: 1;
-        }
-
-        .btn-primary {
-            background: #E8B4C8;
-            color: #4A4139;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
+        .box-header h3 {
+            margin: 0;
+            color: #6B5D52;
         }
 
         table {
@@ -112,7 +188,58 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* Modal Styles */
+        th {
+            font-weight: 600;
+            color: #888;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #C8E6C9;
+            color: #1B5E20;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .btn-primary {
+            background: #E8B4C8;
+            color: #4A4139;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -125,6 +252,39 @@
             justify-content: center;
             align-items: center;
         }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
     </style>
 </head>
 
@@ -133,36 +293,67 @@
         <div class="dash-logo">TASSEL STAFF</div>
         <nav>
             <ul class="dash-nav">
-                <li><a href="#" class="active" onclick="showSection('schedule')"><i class="fas fa-calendar-alt"></i> My
-                        Schedule</a></li>
-                <li><a href="#" onclick="showSection('search')"><i class="fas fa-search"></i> Find User</a></li>
-                <li><a href="#" onclick="showSection('leave')"><i class="fas fa-paper-plane"></i> Request Leave</a></li>
-                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
-                <li><a href="#" id="logout-btn" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i>
+                        Dashboard</a></li>
+                <li><a href="#" onclick="showSection('schedule')"><i class="fas fa-calendar-alt"></i> My Schedule</a>
                 </li>
+                <li><a href="#" onclick="showSection('appointments')"><i class="fas fa-clock"></i> Appointments</a></li>
+                <li><a href="#" onclick="showSection('leave')"><i class="fas fa-plane-departure"></i> Request Leave</a>
+                </li>
+                <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="dash-main">
-        <header class="dash-header" style="margin-bottom: 2rem; display:flex; justify-content:space-between;">
-            <h1 id="page-title">My Schedule</h1>
-            <div>Welcome, <strong id="user-name">Staff</strong></div>
+        <header class="dash-header">
+            <h1 id="page-title">Staff Dashboard</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="user-initials">S</div>
+                <strong id="user-name">Staff</strong>
+            </div>
         </header>
 
-        <!-- Schedule Section -->
-        <section id="sec-schedule">
+        <!-- Dashboard Section -->
+        <section id="sec-dashboard">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="kpi-info">
+                        <h3>Today's Appointments</h3>
+                        <p id="today-count">0</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+                    <div class="kpi-info">
+                        <h3>Next Appointment</h3>
+                        <p id="next-appointment">--:--</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="kpi-info">
+                        <h3>Completed Today</h3>
+                        <p id="completed-today">0</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="content-box">
                 <div class="box-header">
-                    <h3>Today's Appointments</h3>
+                    <h3>Today's Schedule</h3>
                 </div>
-                <table>
+                <table id="today-schedule">
                     <thead>
                         <tr>
+                            <th>Time</th>
                             <th>Client</th>
                             <th>Service</th>
-                            <th>Time</th>
+                            <th>Duration</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="appointments-table"></tbody>
@@ -170,26 +361,41 @@
             </div>
         </section>
 
-        <!-- Search Users Section -->
-        <section id="sec-search" style="display:none;">
+        <!-- Schedule Section -->
+        <section id="sec-schedule" style="display:none;">
             <div class="content-box">
                 <div class="box-header">
-                    <h3>Search Customers</h3>
+                    <h3>My Weekly Schedule</h3>
                 </div>
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Enter customer name or email...">
-                    <button class="btn-primary" onclick="searchUsers()"><i class="fas fa-search"></i> Search</button>
+                <div id="staff-calendar" style="height: 600px;"></div>
+            </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="sec-appointments" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>All My Appointments</h3>
+                    <select id="appointment-filter" onchange="filterStaffAppointments()">
+                        <option value="all">All</option>
+                        <option value="today">Today</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                    </select>
                 </div>
-                <table>
+                <table id="appointments-list">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Action</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="users-results"></tbody>
+                    <tbody id="all-appointments-table"></tbody>
                 </table>
             </div>
         </section>
@@ -200,59 +406,83 @@
                 <div class="box-header">
                     <h3>Submit Leave Request</h3>
                 </div>
-                <form id="leave-form" style="display:grid; gap: 1rem; max-width: 400px;">
-                    <input type="date" id="leave-start" class="form-control" required>
-                    <input type="date" id="leave-end" class="form-control" required>
-                    <textarea id="leave-reason" placeholder="Reason for leave..." class="form-control"
-                        required></textarea>
+                <form id="leave-form" style="max-width:500px;">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="leave-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="leave-end" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <textarea id="leave-reason" rows="3" required></textarea>
+                    </div>
                     <button type="submit" class="btn-primary">Submit Request</button>
                 </form>
             </div>
+
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>My Leave History</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leave-history-table"></tbody>
+                </table>
+            </div>
         </section>
 
-        <!-- Universal Profile Modal -->
+        <!-- Profile Modal -->
         <div id="profile-modal" class="modal">
-            <div class="modal-content"
-                style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
-                <button onclick="closeProfileModal()"
-                    style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <div class="modal-content" style="max-width:450px;">
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
                 <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
                 <form id="profile-form">
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>Full Name</label>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Full Name</label>
                         <input type="text" id="profile-name" class="form-control"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>Email Address</label>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Email Address</label>
                         <input type="email" id="profile-email" class="form-control"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
                     <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
-                        current
-                        password</p>
+                        current password</p>
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>New Password</label>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">New Password</label>
                         <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>Confirm New Password</label>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Confirm New Password</label>
                         <input type="password" id="profile-pass-confirm" class="form-control"
                             placeholder="Confirm new password"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block"
-                        style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
+                        style="padding:12px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer;">Update
                         Profile</button>
                 </form>
             </div>
         </div>
-
-    </main> <!-- MAIN TAG CLOSED HERE -->
+    </main>
 
     <script src="dashboard.js"></script>
+    <!-- FullCalendar for staff schedule -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 </body>
 
 </html>

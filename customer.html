@@ -2,9 +2,14 @@
 <html lang="en">
 
 <head>
-    <title>My Account | Tassel</title>
+    <title>My Account | Tassel Studio</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- DataTables for better tables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    
     <style>
         body {
             margin: 0;
@@ -15,11 +20,13 @@
         }
 
         .dash-sidebar {
-            width: 250px;
+            width: 260px;
             background: #6B5D52;
             color: white;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
 
         .dash-logo {
@@ -28,6 +35,8 @@
             font-weight: 700;
             text-align: center;
             color: #E8B4C8;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 2px;
         }
 
         .dash-nav {
@@ -36,21 +45,30 @@
             flex-grow: 1;
         }
 
+        .dash-nav li {
+            margin-bottom: 0.5rem;
+        }
+
         .dash-nav a {
             color: #ddd;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 8px;
             transition: 0.2s;
         }
 
         .dash-nav a:hover,
         .dash-nav a.active {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.15);
             color: white;
+        }
+
+        .dash-nav a i {
+            width: 20px;
+            color: #E8B4C8;
         }
 
         .dash-main {
@@ -59,11 +77,47 @@
             overflow-y: auto;
         }
 
-        .welcome-banner {
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
             background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .dash-header h1 {
+            margin: 0;
+            color: #6B5D52;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: #E8B4C8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #E8B4C8, #d89eb5);
+            color: white;
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
@@ -72,16 +126,17 @@
 
         .welcome-text h1 {
             margin: 0;
-            color: #6B5D52;
+            font-size: 2rem;
         }
 
         .welcome-text p {
-            color: #888;
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -91,19 +146,40 @@
             padding: 1.5rem;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            border-top: 4px solid #E8B4C8;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: 0.2s;
         }
 
-        .stat-card h3 {
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #E8B4C8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-info h3 {
             margin: 0;
-            color: #888;
             font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .stat-card p {
-            margin: 10px 0 0;
-            font-size: 2rem;
+        .stat-info p {
+            margin: 0.25rem 0 0;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #4A4139;
         }
@@ -113,12 +189,29 @@
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
         }
 
         .box-header {
-            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
             border-bottom: 1px solid #eee;
-            padding-bottom: 0.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .box-header h3 {
+            margin: 0;
+            color: #6B5D52;
+            font-size: 1.3rem;
+        }
+
+        .view-all {
+            color: #E8B4C8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
         table {
@@ -126,14 +219,76 @@
             border-collapse: collapse;
         }
 
-        th,
-        td {
+        th {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid #eee;
+            color: #888;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
-        /* Modal Styles */
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #4A4139;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-confirmed { background: #D4EDDA; color: #155724; }
+        .status-completed { background: #C8E6C9; color: #1B5E20; }
+        .status-cancelled { background: #F8D7DA; color: #721C24; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #E8B4C8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d89eb5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline-light:hover {
+            background: white;
+            color: #6B5D52;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -141,10 +296,125 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-close:hover {
+            color: #E8B4C8;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4A4139;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #E8B4C8;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 1.5rem 0;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .upcoming-appointment {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #E8B4C8;
+        }
+
+        .upcoming-title {
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .upcoming-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .upcoming-service {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #6B5D52;
+        }
+
+        .upcoming-datetime {
+            color: #E8B4C8;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -154,8 +424,10 @@
         <div class="dash-logo">MY TASSEL</div>
         <nav>
             <ul class="dash-nav">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="index.html#services"><i class="fas fa-plus-circle"></i> Book Appointment</a></li>
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-alt"></i> My Bookings</a></li>
+                <li><a href="#" onclick="showSection('favourites')"><i class="fas fa-heart"></i> Favourites</a></li>
+                <li><a href="#" onclick="showSection('rewards')"><i class="fas fa-gift"></i> Rewards</a></li>
                 <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
                 <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
@@ -163,92 +435,299 @@
     </aside>
 
     <main class="dash-main">
-        <div class="welcome-banner">
-            <div class="welcome-text">
-                <h1>Hello, <span id="user-name">Guest</span>!</h1>
-                <p>Ready to look beautiful today?</p>
+        <header class="dash-header">
+            <h1 id="page-title">My Dashboard</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="user-initials">G</div>
+                <strong id="user-name">Guest</strong>
             </div>
-            <a href="index.html#services" class="btn btn-primary"
-                style="text-decoration:none; padding: 12px 25px; background: #E8B4C8; color: white; border-radius: 30px;">
-                Book Now <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
+        </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Visits</h3>
-                <p id="stat-visits">0</p>
+        <!-- Dashboard Section -->
+        <section id="sec-dashboard">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h1>Hello, <span id="welcome-name">Guest</span>!</h1>
+                    <p>Ready to look beautiful today?</p>
+                </div>
+                <a href="index.html#services" class="btn btn-outline-light">
+                    <i class="fas fa-plus-circle"></i> Book Now
+                </a>
             </div>
-            <div class="stat-card">
-                <h3>Next Appointment</h3>
-                <p id="stat-next">N/A</p>
-            </div>
-            <div class="stat-card">
-                <h3>Reward Points</h3>
-                <p>150</p>
-            </div>
-        </div>
 
-        <div class="content-box">
-            <div class="box-header">
-                <h3>My Booking History</h3>
+            <!-- Upcoming Appointment Highlight -->
+            <div class="upcoming-appointment" id="upcoming-appointment" style="display: none;">
+                <div class="upcoming-title">Your Next Appointment</div>
+                <div class="upcoming-details">
+                    <span class="upcoming-service" id="next-service">Hair Styling</span>
+                    <span class="upcoming-datetime" id="next-datetime">Tomorrow at 10:00 AM</span>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="appointments-table"></tbody>
-            </table>
-        </div>
 
-        <!-- Universal Profile Modal -->
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Visits</h3>
+                        <p id="stat-visits">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3>Pending</h3>
+                        <p id="stat-pending">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3>Completed</h3>
+                        <p id="stat-completed">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-info">
+                        <h3>Reward Points</h3>
+                        <p id="stat-points">150</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Recent Bookings</h3>
+                    <span class="view-all" onclick="showSection('bookings')">View All →</span>
+                </div>
+                <table id="recent-bookings-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-appointments-table"></tbody>
+                </table>
+            </div>
+
+            <!-- Recommended Services -->
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Recommended for You</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👧</div>
+                        <h4>Kiddies Braids</h4>
+                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💅</div>
+                        <h4>Gel Manicure</h4>
+                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
+                        <h4>Facial Treatment</h4>
+                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bookings Section -->
+        <section id="sec-bookings" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>My Booking History</h3>
+                    <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">
+                        <i class="fas fa-plus"></i> New Booking
+                    </button>
+                </div>
+                <table id="bookings-history-table" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Staff</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointments-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Favourites Section -->
+        <section id="sec-favourites" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>My Favourite Services</h3>
+                </div>
+                <div style="text-align: center; padding: 3rem; color: #888;">
+                    <i class="fas fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: #E8B4C8;"></i>
+                    <p>You haven't added any favourites yet.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html#services'">Browse Services</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rewards Section -->
+        <section id="sec-rewards" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>My Rewards</h3>
+                </div>
+                <div style="background: linear-gradient(135deg, #6B5D52, #4A4139); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0; color: #E8B4C8;">Tassel Rewards</h4>
+                            <p style="margin: 0.5rem 0 0; opacity: 0.9;">Earn points with every booking</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.5rem; font-weight: 700;">150</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">points</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>How to earn more points</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eee;">
+                        <i class="fas fa-calendar-check" style="color: #E8B4C8; font-size: 1.2rem;"></i>
+                        <div>
+                            <strong>Book a service</strong>
+                            <p style="margin: 0.25rem 0 0; color: #666;">Earn 10 points per booking</p>
+                        </div>
+                    </li>
+                    <li style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eee;">
+                        <i class="fas fa-star" style="color: #E8B4C8; font-size: 1.2rem;"></i>
+                        <div>
+                            <strong>Leave a review</strong>
+                            <p style="margin: 0.25rem 0 0; color: #666;">Earn 5 points per review</p>
+                        </div>
+                    </li>
+                    <li style="display: flex; gap: 1rem; padding: 1rem 0;">
+                        <i class="fas fa-user-plus" style="color: #E8B4C8; font-size: 1.2rem;"></i>
+                        <div>
+                            <strong>Refer a friend</strong>
+                            <p style="margin: 0.25rem 0 0; color: #666;">Earn 50 points per referral</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Profile Modal -->
         <div id="profile-modal" class="modal">
-            <div class="modal-content"
-                style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
-                <button onclick="closeProfileModal()"
-                    style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
                 <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
                 <form id="profile-form">
-                    <div class="form-group" style="margin-bottom:1rem;">
+                    <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="profile-name" class="form-control"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <input type="text" id="profile-name" class="form-control" required>
                     </div>
-                    <div class="form-group" style="margin-bottom:1rem;">
+                    <div class="form-group">
                         <label>Email Address</label>
-                        <input type="email" id="profile-email" class="form-control"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <input type="email" id="profile-email" class="form-control" required>
                     </div>
-                    <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
-                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
-                        current
-                        password</p>
-                    <div class="form-group" style="margin-bottom:1rem;">
+                    <hr>
+                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current password</p>
+                    <div class="form-group">
                         <label>New Password</label>
-                        <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password">
                     </div>
-                    <div class="form-group" style="margin-bottom:1rem;">
+                    <div class="form-group">
                         <label>Confirm New Password</label>
-                        <input type="password" id="profile-pass-confirm" class="form-control"
-                            placeholder="Confirm new password"
-                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <input type="password" id="profile-pass-confirm" class="form-control" placeholder="Confirm new password">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block"
-                        style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
-                        Profile</button>
+                    <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
                 </form>
             </div>
         </div>
 
-    </main> <!-- MAIN TAG CLOSED HERE -->
+    </main>
 
     <script src="dashboard.js"></script>
+    <script>
+        // Override initCustomer function to enhance the customer dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store the original initCustomer function
+            const originalInitCustomer = window.initCustomer;
+            
+            // Override it
+            window.initCustomer = async function() {
+                if (originalInitCustomer) {
+                    await originalInitCustomer();
+                }
+                
+                // Additional enhancements
+                const userName = document.getElementById('user-name')?.textContent || 'Guest';
+                document.getElementById('welcome-name').textContent = userName;
+                
+                // Load rewards points
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    document.getElementById('stat-points').textContent = user.points || '150';
+                }
+                
+                // Setup DataTable for bookings history
+                if ($.fn.DataTable && document.getElementById('bookings-history-table')) {
+                    $('#bookings-history-table').DataTable({
+                        pageLength: 10,
+                        order: [[1, 'desc']],
+                        language: {
+                            search: "Search bookings:"
+                        }
+                    });
+                }
+            };
+            
+            // Call the enhanced function
+            if (window.initCustomer) {
+                window.initCustomer();
+            }
+        });
+        
+        // Section show function
+        window.showSection = function(sectionId) {
+            document.querySelectorAll('main > section').forEach(el => el.style.display = 'none');
+            const section = document.getElementById(`sec-${sectionId}`);
+            if (section) section.style.display = 'block';
+            
+            const titles = {
+                'dashboard': 'My Dashboard',
+                'bookings': 'My Bookings',
+                'favourites': 'My Favourites',
+                'rewards': 'My Rewards'
+            };
+            
+            const titleEl = document.getElementById('page-title');
+            if (titleEl) titleEl.textContent = titles[sectionId] || 'My Account';
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.dash-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Find and activate the clicked link
+            document.querySelectorAll('.dash-nav a').forEach(link => {
+                if (link.getAttribute('onclick')?.includes(sectionId)) {
+                    link.classList.add('active');
+                }
+            });
+        };
+    </script>
 </body>
 
 </html>
