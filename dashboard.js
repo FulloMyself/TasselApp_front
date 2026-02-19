@@ -4,6 +4,7 @@ const API_URL = 'https://tasselapp-back.onrender.com';
 // Global store
 let productsData = [];
 let vouchersData = [];
+let servicesData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     try {
@@ -62,6 +63,30 @@ function initLogout() {
             localStorage.clear();
             window.location.href = 'index.html';
         });
+    }
+}
+
+// Helper function to validate JSON format for service items
+function validateServiceItems(jsonString) {
+    try {
+        const items = JSON.parse(jsonString);
+        if (!Array.isArray(items)) {
+            return { valid: false, error: 'Items must be an array' };
+        }
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item.name || typeof item.name !== 'string') {
+                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'name'` };
+            }
+            if (!item.price || typeof item.price !== 'number') {
+                return { valid: false, error: `Item ${i + 1}: Missing or invalid 'price' (must be a number)` };
+            }
+        }
+
+        return { valid: true, items };
+    } catch (e) {
+        return { valid: false, error: e.message };
     }
 }
 
@@ -222,6 +247,7 @@ async function initAdmin() {
             'staff-leave': 'Leave Requests',
             'users': 'Users',
             'products': 'Products',
+            'services': 'Services',
             'vouchers': 'Vouchers'
         };
         const titleEl = document.getElementById('page-title');
@@ -232,6 +258,7 @@ async function initAdmin() {
         if (sectionId === 'staff-leave') loadLeaveRequests();
         if (sectionId === 'users') loadUsers();
         if (sectionId === 'products') loadProducts();
+        if (sectionId === 'services') loadServices();
         if (sectionId === 'vouchers') loadVouchers();
     };
 
@@ -244,22 +271,30 @@ async function initAdmin() {
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
 
-            console.log('Form submission:', { type, id, data }); // Debug log
+            console.log('Form submission:', { type, id, data });
 
-            // Convert types
+            // Convert types based on form type
             if (type === 'product') {
                 data.price = parseFloat(data.price);
                 data.stock = parseInt(data.stock) || 0;
             } else if (type === 'voucher') {
                 data.discount = parseFloat(data.discount);
                 data.isActive = data.isActive === 'on';
-
-                // Ensure discount type is set
                 if (!data.discountType) {
                     data.discountType = 'fixed';
                 }
-
-                console.log('Processed voucher data:', data); // Debug log
+                console.log('Processed voucher data:', data);
+            } else if (type === 'service') {
+                // Parse and validate items JSON using the helper function
+                const validation = validateServiceItems(data.items);
+                if (!validation.valid) {
+                    alert('Invalid service items: ' + validation.error);
+                    return;
+                }
+                data.items = validation.items;
+                data.isActive = data.isActive === 'on';
+                data.order = parseInt(data.order) || 0;
+                console.log('Processed service data:', data);
             }
 
             try {
@@ -271,7 +306,11 @@ async function initAdmin() {
                     res = id ? await putData(url, data) : await postData(url, data);
                 } else if (type === 'voucher') {
                     url = id ? `/api/vouchers/${id}` : '/api/vouchers';
-                    console.log('Sending request to:', url); // Debug log
+                    console.log('Sending voucher request to:', url);
+                    res = id ? await putData(url, data) : await postData(url, data);
+                } else if (type === 'service') {
+                    url = id ? `/api/services/${id}` : '/api/services';
+                    console.log('Sending service request to:', url);
                     res = id ? await putData(url, data) : await postData(url, data);
                 }
 
@@ -281,6 +320,8 @@ async function initAdmin() {
                         await loadProducts();
                     } else if (type === 'voucher') {
                         await loadVouchers();
+                    } else if (type === 'service') {
+                        await loadServices();
                     }
                     alert(`${type} saved successfully!`);
                 } else {
@@ -304,6 +345,7 @@ async function initAdmin() {
     loadAdminStats();
     loadProducts();
     loadVouchers();
+    loadServices();
 }
 
 async function loadAdminStats() {
@@ -436,6 +478,216 @@ window.deleteProduct = async function (id) {
         } catch (err) {
             console.error('Delete product error:', err);
             alert('Failed to delete product: ' + err.message);
+        }
+    }
+};
+
+// == SERVICE MANAGEMENT ==
+async function loadServices() {
+    servicesData = await getData('/api/services');
+    const tbody = document.getElementById('services-table');
+    if (!tbody) return;
+
+    if (!Array.isArray(servicesData)) servicesData = [];
+
+    tbody.innerHTML = servicesData.map(s => {
+        const categoryDisplay = {
+            'kiddies': '👧 Kiddies Hair',
+            'adult': '💇‍♀️ Adult Hair',
+            'nails': '💅 Nails',
+            'beauty': '✨ Skin & Beauty'
+        }[s.category] || s.category;
+
+        const itemsCount = s.items?.length || 0;
+        const itemsPreview = itemsCount > 0 ? `${itemsCount} items` : 'No items';
+
+        return `
+            <tr>
+                <td><img src="${s.image || 'https://via.placeholder.com/50'}" width="50" height="50" style="border-radius:4px; object-fit:cover;"></td>
+                <td><span class="status-badge" style="background:var(--accent-pink); color:white;">${categoryDisplay}</span></td>
+                <td><strong>${s.title}</strong></td>
+                <td>${s.description.substring(0, 50)}${s.description.length > 50 ? '...' : ''}</td>
+                <td>
+                    <span style="cursor:pointer; color:var(--accent-pink);" onclick="showServiceItems('${s._id}')">
+                        ${itemsPreview} <i class="fas fa-eye"></i>
+                    </span>
+                </td>
+                <td><span class="status-badge ${s.isActive ? 'status-confirmed' : 'status-rejected'}">${s.isActive ? 'Active' : 'Inactive'}</span></td>
+                <td>
+                    <button class="btn-sm btn-primary" onclick="window.openServiceModal('${s._id}')">Edit</button>
+                    <button class="btn-sm btn-danger" onclick="window.deleteService('${s._id}')">Delete</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+window.filterServices = function (category) {
+    // Update active tab
+    document.querySelectorAll('[onclick^="filterServices"]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Filter table rows
+    const rows = document.querySelectorAll('#services-table tr');
+    rows.forEach(row => {
+        if (category === 'all') {
+            row.style.display = '';
+        } else {
+            const categoryCell = row.cells[1]?.textContent || '';
+            if (categoryCell.toLowerCase().includes(category)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+};
+
+window.showServiceItems = function (serviceId) {
+    const service = servicesData.find(s => s._id === serviceId);
+    if (!service) return;
+
+    let itemsHtml = '<div style="padding:1rem;">';
+    itemsHtml += `<h3 style="margin-bottom:1rem;">${service.title} - Items</h3>`;
+    itemsHtml += '<table style="width:100%;"><thead><tr><th>Item</th><th>Price</th><th>Description</th></tr></thead><tbody>';
+
+    service.items.forEach(item => {
+        itemsHtml += `<tr>
+            <td>${item.name}</td>
+            <td><strong>R${item.price}</strong></td>
+            <td>${item.description || ''}</td>
+        </tr>`;
+    });
+
+    itemsHtml += '</tbody></table>';
+    itemsHtml += '<div style="text-align:right; margin-top:1rem;"><button class="btn-sm btn-primary" onclick="closeModal()">Close</button></div>';
+    itemsHtml += '</div>';
+
+    // Show in a modal
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `<div class="modal-content" style="max-width:600px;">${itemsHtml}</div>`;
+    document.body.appendChild(modal);
+
+    window.closeModal = function () {
+        modal.remove();
+    };
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+};
+
+window.openServiceModal = function (serviceId = null) {
+    try {
+        const form = document.getElementById('admin-form');
+        const title = document.getElementById('modal-title');
+        const modal = document.getElementById('admin-modal');
+
+        if (!form || !title || !modal) {
+            console.error('Modal elements not found');
+            alert('System error: Modal elements not found');
+            return;
+        }
+
+        let service = {};
+        if (serviceId && Array.isArray(servicesData)) {
+            service = servicesData.find(s => s._id === serviceId) || {};
+        }
+
+        form.dataset.type = 'service';
+        form.dataset.id = service._id || '';
+        title.textContent = service._id ? 'Edit Service' : 'Add New Service';
+
+        // Format items for display
+        const itemsJson = service.items ? JSON.stringify(service.items, null, 2) : '[]';
+
+        form.innerHTML = `
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
+                <select name="category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                    <option value="">Select Category</option>
+                    <option value="kiddies" ${service.category === 'kiddies' ? 'selected' : ''}>👧 Kiddies Hair</option>
+                    <option value="adult" ${service.category === 'adult' ? 'selected' : ''}>💇‍♀️ Adult Hair</option>
+                    <option value="nails" ${service.category === 'nails' ? 'selected' : ''}>💅 Nails</option>
+                    <option value="beauty" ${service.category === 'beauty' ? 'selected' : ''}>✨ Skin & Beauty</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Category Display Name *</label>
+                <input type="text" name="categoryDisplay" placeholder="e.g. Kiddies Hair, Adult Hair, etc." value="${service.categoryDisplay || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Service Title *</label>
+                <input type="text" name="title" placeholder="e.g. Kids Braids, Benny & Betty Styles" value="${service.title || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Description *</label>
+                <textarea name="description" placeholder="Brief description of this service" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:80px;">${service.description || ''}</textarea>
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Image URL (optional)</label>
+                <input type="url" name="image" placeholder="https://example.com/image.jpg" value="${service.image || ''}" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Order (lower numbers appear first)</label>
+                <input type="number" name="order" value="${service.order || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" name="isActive" ${service.isActive !== false ? 'checked' : ''}> 
+                    <span style="font-weight:600;">Active (show on website)</span>
+                </label>
+            </div>
+            
+            <div style="margin-bottom:20px; border-top:2px solid #eee; padding-top:20px;">
+                <h4 style="margin-bottom:15px;">Service Items (Prices)</h4>
+                <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">Enter items as JSON array. Example:</p>
+                <pre style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:0.85rem; margin-bottom:10px;">
+[
+  {"name": "Plain Cornrows", "price": 320, "description": ""},
+  {"name": "Needle Cornrows", "price": 280, "description": ""}
+]
+                </pre>
+                <textarea name="items" placeholder="Enter JSON array of items" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:150px; font-family:monospace;">${itemsJson}</textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="padding:12px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer;">
+                ${service._id ? 'Update' : 'Save'} Service
+            </button>
+        `;
+        modal.classList.add('active');
+    } catch (e) {
+        console.error("Open Service Modal Error:", e);
+        alert("Error opening service form: " + e.message);
+    }
+};
+
+window.deleteService = async function (id) {
+    if (!id) return;
+
+    if (confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
+        try {
+            const res = await deleteData(`/api/services/${id}`);
+            if (res.ok) {
+                await loadServices();
+                alert('Service deleted successfully!');
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to delete service');
+            }
+        } catch (err) {
+            console.error('Delete service error:', err);
+            alert('Failed to delete service: ' + err.message);
         }
     }
 };
@@ -860,6 +1112,10 @@ window.openProfileModal = window.openProfileModal;
 window.closeProfileModal = window.closeProfileModal;
 window.openProductModal = window.openProductModal;
 window.deleteProduct = window.deleteProduct;
+window.openServiceModal = window.openServiceModal;
+window.deleteService = window.deleteService;
+window.filterServices = window.filterServices;
+window.showServiceItems = window.showServiceItems;
 window.openVoucherModal = window.openVoucherModal;
 window.deleteVoucher = window.deleteVoucher;
 window.closeAdminModal = window.closeAdminModal;

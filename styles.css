@@ -20,6 +20,8 @@
     --success: #4CAF50;
     --warning: #FF9800;
     --error: #F44336;
+    --whatsapp: #25D366;
+    --whatsapp-dark: #128C7E;
 
     /* Typography */
     --font-heading: 'Cormorant Garamond', serif;
@@ -364,6 +366,17 @@ select {
     background-color: var(--primary-beige);
 }
 
+.btn-whatsapp {
+    background-color: var(--whatsapp);
+    color: var(--white);
+}
+
+.btn-whatsapp:hover {
+    background-color: var(--whatsapp-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
 .btn-lg {
     padding: 1rem 2rem;
     font-size: 1rem;
@@ -458,6 +471,10 @@ select {
     display: flex;
     gap: var(--spacing-md);
     flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+    min-width: 200px;
 }
 
 .hero-controls {
@@ -594,6 +611,52 @@ select {
 .feature-card p {
     color: var(--text-dark);
     font-size: 0.95rem;
+}
+
+/* ===== Value Proposition Section ===== */
+.value-props {
+    background-color: var(--white);
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.value-prop-text {
+    text-align: center;
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    color: var(--text-dark);
+}
+
+.props-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.prop-item {
+    text-align: center;
+}
+
+.prop-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.prop-item h3 {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: var(--primary-brown);
+    margin-bottom: 0.5rem;
+}
+
+.prop-item p {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.8;
 }
 
 /* ===== Section Styles ===== */
@@ -762,6 +825,64 @@ section {
 
 .service-category.active {
     display: block;
+}
+
+/* ===== Service Categories ===== */
+.service-categories {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.category-card {
+    background: linear-gradient(135deg, var(--primary-beige), var(--white));
+    border-radius: var(--radius-lg);
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+    border: 1px solid var(--border-color);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-pink);
+}
+
+.category-icon {
+    font-size: 2.5rem;
+    color: var(--accent-pink);
+    margin-bottom: 1rem;
+}
+
+.category-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--primary-brown);
+    margin-bottom: 1rem;
+}
+
+.category-card .btn-sm {
+    margin-top: 1rem;
+    background-color: var(--accent-pink);
+    color: white;
+    border: none;
+}
+
+.category-card .btn-sm:hover {
+    background-color: #d89eb5;
+}
+
+/* ===== Service Detail Sections ===== */
+.service-detail {
+    padding: var(--spacing-xxl) 0;
+}
+
+.service-detail .section-title {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
 }
 
 .services-grid {
@@ -1376,6 +1497,38 @@ section {
     border-radius: var(--radius-full);
 }
 
+/* ===== Location Highlight Section ===== */
+.location-highlight {
+    background: linear-gradient(135deg, var(--primary-brown), #5a4e44);
+    color: var(--white);
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.location-highlight h2 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.location-details {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.location-details i {
+    color: var(--accent-pink);
+    margin-right: 0.5rem;
+}
+
+.map-container {
+    max-width: 800px;
+    margin: 2rem auto 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
 /* ===== Contact Section ===== */
 .contact {
     background-color: var(--white);
@@ -1869,6 +2022,18 @@ section {
     text-align: center;
 }
 
+/* ===== Dashboard Modal Fixes ===== */
+.dash-main .modal.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+.dash-main .modal.active .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
 /* ===== Responsive Design ===== */
 @media (max-width: 1024px) {
     .hero-title {
@@ -1886,6 +2051,10 @@ section {
 
     .footer-top {
         grid-template-columns: 1fr 1fr;
+    }
+    
+    .service-categories {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -1924,6 +2093,10 @@ section {
     .hero-buttons {
         flex-direction: column;
     }
+    
+    .hero-buttons .btn {
+        width: 100%;
+    }
 
     .section-title {
         font-size: 2rem;
@@ -1941,6 +2114,19 @@ section {
 
     .service-tabs {
         flex-direction: column;
+    }
+    
+    .props-grid,
+    .service-categories {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .location-highlight h2 {
+        font-size: 2rem;
+    }
+    
+    .location-details {
+        font-size: 1rem;
     }
 
     .footer-top {
@@ -1982,6 +2168,23 @@ section {
 
     .modal-content {
         padding: var(--spacing-lg);
+    }
+    
+    .props-grid,
+    .service-categories {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-highlight {
+        padding: 3rem 0;
+    }
+    
+    .location-highlight h2 {
+        font-size: 1.75rem;
+    }
+    
+    .map-container iframe {
+        height: 300px;
     }
 }
 
@@ -2036,17 +2239,4 @@ section {
 
 .visible {
     display: block;
-}
-
-/* Modal fix for dashboard */
-.dash-main .modal.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: flex !important;
-}
-
-/* Ensure modal content is visible */
-.dash-main .modal.active .modal-content {
-    transform: translateY(0);
-    opacity: 1;
 }

@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Tassel Hair & Beauty Studio - Premium hair salon and beauty spa services in Johannesburg. Book your appointment today!">
+        content="Tassel Hair & Beauty Studio - Where kiddies hair meets luxury family beauty. Premium hair, nails & beauty services for the whole family in Glenvista.">
     <meta name="keywords"
-        content="hair salon, beauty salon, spa, hair styling, braids, cornrows, beauty treatments, Johannesburg">
-    <title>Tassel Hair & Beauty Studio | Premium Hair & Beauty Services</title>
+        content="kiddies hair, family salon, beauty salon, braids, cornrows, nails, beauty treatments, Glenvista, Johannesburg">
+    <title>Tassel Hair & Beauty Studio | Where Kiddies Hair Meets Luxury Family Beauty</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico">
@@ -25,6 +25,45 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="./styles.css">
+    
+    <style>
+        /* Additional styles for service details */
+        .service-detail {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .service-detail:target {
+            scroll-margin-top: 80px;
+        }
+        
+        .service-detail .section-header {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .back-to-services {
+            display: inline-block;
+            margin-top: var(--spacing-lg);
+            color: var(--accent-pink);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .back-to-services:hover {
+            color: var(--primary-brown);
+        }
+        
+        .service-category-tag {
+            display: inline-block;
+            background-color: var(--accent-pink);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -45,23 +84,15 @@
                     <!-- Logo -->
                     <a href="#home" class="logo">
                         <span class="logo-text">TASSEL</span>
-                        <span class="logo-subtitle">Hair & Beauty Studio</span>
+                        <span class="logo-subtitle">Family Hair & Beauty Studio</span>
                     </a>
 
                     <!-- Desktop Navigation -->
                     <ul class="nav-menu" id="nav-menu">
                         <li><a href="#home" class="nav-link active">Home</a></li>
                         <li><a href="#about" class="nav-link">About</a></li>
-                        <li class="nav-dropdown">
-                            <a href="#services" class="nav-link">Services <i class="fas fa-chevron-down"></i></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#hair-salon">Hair Salon</a></li>
-                                <li><a href="#beauty-spa">Beauty Spa</a></li>
-                                <li><a href="#gifts">Gift Packages</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#gallery" class="nav-link">Gallery</a></li>
-                        <li><a href="#products" class="nav-link">Products</a></li>
+                        <li><a href="#services" class="nav-link">Services</a></li>
+                        <li><a href="#location" class="nav-link">Location</a></li>
                         <li><a href="#contact" class="nav-link">Contact</a></li>
                     </ul>
 
@@ -92,61 +123,25 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-slider">
-            <!-- Slide 1 -->
+            <!-- Slide 1 - Family Focus -->
             <div class="hero-slide active"
-                style="background-image: linear-gradient(rgba(107, 93, 82, 0.3), rgba(107, 93, 82, 0.5)), url('./assets/images/hero-1.jpg');">
+                style="background-image: linear-gradient(rgba(107, 93, 82, 0.4), rgba(107, 93, 82, 0.6)), url('./assets/images/hero-family.jpg');">
                 <div class="container">
                     <div class="hero-content">
-                        <span class="hero-label">Welcome to Tassel</span>
-                        <h1 class="hero-title">Your Beauty,<br>Our Passion</h1>
-                        <p class="hero-description">Experience luxury hair and beauty services in the heart of
-                            Johannesburg</p>
+                        <span class="hero-label">Tassel Hair & Beauty</span>
+                        <h1 class="hero-title">Where Kiddies Hair Meets<br>Luxury Family Beauty</h1>
+                        <p class="hero-description">Premium Hair, Nails & Beauty — designed for families.</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-primary btn-lg">Book Appointment</button>
-                            <button class="btn btn-outline-light btn-lg">View Services</button>
+                            <button class="btn btn-primary btn-lg" onclick="document.getElementById('book-btn').click()">
+                                <i class="fas fa-calendar-alt"></i> Book Appointment
+                            </button>
+                            <a href="https://maps.google.com/?q=101+Bellairs+Drive+Glenvista" target="_blank" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-map-marker-alt"></i> Get Directions
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Slide 2 -->
-            <div class="hero-slide"
-                style="background-image: linear-gradient(rgba(107, 93, 82, 0.3), rgba(107, 93, 82, 0.5)), url('./assets/images/hero-2.jpg');">
-                <div class="container">
-                    <div class="hero-content">
-                        <span class="hero-label">Premium Services</span>
-                        <h1 class="hero-title">Expert Stylists,<br>Stunning Results</h1>
-                        <p class="hero-description">Transform your look with our professional hair styling services</p>
-                        <div class="hero-buttons">
-                            <button class="btn btn-primary btn-lg">Explore Hair Services</button>
-                            <button class="btn btn-outline-light btn-lg">Meet Our Team</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 3 -->
-            <div class="hero-slide"
-                style="background-image: linear-gradient(rgba(107, 93, 82, 0.3), rgba(107, 93, 82, 0.5)), url('./assets/images/hero-3.jpg');">
-                <div class="container">
-                    <div class="hero-content">
-                        <span class="hero-label">Special Offer</span>
-                        <h1 class="hero-title">Indulge in<br>Luxury Spa</h1>
-                        <p class="hero-description">Rejuvenate your body and soul with our beauty spa treatments</p>
-                        <div class="hero-buttons">
-                            <button class="btn btn-primary btn-lg">View Spa Packages</button>
-                            <button class="btn btn-outline-light btn-lg">Gift Vouchers</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slider Controls -->
-        <div class="hero-controls">
-            <button class="hero-prev"><i class="fas fa-chevron-left"></i></button>
-            <div class="hero-dots"></div>
-            <button class="hero-next"><i class="fas fa-chevron-right"></i></button>
         </div>
 
         <!-- Scroll Indicator -->
@@ -156,37 +151,29 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
+    <!-- Value Proposition (Immediately after hero) -->
+    <section class="value-props">
         <div class="container">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <h3>Expert Stylists</h3>
-                    <p>Highly trained professionals with years of experience</p>
+            <p class="value-prop-text">
+                A calm, professional studio offering kiddies hair specialists, adult hair, nails, 
+                skin and beauty services — all in one beautiful space.
+            </p>
+            
+            <div class="props-grid">
+                <div class="prop-item">
+                    <div class="prop-icon">👧</div>
+                    <h3>Kiddies Hair Specialists</h3>
+                    <p>Gentle, professional styling designed for children.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h3>Premium Products</h3>
-                    <p>Top-quality hair and beauty products for best results</p>
+                <div class="prop-item">
+                    <div class="prop-icon">👩</div>
+                    <h3>One-Stop Convenience</h3>
+                    <p>Hair & beauty services for parents while kids are pampered.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3>Flexible Hours</h3>
-                    <p>Convenient scheduling to fit your busy lifestyle</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3>Client Focused</h3>
-                    <p>Your satisfaction is our top priority</p>
+                <div class="prop-item">
+                    <div class="prop-icon">✨</div>
+                    <h3>Luxury Experience</h3>
+                    <p>A calm, clean and professional environment.</p>
                 </div>
             </div>
         </div>
@@ -197,682 +184,478 @@
         <div class="container">
             <div class="about-wrapper">
                 <div class="about-image">
-                    <img src="./assets/images/about-salon.jpg" alt="Tassel Hair & Beauty Studio Interior">
+                    <img src="./assets/images/about-salon.jpg" alt="Tassel Hair & Beauty Studio - Family friendly salon">
                     <div class="about-badge">
                         <span class="badge-number">10+</span>
                         <span class="badge-text">Years of Excellence</span>
                     </div>
                 </div>
                 <div class="about-content">
-                    <span class="section-label">About Us</span>
-                    <h2 class="section-title">Where Beauty Meets Expertise</h2>
+                    <span class="section-label">Our Story</span>
+                    <h2 class="section-title">A Family-Focused Studio</h2>
                     <p class="about-text">
-                        At Tassel Hair & Beauty Studio, we believe that everyone deserves to look and feel their best.
-                        Since our founding, we've been dedicated to providing exceptional hair and beauty services
-                        in a warm, welcoming environment.
+                        Tassel Hair & Beauty Studio was created to offer something different — a calm, 
+                        professional space where families feel welcome and cared for.
                     </p>
                     <p class="about-text">
-                        Our team of skilled professionals stays up-to-date with the latest trends and techniques
-                        to ensure you receive the best possible care. From precision haircuts to luxurious spa
-                        treatments, we're here to help you shine.
+                        Our foundation is <strong>kiddies hair expertise</strong>, paired with professional adult 
+                        hair and beauty services, making Tassel a one-stop destination for parents who value 
+                        quality and convenience.
+                    </p>
+                    <p class="about-text">
+                        From gentle kiddies styling to nails, skin and beauty treatments, every detail is 
+                        designed to deliver a premium experience built on care, comfort and excellence.
                     </p>
                     <div class="about-features">
                         <div class="about-feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Professional & Certified Staff</span>
+                            <span>Kiddies Hair Specialists</span>
                         </div>
                         <div class="about-feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Hygienic & Safe Environment</span>
+                            <span>Calm Luxury Environment</span>
                         </div>
                         <div class="about-feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Personalized Consultations</span>
+                            <span>One-Stop for Parents</span>
                         </div>
                         <div class="about-feature">
                             <i class="fas fa-check-circle"></i>
-                            <span>Competitive Pricing</span>
+                            <span>Professional & Certified</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary">Learn More</button>
+                    <button class="btn btn-primary" onclick="document.getElementById('book-btn').click()">Book Your Visit</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- Services Preview Section -->
     <section id="services" class="services">
         <div class="container">
             <div class="section-header">
                 <span class="section-label">Our Services</span>
-                <h2 class="section-title">Experience the Best in Hair & Beauty</h2>
+                <h2 class="section-title">Something Beautiful for Everyone</h2>
                 <p class="section-description">
-                    Choose from our wide range of professional services designed to enhance your natural beauty
+                    From little ones to parents, we've got the whole family covered
                 </p>
             </div>
 
-            <!-- Service Categories Tabs -->
-            <div class="service-tabs">
-                <button class="service-tab active" data-category="hair">
-                    <i class="fas fa-cut"></i>
-                    <span>Hair Salon</span>
-                </button>
-                <button class="service-tab" data-category="beauty">
-                    <i class="fas fa-spa"></i>
-                    <span>Beauty Spa</span>
-                </button>
-                <button class="service-tab" data-category="gifts">
-                    <i class="fas fa-gift"></i>
-                    <span>Gift Packages</span>
-                </button>
-            </div>
-
-            <!-- Hair Salon Services -->
-            <div id="hair-salon" class="service-category active" data-category="hair">
-                <div class="services-grid">
-                    <!-- Hair Wash & Treatments -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-wash.jpg" alt="Hair Wash & Treatment">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Hair Wash & Treatments</h3>
-                            <p class="service-description">Gentle cleansing and nourishing treatments for healthy,
-                                beautiful hair</p>
-                            <ul class="service-list">
-                                <li><span>Gentle Hair Wash</span><span class="price">R180</span></li>
-                                <li><span>Deep Conditioning & Detangling</span><span class="price">R280</span></li>
-                                <li><span>Hot Oil Treatment</span><span class="price">R320</span></li>
-                                <li><span>Blow Out</span><span class="price">R300</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Braids -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-braids.jpg" alt="Braids">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Braids</h3>
-                            <p class="service-description">Beautiful, intricate braid styles from classic to
-                                contemporary</p>
-                            <ul class="service-list">
-                                <li><span>Plain Bantu Knots</span><span class="price">R260</span></li>
-                                <li><span>Bantu Knots with Hairpiece</span><span class="price">R360</span></li>
-                                <li><span>Box Braids - Short</span><span class="price">R680</span></li>
-                                <li><span>Box Braids - Medium</span><span class="price">R720</span></li>
-                                <li><span>Box Braids - Long</span><span class="price">R820</span></li>
-                                <li><span>Knotless Braids - Medium</span><span class="price">R850</span></li>
-                                <li><span>Knotless Braids - Long</span><span class="price">R920</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Cornrows -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-cornrows.jpg" alt="Cornrows">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Cornrows</h3>
-                            <p class="service-description">Stylish cornrow designs tailored to your preference</p>
-                            <ul class="service-list">
-                                <li><span>Plain Cornrows</span><span class="price">R420</span></li>
-                                <li><span>Needle Cornrows</span><span class="price">R380</span></li>
-                                <li><span>Needle Cornrows (Styled)</span><span class="price">R440</span></li>
-                                <li><span>Needle Cornrows (Premium)</span><span class="price">R480</span></li>
-                                <li><span>Plain Freehand</span><span class="price">R450</span></li>
-                                <li><span>Freehand with 1 Pom</span><span class="price">R480</span></li>
-                                <li><span>Freehand with 2 Pom</span><span class="price">R520</span></li>
-                                <li><span>Freehand with 3 Pom</span><span class="price">R580</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Undo Services -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-undo.jpg" alt="Undo Services">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Undo Services</h3>
-                            <p class="service-description">Gentle removal of braids, cornrows, and other protective
-                                styles</p>
-                            <ul class="service-list">
-                                <li><span>Needle Cornrows Undo</span><span class="price">R100</span></li>
-                                <li><span>Freehand Undo</span><span class="price">R100</span></li>
-                                <li><span>Braids Undo</span><span class="price">R140</span></li>
-                                <li><span>Foreign/Tribal Undo</span><span class="price">R200</span></li>
-                                <li><span>Benny & Betty Undo</span><span class="price">R80</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Kids Styles -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-kids.jpg" alt="Kids Hair Styles">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Benny & Betty Styles</h3>
-                            <p class="service-description">Fun and practical styles for children</p>
-                            <ul class="service-list">
-                                <li><span>Plain Benny & Betty</span><span class="price">R260</span></li>
-                                <li><span>Max 3-4 Lines</span><span class="price">R320</span></li>
-                                <li><span>Benny & Betty with Style</span><span class="price">R420</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Plaits -->
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-plaits.jpg" alt="Plaits">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Plaits & Special Styles</h3>
-                            <p class="service-description">Elegant plaits and custom styling options</p>
-                            <ul class="service-list">
-                                <li><span>Back Line Thin</span><span class="price">R460</span></li>
-                                <li><span>Back Line Medium</span><span class="price">R420</span></li>
-                                <li><span>Back Line Thick</span><span class="price">R380</span></li>
-                                <li><span>Tribal Braids</span><span class="price">R600</span></li>
-                                <li><span>Straight Up with Hairpiece</span><span class="price">R620</span></li>
-                            </ul>
-                        </div>
-                    </div>
+            <div class="service-categories">
+                <!-- Kiddies Hair -->
+                <div class="category-card" data-category="kiddies">
+                    <div class="category-icon">👧</div>
+                    <h3>Kiddies Hair</h3>
+                    <p>Gentle braids, cornrows & styling for children</p>
+                    <a href="#kiddies-services" class="btn btn-sm">View Services →</a>
                 </div>
-            </div>
-
-            <!-- Beauty Spa Services -->
-            <div id="beauty-spa" class="service-category" data-category="beauty">
-                <div class="services-grid">
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-facial.jpg" alt="Facial Treatments">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Facial Treatments</h3>
-                            <p class="service-description">Revitalize and rejuvenate your skin with our customized
-                                facials</p>
-                            <ul class="service-list">
-                                <li><span>Classic Facial</span><span class="price">R450</span></li>
-                                <li><span>Deep Cleansing Facial</span><span class="price">R550</span></li>
-                                <li><span>Anti-Aging Treatment</span><span class="price">R650</span></li>
-                                <li><span>Hydrating Facial</span><span class="price">R500</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-nails.jpg" alt="Nail Services">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Nail Services</h3>
-                            <p class="service-description">Professional manicures and pedicures for beautiful hands and
-                                feet</p>
-                            <ul class="service-list">
-                                <li><span>Classic Manicure</span><span class="price">R200</span></li>
-                                <li><span>Gel Manicure</span><span class="price">R300</span></li>
-                                <li><span>Classic Pedicure</span><span class="price">R250</span></li>
-                                <li><span>Spa Pedicure</span><span class="price">R350</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-massage.jpg" alt="Massage Therapy">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Massage Therapy</h3>
-                            <p class="service-description">Relax and unwind with our therapeutic massage treatments</p>
-                            <ul class="service-list">
-                                <li><span>Swedish Massage (60min)</span><span class="price">R500</span></li>
-                                <li><span>Deep Tissue Massage (60min)</span><span class="price">R600</span></li>
-                                <li><span>Hot Stone Massage (90min)</span><span class="price">R750</span></li>
-                                <li><span>Aromatherapy Massage (60min)</span><span class="price">R550</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="service-card">
-                        <div class="service-image">
-                            <img src="./assets/images/service-waxing.jpg" alt="Waxing Services">
-                            <div class="service-overlay">
-                                <button class="btn btn-white btn-sm">Book Now</button>
-                            </div>
-                        </div>
-                        <div class="service-content">
-                            <h3 class="service-title">Waxing Services</h3>
-                            <p class="service-description">Smooth, hair-free skin with our professional waxing services
-                            </p>
-                            <ul class="service-list">
-                                <li><span>Eyebrow Wax</span><span class="price">R80</span></li>
-                                <li><span>Upper Lip Wax</span><span class="price">R60</span></li>
-                                <li><span>Underarm Wax</span><span class="price">R120</span></li>
-                                <li><span>Full Leg Wax</span><span class="price">R350</span></li>
-                                <li><span>Brazilian Wax</span><span class="price">R400</span></li>
-                            </ul>
-                        </div>
-                    </div>
+                
+                <!-- Adult Hair -->
+                <div class="category-card" data-category="adult">
+                    <div class="category-icon">💇‍♀️</div>
+                    <h3>Adult Hair</h3>
+                    <p>Braids, cornrows, treatments & styling</p>
+                    <a href="#adult-services" class="btn btn-sm">View Services →</a>
                 </div>
-            </div>
-
-            <!-- Gift Packages -->
-            <div id="gifts" class="service-category" data-category="gifts">
-                <div class="services-grid">
-                    <div class="gift-card featured">
-                        <div class="gift-ribbon">Popular</div>
-                        <div class="gift-icon">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <h3 class="gift-title">Royal Treatment Package</h3>
-                        <p class="gift-description">The ultimate pampering experience</p>
-                        <ul class="gift-includes">
-                            <li><i class="fas fa-check"></i> Full Hair Styling Session</li>
-                            <li><i class="fas fa-check"></i> Facial Treatment</li>
-                            <li><i class="fas fa-check"></i> Manicure & Pedicure</li>
-                            <li><i class="fas fa-check"></i> 60min Massage</li>
-                            <li><i class="fas fa-check"></i> Complimentary Refreshments</li>
-                        </ul>
-                        <div class="gift-price">
-                            <span class="original-price">R2,500</span>
-                            <span class="sale-price">R1,999</span>
-                        </div>
-                        <button class="btn btn-primary btn-block">Purchase Package</button>
-                    </div>
-
-                    <div class="gift-card">
-                        <div class="gift-icon">
-                            <i class="fas fa-spa"></i>
-                        </div>
-                        <h3 class="gift-title">Relaxation Retreat</h3>
-                        <p class="gift-description">Perfect for stress relief and rejuvenation</p>
-                        <ul class="gift-includes">
-                            <li><i class="fas fa-check"></i> Hot Stone Massage (90min)</li>
-                            <li><i class="fas fa-check"></i> Hydrating Facial</li>
-                            <li><i class="fas fa-check"></i> Spa Pedicure</li>
-                            <li><i class="fas fa-check"></i> Herbal Tea & Snacks</li>
-                        </ul>
-                        <div class="gift-price">
-                            <span class="original-price">R1,800</span>
-                            <span class="sale-price">R1,499</span>
-                        </div>
-                        <button class="btn btn-primary btn-block">Purchase Package</button>
-                    </div>
-
-                    <div class="gift-card">
-                        <div class="gift-icon">
-                            <i class="fas fa-cut"></i>
-                        </div>
-                        <h3 class="gift-title">Hair Transformation</h3>
-                        <p class="gift-description">Complete hair makeover experience</p>
-                        <ul class="gift-includes">
-                            <li><i class="fas fa-check"></i> Consultation with Stylist</li>
-                            <li><i class="fas fa-check"></i> Deep Conditioning Treatment</li>
-                            <li><i class="fas fa-check"></i> Premium Braids or Cornrows</li>
-                            <li><i class="fas fa-check"></i> Scalp Massage</li>
-                        </ul>
-                        <div class="gift-price">
-                            <span class="sale-price">R1,200</span>
-                        </div>
-                        <button class="btn btn-primary btn-block">Purchase Package</button>
-                    </div>
-
-                    <div class="gift-card">
-                        <div class="gift-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <h3 class="gift-title">Mother's Day Special</h3>
-                        <p class="gift-description">Show mom how much you care</p>
-                        <ul class="gift-includes">
-                            <li><i class="fas fa-check"></i> Choice of Hair Service</li>
-                            <li><i class="fas fa-check"></i> Relaxing Facial</li>
-                            <li><i class="fas fa-check"></i> Gel Manicure</li>
-                            <li><i class="fas fa-check"></i> Gift Voucher (R200)</li>
-                        </ul>
-                        <div class="gift-price">
-                            <span class="original-price">R1,400</span>
-                            <span class="sale-price">R1,199</span>
-                        </div>
-                        <button class="btn btn-primary btn-block">Purchase Package</button>
-                    </div>
-
-                    <!-- Gift Voucher -->
-                    <div class="gift-card voucher-card">
-                        <div class="gift-icon">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                        <h3 class="gift-title">Gift Voucher</h3>
-                        <p class="gift-description">Let them choose their perfect treatment</p>
-                        <div class="voucher-amounts">
-                            <button class="voucher-btn" data-amount="250">R250</button>
-                            <button class="voucher-btn" data-amount="500">R500</button>
-                            <button class="voucher-btn" data-amount="1000">R1000</button>
-                            <button class="voucher-btn active" data-amount="custom">Custom</button>
-                        </div>
-                        <input type="number" class="voucher-input" placeholder="Enter custom amount" min="100">
-                        <button class="btn btn-primary btn-block">Purchase Voucher</button>
-                    </div>
+                
+                <!-- Nails -->
+                <div class="category-card" data-category="nails">
+                    <div class="category-icon">💅</div>
+                    <h3>Nails</h3>
+                    <p>Manicure, pedicure & nail art</p>
+                    <a href="#nails-services" class="btn btn-sm">View Services →</a>
+                </div>
+                
+                <!-- Skin & Beauty -->
+                <div class="category-card" data-category="beauty">
+                    <div class="category-icon">✨</div>
+                    <h3>Skin & Beauty</h3>
+                    <p>Facials, waxing & beauty treatments</p>
+                    <a href="#beauty-services" class="btn btn-sm">View Services →</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section id="gallery" class="gallery">
+    <!-- Kiddies Hair Services Detail -->
+    <section id="kiddies-services" class="service-detail">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Our Work</span>
-                <h2 class="section-title">Gallery of Beautiful Transformations</h2>
-                <p class="section-description">
-                    See the stunning results our talented team creates every day
-                </p>
+                <span class="service-category-tag">Kiddies Hair</span>
+                <h2 class="section-title">Gentle Styling for Little Ones</h2>
+                <p class="section-description">Specialized hair care for children in a calm, patient environment</p>
             </div>
-
-            <!-- Gallery Filter -->
-            <div class="gallery-filter">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="braids">Braids</button>
-                <button class="filter-btn" data-filter="cornrows">Cornrows</button>
-                <button class="filter-btn" data-filter="kids">Kids Styles</button>
-                <button class="filter-btn" data-filter="beauty">Beauty & Spa</button>
+            
+            <div class="services-grid">
+                <!-- Benny & Betty Styles -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-kids.jpg" alt="Benny & Betty Styles">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Benny & Betty Styles</h3>
+                        <p class="service-description">Fun and practical styles for children, gentle on little scalps</p>
+                        <ul class="service-list">
+                            <li><span>Plain Benny & Betty</span><span class="price">R260</span></li>
+                            <li><span>Max 3-4 Lines</span><span class="price">R320</span></li>
+                            <li><span>Benny & Betty with Style</span><span class="price">R420</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Kids Braids -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-braids.jpg" alt="Kids Braids">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Kids Braids</h3>
+                        <p class="service-description">Beautiful braids designed for comfort and durability</p>
+                        <ul class="service-list">
+                            <li><span>Box Braids - Short</span><span class="price">R580</span></li>
+                            <li><span>Box Braids - Medium</span><span class="price">R620</span></li>
+                            <li><span>Box Braids - Long</span><span class="price">R720</span></li>
+                            <li><span>Knotless Braids - Medium</span><span class="price">R750</span></li>
+                            <li><span>Knotless Braids - Long</span><span class="price">R820</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Kids Cornrows -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-cornrows.jpg" alt="Kids Cornrows">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Kids Cornrows</h3>
+                        <p class="service-description">Neat and stylish cornrows perfect for active children</p>
+                        <ul class="service-list">
+                            <li><span>Plain Cornrows</span><span class="price">R320</span></li>
+                            <li><span>Needle Cornrows</span><span class="price">R280</span></li>
+                            <li><span>Needle Cornrows (Styled)</span><span class="price">R340</span></li>
+                            <li><span>Freehand Styles</span><span class="price">R350</span></li>
+                            <li><span>Freehand with Design</span><span class="price">R420</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Kids Undo Services -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-undo.jpg" alt="Undo Services">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Gentle Undo Services</h3>
+                        <p class="service-description">Careful removal of braids and cornrows without stress</p>
+                        <ul class="service-list">
+                            <li><span>Braids Undo</span><span class="price">R120</span></li>
+                            <li><span>Cornrows Undo</span><span class="price">R80</span></li>
+                            <li><span>Benny & Betty Undo</span><span class="price">R60</span></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-
-            <!-- Gallery Grid -->
-            <div class="gallery-grid">
-                <div class="gallery-item" data-category="braids">
-                    <img src="./assets/images/gallery-1.jpg" alt="Box Braids">
-                    <div class="gallery-overlay">
-                        <h4>Box Braids</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="cornrows">
-                    <img src="./assets/images/gallery-2.jpg" alt="Cornrows">
-                    <div class="gallery-overlay">
-                        <h4>Cornrow Design</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="braids">
-                    <img src="./assets/images/gallery-3.jpg" alt="Knotless Braids">
-                    <div class="gallery-overlay">
-                        <h4>Knotless Braids</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="kids">
-                    <img src="./assets/images/gallery-4.jpg" alt="Kids Braids">
-                    <div class="gallery-overlay">
-                        <h4>Kids Benny & Betty</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="beauty">
-                    <img src="./assets/images/gallery-5.jpg" alt="Facial Treatment">
-                    <div class="gallery-overlay">
-                        <h4>Spa Facial</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="cornrows">
-                    <img src="./assets/images/gallery-6.jpg" alt="Freehand Cornrows">
-                    <div class="gallery-overlay">
-                        <h4>Freehand Cornrows</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="braids">
-                    <img src="./assets/images/gallery-7.jpg" alt="Tribal Braids">
-                    <div class="gallery-overlay">
-                        <h4>Tribal Braids</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-                <div class="gallery-item" data-category="beauty">
-                    <img src="./assets/images/gallery-8.jpg" alt="Nail Art">
-                    <div class="gallery-overlay">
-                        <h4>Nail Art Design</h4>
-                        <button class="gallery-btn"><i class="fas fa-search-plus"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="gallery-load-more">
-                <button class="btn btn-outline">Load More</button>
+            
+            <div class="text-center">
+                <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section id="products" class="products">
+    <!-- Adult Hair Services Detail -->
+    <section id="adult-services" class="service-detail">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Shop</span>
-                <h2 class="section-title">Premium Hair & Beauty Products</h2>
-                <p class="section-description">
-                    Browse our curated selection of professional-grade products
-                </p>
+                <span class="service-category-tag">Adult Hair</span>
+                <h2 class="section-title">Professional Hair Services for Adults</h2>
+                <p class="section-description">Expert styling, braiding and treatments for beautiful, healthy hair</p>
             </div>
-
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-image">
-                        <img src="./assets/images/product-1.jpg" alt="Hair Oil">
-                        <div class="product-actions">
-                            <button class="product-btn"><i class="fas fa-heart"></i></button>
-                            <button class="product-btn"><i class="fas fa-eye"></i></button>
-                            <button class="product-btn"><i class="fas fa-shopping-cart"></i></button>
+            
+            <div class="services-grid">
+                <!-- Braids -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-braids.jpg" alt="Braids">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
-                    <div class="product-content">
-                        <div class="product-category">Hair Care</div>
-                        <h4 class="product-name">Argan Oil Treatment</h4>
-                        <div class="product-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            <span>(127)</span>
-                        </div>
-                        <div class="product-price">R245</div>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-badge sale">Sale</div>
-                    <div class="product-image">
-                        <img src="./assets/images/product-2.jpg" alt="Shampoo">
-                        <div class="product-actions">
-                            <button class="product-btn"><i class="fas fa-heart"></i></button>
-                            <button class="product-btn"><i class="fas fa-eye"></i></button>
-                            <button class="product-btn"><i class="fas fa-shopping-cart"></i></button>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <div class="product-category">Hair Care</div>
-                        <h4 class="product-name">Moisturizing Shampoo</h4>
-                        <div class="product-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <span>(89)</span>
-                        </div>
-                        <div class="product-price">
-                            <span class="old-price">R180</span>
-                            <span>R149</span>
-                        </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Braids</h3>
+                        <p class="service-description">Beautiful, intricate braid styles from classic to contemporary</p>
+                        <ul class="service-list">
+                            <li><span>Plain Bantu Knots</span><span class="price">R260</span></li>
+                            <li><span>Bantu Knots with Hairpiece</span><span class="price">R360</span></li>
+                            <li><span>Box Braids - Short</span><span class="price">R680</span></li>
+                            <li><span>Box Braids - Medium</span><span class="price">R720</span></li>
+                            <li><span>Box Braids - Long</span><span class="price">R820</span></li>
+                            <li><span>Knotless Braids - Medium</span><span class="price">R850</span></li>
+                            <li><span>Knotless Braids - Long</span><span class="price">R920</span></li>
+                            <li><span>Tribal Braids</span><span class="price">R600</span></li>
+                        </ul>
                     </div>
                 </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="./assets/images/product-3.jpg" alt="Face Serum">
-                        <div class="product-actions">
-                            <button class="product-btn"><i class="fas fa-heart"></i></button>
-                            <button class="product-btn"><i class="fas fa-eye"></i></button>
-                            <button class="product-btn"><i class="fas fa-shopping-cart"></i></button>
+                
+                <!-- Cornrows -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-cornrows.jpg" alt="Cornrows">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
-                    <div class="product-content">
-                        <div class="product-category">Skincare</div>
-                        <h4 class="product-name">Vitamin C Serum</h4>
-                        <div class="product-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <span>(64)</span>
-                        </div>
-                        <div class="product-price">R399</div>
+                    <div class="service-content">
+                        <h3 class="service-title">Cornrows</h3>
+                        <p class="service-description">Stylish cornrow designs tailored to your preference</p>
+                        <ul class="service-list">
+                            <li><span>Plain Cornrows</span><span class="price">R420</span></li>
+                            <li><span>Needle Cornrows</span><span class="price">R380</span></li>
+                            <li><span>Needle Cornrows (Styled)</span><span class="price">R440</span></li>
+                            <li><span>Needle Cornrows (Premium)</span><span class="price">R480</span></li>
+                            <li><span>Plain Freehand</span><span class="price">R450</span></li>
+                            <li><span>Freehand with 1 Pom</span><span class="price">R480</span></li>
+                            <li><span>Freehand with 2 Pom</span><span class="price">R520</span></li>
+                            <li><span>Freehand with 3 Pom</span><span class="price">R580</span></li>
+                        </ul>
                     </div>
                 </div>
-
-                <div class="product-card">
-                    <div class="product-badge">Bestseller</div>
-                    <div class="product-image">
-                        <img src="./assets/images/product-4.jpg" alt="Hair Mask">
-                        <div class="product-actions">
-                            <button class="product-btn"><i class="fas fa-heart"></i></button>
-                            <button class="product-btn"><i class="fas fa-eye"></i></button>
-                            <button class="product-btn"><i class="fas fa-shopping-cart"></i></button>
+                
+                <!-- Hair Wash & Treatments -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-wash.jpg" alt="Hair Treatments">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
-                    <div class="product-content">
-                        <div class="product-category">Hair Care</div>
-                        <h4 class="product-name">Deep Repair Hair Mask</h4>
-                        <div class="product-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <span>(203)</span>
+                    <div class="service-content">
+                        <h3 class="service-title">Hair Wash & Treatments</h3>
+                        <p class="service-description">Gentle cleansing and nourishing treatments</p>
+                        <ul class="service-list">
+                            <li><span>Gentle Hair Wash</span><span class="price">R180</span></li>
+                            <li><span>Deep Conditioning</span><span class="price">R280</span></li>
+                            <li><span>Hot Oil Treatment</span><span class="price">R320</span></li>
+                            <li><span>Blow Out</span><span class="price">R300</span></li>
+                            <li><span>Scalp Treatment</span><span class="price">R250</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Undo Services -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-undo.jpg" alt="Undo Services">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
-                        <div class="product-price">R295</div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Undo Services</h3>
+                        <p class="service-description">Professional removal of protective styles</p>
+                        <ul class="service-list">
+                            <li><span>Needle Cornrows Undo</span><span class="price">R100</span></li>
+                            <li><span>Freehand Undo</span><span class="price">R100</span></li>
+                            <li><span>Braids Undo</span><span class="price">R140</span></li>
+                            <li><span>Foreign/Tribal Undo</span><span class="price">R200</span></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <div class="products-cta">
-                <button class="btn btn-primary btn-lg">View All Products</button>
+            
+            <div class="text-center">
+                <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
+    <!-- Nails Services Detail -->
+    <section id="nails-services" class="service-detail">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Testimonials</span>
-                <h2 class="section-title">What Our Clients Say</h2>
+                <span class="service-category-tag">Nails</span>
+                <h2 class="section-title">Beautiful Hands & Feet</h2>
+                <p class="section-description">Professional nail care for the whole family</p>
             </div>
-
-            <div class="testimonials-slider">
-                <div class="testimonial-card active">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonial-text">
-                        "Absolutely love the service at Tassel! The staff is professional, friendly, and my braids
-                        always turn out perfect. I've been coming here for over a year and wouldn't go anywhere else!"
-                    </p>
-                    <div class="testimonial-author">
-                        <img src="./assets/images/client-1.jpg" alt="Client">
-                        <div class="author-info">
-                            <h5>Thandiwe Mokoena</h5>
-                            <span>Regular Client</span>
+            
+            <div class="services-grid">
+                <!-- Manicure -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-nails.jpg" alt="Manicure">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Manicure</h3>
+                        <p class="service-description">Perfectly polished hands with expert care</p>
+                        <ul class="service-list">
+                            <li><span>Classic Manicure</span><span class="price">R200</span></li>
+                            <li><span>Gel Manicure</span><span class="price">R300</span></li>
+                            <li><span>French Manicure</span><span class="price">R280</span></li>
+                            <li><span>Nail Art (per nail)</span><span class="price">R30</span></li>
+                        </ul>
                     </div>
                 </div>
-
-                <div class="testimonial-card">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonial-text">
-                        "The spa treatments here are incredible! I had the Royal Treatment Package for my birthday and
-                        it was the most relaxing experience. Highly recommend!"
-                    </p>
-                    <div class="testimonial-author">
-                        <img src="./assets/images/client-2.jpg" alt="Client">
-                        <div class="author-info">
-                            <h5>Lerato Dlamini</h5>
-                            <span>Spa Enthusiast</span>
+                
+                <!-- Pedicure -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-nails.jpg" alt="Pedicure">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Pedicure</h3>
+                        <p class="service-description">Relaxing foot care and beautiful toes</p>
+                        <ul class="service-list">
+                            <li><span>Classic Pedicure</span><span class="price">R250</span></li>
+                            <li><span>Spa Pedicure</span><span class="price">R350</span></li>
+                            <li><span>Gel Pedicure</span><span class="price">R380</span></li>
+                            <li><span>Luxury Pedicure</span><span class="price">R450</span></li>
+                        </ul>
                     </div>
                 </div>
-
-                <div class="testimonial-card">
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <p class="testimonial-text">
-                        "Best salon for kids! My daughter loves getting her hair done here. The stylists are patient and
-                        create such beautiful styles. Thank you Tassel!"
-                    </p>
-                    <div class="testimonial-author">
-                        <img src="./assets/images/client-3.jpg" alt="Client">
-                        <div class="author-info">
-                            <h5>Nomsa Khumalo</h5>
-                            <span>Happy Mother</span>
+                
+                <!-- Extras -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-nails.jpg" alt="Nail Extras">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Nail Enhancements</h3>
+                        <p class="service-description">Add-ons and special treatments</p>
+                        <ul class="service-list">
+                            <li><span>Nail Repair</span><span class="price">R50</span></li>
+                            <li><span>Paraffin Treatment</span><span class="price">R100</span></li>
+                            <li><span>Nail Strengthening</span><span class="price">R80</span></li>
+                            <li><span>Cuticle Treatment</span><span class="price">R60</span></li>
+                        </ul>
                     </div>
                 </div>
             </div>
+            
+            <div class="text-center">
+                <a href="#services" class="back-to-services">← Back to All Services</a>
+            </div>
+        </div>
+    </section>
 
-            <div class="testimonial-controls">
-                <button class="testimonial-prev"><i class="fas fa-chevron-left"></i></button>
-                <div class="testimonial-dots"></div>
-                <button class="testimonial-next"><i class="fas fa-chevron-right"></i></button>
+    <!-- Skin & Beauty Services Detail -->
+    <section id="beauty-services" class="service-detail">
+        <div class="container">
+            <div class="section-header">
+                <span class="service-category-tag">Skin & Beauty</span>
+                <h2 class="section-title">Rejuvenate and Refresh</h2>
+                <p class="section-description">Professional skincare and beauty treatments for a radiant glow</p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Facials -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-facial.jpg" alt="Facials">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Facial Treatments</h3>
+                        <p class="service-description">Customized facials for all skin types</p>
+                        <ul class="service-list">
+                            <li><span>Classic Facial</span><span class="price">R450</span></li>
+                            <li><span>Deep Cleansing Facial</span><span class="price">R550</span></li>
+                            <li><span>Anti-Aging Treatment</span><span class="price">R650</span></li>
+                            <li><span>Hydrating Facial</span><span class="price">R500</span></li>
+                            <li><span>Teen Facial</span><span class="price">R350</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Waxing -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-waxing.jpg" alt="Waxing">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Waxing Services</h3>
+                        <p class="service-description">Smooth, hair-free skin with professional waxing</p>
+                        <ul class="service-list">
+                            <li><span>Eyebrow Wax</span><span class="price">R80</span></li>
+                            <li><span>Upper Lip Wax</span><span class="price">R60</span></li>
+                            <li><span>Underarm Wax</span><span class="price">R120</span></li>
+                            <li><span>Half Leg Wax</span><span class="price">R200</span></li>
+                            <li><span>Full Leg Wax</span><span class="price">R350</span></li>
+                            <li><span>Brazilian Wax</span><span class="price">R400</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Massage -->
+                <div class="service-card">
+                    <div class="service-image">
+                        <img src="./assets/images/service-massage.jpg" alt="Massage">
+                        <div class="service-overlay">
+                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                        </div>
+                    </div>
+                    <div class="service-content">
+                        <h3 class="service-title">Massage Therapy</h3>
+                        <p class="service-description">Relax and unwind with therapeutic massage</p>
+                        <ul class="service-list">
+                            <li><span>Swedish Massage (60min)</span><span class="price">R500</span></li>
+                            <li><span>Deep Tissue (60min)</span><span class="price">R600</span></li>
+                            <li><span>Hot Stone Massage (90min)</span><span class="price">R750</span></li>
+                            <li><span>Aromatherapy (60min)</span><span class="price">R550</span></li>
+                            <li><span>Back, Neck & Shoulder</span><span class="price">R350</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="#services" class="back-to-services">← Back to All Services</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="location" class="location-highlight">
+        <div class="container">
+            <h2>📍 Visit Our Studio</h2>
+            <div class="location-details">
+                <p><i class="fas fa-map-marker-alt"></i> 101 Bellairs Drive, Glenvista</p>
+                <p style="margin: 1rem 0;">
+                    <a href="https://wa.me/27823456789?text=Hi%20Tassel!%20I'd%20like%20to%20book%20an%20appointment" 
+                       class="btn btn-whatsapp btn-lg">
+                        <i class="fab fa-whatsapp"></i> WhatsApp Us to Book
+                    </a>
+                </p>
+            </div>
+            <div class="map-container">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3583.063847384384!2d28.0473!3d-26.1076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzI3LjQiUyAyOMKwMDInNTAuMyJF!5e0!3m2!1sen!2sza!4v1234567890"
+                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+                </iframe>
             </div>
         </div>
     </section>
@@ -883,11 +666,8 @@
             <div class="contact-wrapper">
                 <div class="contact-info">
                     <span class="section-label">Get in Touch</span>
-                    <h2 class="section-title">Visit Us or Book Online</h2>
-                    <p class="contact-description">
-                        We'd love to hear from you! Reach out to us for appointments, inquiries, or just to say hello.
-                    </p>
-
+                    <h2 class="section-title">We'd Love to Hear From You</h2>
+                    
                     <div class="contact-details">
                         <div class="contact-item">
                             <div class="contact-icon">
@@ -895,7 +675,7 @@
                             </div>
                             <div class="contact-content">
                                 <h4>Location</h4>
-                                <p>123 Beauty Avenue, Sandton<br>Johannesburg, Gauteng 2196</p>
+                                <p>101 Bellairs Drive, Glenvista<br>Johannesburg, Gauteng</p>
                             </div>
                         </div>
 
@@ -915,7 +695,7 @@
                             </div>
                             <div class="contact-content">
                                 <h4>Email</h4>
-                                <p>info@tasselhairandbeauty.co.za<br>bookings@tasselhairandbeauty.co.za</p>
+                                <p>info@tasselstudio.co.za</p>
                             </div>
                         </div>
 
@@ -935,7 +715,6 @@
                     <div class="social-links">
                         <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
@@ -953,29 +732,11 @@
                             <input type="tel" id="phone" name="phone" placeholder="Your Phone">
                         </div>
                         <div class="form-group">
-                            <select id="subject" name="subject" required>
-                                <option value="">Select Subject</option>
-                                <option value="booking">Appointment Booking</option>
-                                <option value="inquiry">General Inquiry</option>
-                                <option value="complaint">Complaint</option>
-                                <option value="feedback">Feedback</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="message" name="message" rows="5" placeholder="Your Message"
-                                required></textarea>
+                            <textarea id="message" name="message" rows="4" placeholder="How can we help you?" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Send Message</button>
                     </form>
                 </div>
-            </div>
-
-            <!-- Map -->
-            <div class="contact-map">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3583.063847384384!2d28.0473!3d-26.1076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzI3LjQiUyAyOMKwMDInNTAuMyJF!5e0!3m2!1sen!2sza!4v1234567890"
-                    width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
-                </iframe>
             </div>
         </div>
     </section>
@@ -987,18 +748,16 @@
                 <div class="footer-column">
                     <div class="footer-logo">
                         <span class="logo-text">TASSEL</span>
-                        <span class="logo-subtitle">Hair & Beauty Studio</span>
+                        <span class="logo-subtitle">Family Hair & Beauty Studio</span>
                     </div>
                     <p class="footer-description">
-                        Your trusted destination for premium hair and beauty services in Johannesburg.
-                        Experience excellence, elegance, and exceptional care.
+                        Where kiddies hair meets luxury family beauty. Premium hair, nails & beauty services 
+                        for the whole family in Glenvista.
                     </p>
                     <div class="footer-social">
                         <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                         <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
 
@@ -1007,8 +766,7 @@
                     <ul class="footer-links">
                         <li><a href="#about">About Us</a></li>
                         <li><a href="#services">Services</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#products">Products</a></li>
+                        <li><a href="#location">Location</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -1016,27 +774,22 @@
                 <div class="footer-column">
                     <h4 class="footer-title">Services</h4>
                     <ul class="footer-links">
-                        <li><a href="#hair-salon">Hair Salon</a></li>
-                        <li><a href="#beauty-spa">Beauty Spa</a></li>
-                        <li><a href="#gifts">Gift Packages</a></li>
-                        <li><a href="#">Bridal Services</a></li>
-                        <li><a href="#">Men's Grooming</a></li>
+                        <li><a href="#kiddies-services">Kiddies Hair</a></li>
+                        <li><a href="#adult-services">Adult Hair</a></li>
+                        <li><a href="#nails-services">Nails</a></li>
+                        <li><a href="#beauty-services">Skin & Beauty</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4 class="footer-title">Newsletter</h4>
-                    <p class="footer-text">Subscribe to get special offers, updates, and beauty tips!</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Your email address" required>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                    <div class="footer-badges">
-                        <img src="./assets/images/badge-certified.png" alt="Certified" class="badge">
-                        <img src="./assets/images/badge-award.png" alt="Award" class="badge">
-                    </div>
+                    <h4 class="footer-title">Book Now</h4>
+                    <p class="footer-text">Ready to look beautiful? Book your appointment today.</p>
+                    <a href="#" onclick="document.getElementById('book-btn').click()" class="btn btn-primary" style="display: inline-block; margin-bottom: 1rem;">
+                        <i class="fas fa-calendar-alt"></i> Book Online
+                    </a>
+                    <a href="https://wa.me/27823456789" class="btn btn-outline-light" style="display: inline-block;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp Us
+                    </a>
                 </div>
             </div>
 
@@ -1045,7 +798,6 @@
                 <ul class="footer-legal">
                     <li><a href="#">Privacy Policy</a></li>
                     <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Cookie Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -1075,19 +827,28 @@
                     <input type="tel" id="booking-phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="booking-service">Service *</label>
+                    <label for="booking-service">Service Type *</label>
                     <select id="booking-service" required>
                         <option value="">Select a service</option>
-                        <optgroup label="Hair Salon">
-                            <option value="gentle-wash">Gentle Hair Wash - R180</option>
-                            <option value="deep-conditioning">Deep Conditioning - R280</option>
-                            <option value="box-braids">Box Braids - From R680</option>
-                            <option value="cornrows">Cornrows - From R380</option>
+                        <optgroup label="Kiddies Hair">
+                            <option value="kids-braids">Kids Braids</option>
+                            <option value="kids-cornrows">Kids Cornrows</option>
+                            <option value="benny-betty">Benny & Betty Styles</option>
                         </optgroup>
-                        <optgroup label="Beauty Spa">
-                            <option value="facial">Facial Treatment - From R450</option>
-                            <option value="manicure">Manicure - From R200</option>
-                            <option value="massage">Massage - From R500</option>
+                        <optgroup label="Adult Hair">
+                            <option value="braids">Braids</option>
+                            <option value="cornrows">Cornrows</option>
+                            <option value="treatments">Hair Treatments</option>
+                        </optgroup>
+                        <optgroup label="Nails">
+                            <option value="manicure">Manicure</option>
+                            <option value="pedicure">Pedicure</option>
+                            <option value="gel">Gel Nails</option>
+                        </optgroup>
+                        <optgroup label="Skin & Beauty">
+                            <option value="facial">Facial</option>
+                            <option value="waxing">Waxing</option>
+                            <option value="massage">Massage</option>
                         </optgroup>
                     </select>
                 </div>
@@ -1102,8 +863,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="booking-notes">Additional Notes</label>
-                    <textarea id="booking-notes" rows="3"></textarea>
+                    <label for="booking-notes">Additional Notes (optional)</label>
+                    <textarea id="booking-notes" rows="3" placeholder="Any special requests?"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Confirm Booking</button>
             </form>
@@ -1150,8 +911,6 @@
                 <button type="button" class="btn btn-outline btn-block" id="show-login">Back to Login</button>
             </form>
         </div>
-    </div>
-    </div>
     </div>
 
     <!-- Gallery Lightbox -->

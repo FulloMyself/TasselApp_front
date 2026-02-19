@@ -251,6 +251,7 @@
                         Requests</a></li>
                 <li><a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> Users</a></li>
                 <li><a href="#" onclick="showSection('products')"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="#" onclick="showSection('services')"><i class="fas fa-cut"></i> Services</a></li>
                 <li><a href="#" onclick="showSection('vouchers')"><i class="fas fa-ticket-alt"></i> Vouchers</a></li>
                 <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
                 <li><a href="#" id="logout-btn" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -380,6 +381,42 @@
                         </tr>
                     </thead>
                     <tbody id="products-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="sec-services" style="display:none;">
+            <div class="content-box">
+                <div class="box-header">
+                    <h3>Service Management</h3>
+                    <button class="btn btn-primary" onclick="openServiceModal()">Add New Service</button>
+                </div>
+
+                <!-- Category Tabs -->
+                <div
+                    style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                    <button class="filter-btn active" onclick="filterServices('all')">All Services</button>
+                    <button class="filter-btn" onclick="filterServices('kiddies')">👧 Kiddies Hair</button>
+                    <button class="filter-btn" onclick="filterServices('adult')">💇‍♀️ Adult Hair</button>
+                    <button class="filter-btn" onclick="filterServices('nails')">💅 Nails</button>
+                    <button class="filter-btn" onclick="filterServices('beauty')">✨ Skin & Beauty</button>
+                </div>
+
+                <!-- Services Table -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Category</th>
+                            <th>Service Title</th>
+                            <th>Description</th>
+                            <th>Items</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="services-table"></tbody>
                 </table>
             </div>
         </section>
