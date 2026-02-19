@@ -221,6 +221,20 @@
             height: 300px;
             width: 100%;
         }
+
+        /* Modal Styles (should be in <head>, but inline for this example) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -347,7 +361,7 @@
             </div>
         </section>
 
-        <!-- Products & Vouchers -->
+        <!-- Products Section -->
         <section id="sec-products" style="display:none;">
             <div class="content-box">
                 <div class="box-header">
@@ -370,6 +384,7 @@
             </div>
         </section>
 
+        <!-- Vouchers Section -->
         <section id="sec-vouchers" style="display:none;">
             <div class="content-box">
                 <div class="box-header">
@@ -390,64 +405,63 @@
                 </table>
             </div>
         </section>
-    </main>
 
-    <!-- Universal Profile Modal -->
-    <div id="profile-modal" class="modal"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-        <div class="modal-content"
-            style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
-            <button onclick="closeProfileModal()"
-                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-            <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
-            <form id="profile-form">
-                <div class="form-group" style="margin-bottom:1rem;">
-                    <label>Full Name</label>
-                    <input type="text" id="profile-name" class="form-control"
-                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-                <div class="form-group" style="margin-bottom:1rem;">
-                    <label>Email Address</label>
-                    <input type="email" id="profile-email" class="form-control"
-                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-                <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
-                <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current
-                    password</p>
-                <div class="form-group" style="margin-bottom:1rem;">
-                    <label>New Password</label>
-                    <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
-                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-                <div class="form-group" style="margin-bottom:1rem;">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="profile-pass-confirm" class="form-control"
-                        placeholder="Confirm new password"
-                        style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block"
-                    style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
-                    Profile</button>
-            </form>
+        <!-- Universal Profile Modal -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content"
+                style="background:white; padding:2rem; border-radius:10px; width:450px; position:relative;">
+                <button onclick="closeProfileModal()"
+                    style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                <h2 style="margin-bottom:1.5rem; color:#6B5D52;">My Profile</h2>
+                <form id="profile-form">
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" class="form-control"
+                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label>Email Address</label>
+                        <input type="email" id="profile-email" class="form-control"
+                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
+                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
+                        current
+                        password</p>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label>New Password</label>
+                        <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password"
+                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="profile-pass-confirm" class="form-control"
+                            placeholder="Confirm new password"
+                            style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"
+                        style="padding:10px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px;">Update
+                        Profile</button>
+                </form>
+            </div>
         </div>
-    </div>
 
+        <!-- Admin Product/Voucher Modal -->
+        <div id="admin-modal" class="modal">
+            <div class="modal-content"
+                style="background:white; padding:2rem; border-radius:10px; width:400px; position:relative;">
+                <button onclick="closeAdminModal()"
+                    style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                <h2 id="modal-title" style="margin-bottom:1.5rem; color:#6B5D52;">Form</h2>
+                <form id="admin-form">
+                    <!-- Dynamic Fields injected by JS -->
+                </form>
+            </div>
+        </div>
+
+    </main> <!-- MAIN TAG CLOSED HERE -->
 
     <script src="dashboard.js"></script>
-
-    <div id="admin-modal" class="modal"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-        <div class="modal-content"
-            style="background:white; padding:2rem; border-radius:10px; width:400px; position:relative;">
-            <button onclick="closeAdminModal()"
-                style="position:absolute; top:10px; right:15px; border:none; background:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-            <h2 id="modal-title" style="margin-bottom:1.5rem; color:#6B5D52;">Form</h2>
-            <form id="admin-form">
-                <!-- Dynamic Fields will be injected here by JS -->
-                <button type="submit" class="btn btn-primary btn-block" style="margin-top:1rem;">Save</button>
-            </form>
-        </div>
-    </div>
 </body>
 
 </html>
