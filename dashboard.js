@@ -285,13 +285,28 @@ async function initAdmin() {
                 }
                 console.log('Processed voucher data:', data);
             } else if (type === 'service') {
-                // Parse and validate items JSON using the enhanced helper function
-                const validation = validateServiceItems(data.items);
-                if (!validation.valid) {
-                    alert('Invalid service items: ' + validation.error);
-                    return;
+                // Collect all service items from the form
+                const items = [];
+                let index = 0;
+
+                while (document.getElementsByName(`item_name_${index}`).length > 0) {
+                    const name = document.getElementsByName(`item_name_${index}`)[0]?.value;
+                    const duration = document.getElementsByName(`item_duration_${index}`)[0]?.value;
+                    const price = parseFloat(document.getElementsByName(`item_price_${index}`)[0]?.value);
+                    const description = document.getElementsByName(`item_description_${index}`)[0]?.value;
+
+                    if (name && !isNaN(price)) {
+                        items.push({
+                            name: name,
+                            duration: duration || '',
+                            price: price,
+                            description: description || ''
+                        });
+                    }
+                    index++;
                 }
-                data.items = validation.items;
+
+                data.items = items;
                 data.isActive = data.isActive === 'on';
                 data.order = parseInt(data.order) || 0;
                 console.log('Processed service data:', data);
@@ -611,102 +626,198 @@ window.openServiceModal = function (serviceId = null) {
         form.dataset.id = service._id || '';
         title.textContent = service._id ? 'Edit Service' : 'Add New Service';
 
-        // Format items for display with duration
-        const itemsJson = service.items ? JSON.stringify(service.items, null, 2) : JSON.stringify([
-            {
-                "name": "Example Service",
-                "duration": "60 min",
-                "price": 350,
-                "description": "Optional description"
-            }
-        ], null, 2);
+        // Build the items HTML
+        let itemsFieldsHtml = '';
+        const items = service.items || [];
 
+        if (items.length > 0) {
+            items.forEach((item, index) => {
+                itemsFieldsHtml += `
+                    <div class="service-item" style="background:#f9f9f9; padding:20px; margin-bottom:20px; border-radius:8px; border:1px solid #e0e0e0; position:relative;">
+                        <div style="position:absolute; top:10px; right:10px;">
+                            <button type="button" class="btn-sm btn-danger" onclick="removeServiceItem(this)" style="padding:4px 10px; font-size:0.8rem;">✕ Remove</button>
+                        </div>
+                        <h5 style="margin-top:0; margin-bottom:15px; color:var(--primary-brown);">Service Item #${index + 1}</h5>
+                        
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:600;">Item Name *</label>
+                            <input type="text" name="item_name_${index}" value="${item.name || ''}" placeholder="e.g. Plain Cornrows" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:600;">Duration</label>
+                                <input type="text" name="item_duration_${index}" value="${item.duration || ''}" placeholder="e.g. 2 hours" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:5px; font-weight:600;">Price (R) *</label>
+                                <input type="number" name="item_price_${index}" value="${item.price || ''}" placeholder="e.g. 420" step="0.01" min="0" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:600;">Description (optional)</label>
+                            <input type="text" name="item_description_${index}" value="${item.description || ''}" placeholder="Brief description" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            // Show one empty item by default for new services
+            itemsFieldsHtml = `
+                <div class="service-item" style="background:#f9f9f9; padding:20px; margin-bottom:20px; border-radius:8px; border:1px solid #e0e0e0; position:relative;">
+                    <div style="position:absolute; top:10px; right:10px;">
+                        <button type="button" class="btn-sm btn-danger" onclick="removeServiceItem(this)" style="padding:4px 10px; font-size:0.8rem;">✕ Remove</button>
+                    </div>
+                    <h5 style="margin-top:0; margin-bottom:15px; color:var(--primary-brown);">Service Item #1</h5>
+                    
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Item Name *</label>
+                        <input type="text" name="item_name_0" placeholder="e.g. Plain Cornrows" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:600;">Duration</label>
+                            <input type="text" name="item_duration_0" placeholder="e.g. 2 hours" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:600;">Price (R) *</label>
+                            <input type="number" name="item_price_0" placeholder="e.g. 420" step="0.01" min="0" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Description (optional)</label>
+                        <input type="text" name="item_description_0" placeholder="Brief description" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                </div>
+            `;
+        }
+
+        // Build the complete unified form
         form.innerHTML = `
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
-                <select name="category" id="service-category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
-                    <option value="">Select Category</option>
-                    <option value="kiddies" ${service.category === 'kiddies' ? 'selected' : ''}>👧 Kiddies Hair</option>
-                    <option value="adult" ${service.category === 'adult' ? 'selected' : ''}>💇‍♀️ Adult Hair</option>
-                    <option value="nails" ${service.category === 'nails' ? 'selected' : ''}>💅 Nails</option>
-                    <option value="beauty" ${service.category === 'beauty' ? 'selected' : ''}>✨ Skin & Beauty</option>
-                </select>
+            <!-- Category Selection - Top of form -->
+            <div style="margin-bottom:20px; background:white; padding:20px; border-radius:8px; border:1px solid #e0e0e0;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
+                    <select name="category" id="service-category" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px;">
+                        <option value="">Select Category</option>
+                        <option value="kiddies" ${service.category === 'kiddies' ? 'selected' : ''}>👧 Kiddies Hair</option>
+                        <option value="adult" ${service.category === 'adult' ? 'selected' : ''}>💇‍♀️ Adult Hair</option>
+                        <option value="nails" ${service.category === 'nails' ? 'selected' : ''}>💅 Nails</option>
+                        <option value="beauty" ${service.category === 'beauty' ? 'selected' : ''}>✨ Skin & Beauty</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Category Display Name *</label>
+                    <input type="text" name="categoryDisplay" placeholder="e.g. Kiddies Hair" value="${service.categoryDisplay || ''}" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px;">
+                    <small style="color:#666;">This is what customers will see (e.g., "Kiddies Hair")</small>
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Service Title *</label>
+                    <input type="text" name="title" placeholder="e.g. Kids Braids, Benny & Betty Styles" value="${service.title || ''}" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Description *</label>
+                    <textarea name="description" placeholder="Brief description of this service" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px; min-height:80px;">${service.description || ''}</textarea>
+                </div>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Image URL (optional)</label>
+                    <input type="url" name="image" placeholder="https://example.com/image.jpg" value="${service.image || ''}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div>
+                        <label style="display:block; margin-bottom:5px; font-weight:600;">Display Order</label>
+                        <input type="number" name="order" value="${service.order || 0}" min="0" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px;">
+                        <small style="color:#666;">Lower numbers appear first</small>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="checkbox" name="isActive" ${service.isActive !== false ? 'checked' : ''} style="width:18px; height:18px;"> 
+                            <span style="font-weight:600;">Active (show on website)</span>
+                        </label>
+                    </div>
+                </div>
             </div>
             
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Category Display Name *</label>
-                <input type="text" name="categoryDisplay" placeholder="e.g. Kiddies Hair, Adult Hair, etc." value="${service.categoryDisplay || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
-                <small style="color:#666;">This is what customers will see (e.g., "Kiddies Hair")</small>
+            <!-- Service Items Section -->
+            <div style="background:white; padding:20px; border-radius:8px; border:1px solid #e0e0e0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h4 style="margin:0; color:var(--primary-brown);">Service Items / Pricing</h4>
+                    <button type="button" class="btn-sm btn-primary" onclick="addServiceItem()" style="background:var(--accent-pink); padding:8px 15px;">+ Add Another Item</button>
+                </div>
+                
+                <div id="service-items-container">
+                    ${itemsFieldsHtml}
+                </div>
+                
+                <p style="color:#666; font-size:0.85rem; margin-top:15px; padding-top:15px; border-top:1px dashed #ddd;">
+                    <i class="fas fa-info-circle"></i> Add all the specific services and prices under this category. Each item will appear as a separate service option.
+                </p>
             </div>
             
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Service Title *</label>
-                <input type="text" name="title" placeholder="e.g. Kids Braids, Benny & Betty Styles" value="${service.title || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
-            </div>
-            
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Description *</label>
-                <textarea name="description" placeholder="Brief description of this service category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:80px;">${service.description || ''}</textarea>
-            </div>
-            
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Image URL (optional)</label>
-                <input type="url" name="image" placeholder="https://example.com/image.jpg" value="${service.image || ''}" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
-            </div>
-            
-            <div style="margin-bottom:15px;">
-                <label style="display:block; margin-bottom:5px; font-weight:600;">Display Order (lower numbers appear first)</label>
-                <input type="number" name="order" value="${service.order || 0}" min="0" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
-            </div>
-            
-            <div style="margin-bottom:20px;">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                    <input type="checkbox" name="isActive" ${service.isActive !== false ? 'checked' : ''}> 
-                    <span style="font-weight:600;">Active (show on website)</span>
-                </label>
-            </div>
-            
-            <div style="margin-bottom:20px; border-top:2px solid #eee; padding-top:20px;">
-                <h4 style="margin-bottom:15px; color:var(--primary-brown);">Service Items (with Duration & Price)</h4>
-                <p style="color:#666; font-size:0.9rem; margin-bottom:10px;">Enter items as JSON array. Each item should have:</p>
-                <ul style="color:#666; font-size:0.9rem; margin-bottom:15px; margin-left:20px;">
-                    <li><strong>name</strong> - Name of the service (required)</li>
-                    <li><strong>duration</strong> - How long it takes (e.g., "60 min", "1.5 hours") (recommended)</li>
-                    <li><strong>price</strong> - Price in Rand (required, number only)</li>
-                    <li><strong>description</strong> - Optional details (optional)</li>
-                </ul>
-                <pre style="background:#f5f5f5; padding:15px; border-radius:4px; font-size:0.85rem; margin-bottom:15px; overflow-x:auto;">
-[
-  {
-    "name": "Plain Cornrows",
-    "duration": "2 hours",
-    "price": 420,
-    "description": "Basic cornrow style"
-  },
-  {
-    "name": "Needle Cornrows",
-    "duration": "2.5 hours",
-    "price": 380,
-    "description": "Finer, more detailed cornrows"
-  },
-  {
-    "name": "Box Braids - Short",
-    "duration": "3 hours",
-    "price": 680,
-    "description": "Shoulder-length box braids"
-  }
-]</pre>
-                <textarea name="items" placeholder="Enter JSON array of items" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; min-height:200px; font-family:monospace; font-size:0.9rem;">${itemsJson}</textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-block" style="padding:12px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer; font-size:1rem;">
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px; padding:14px; width:100%; background:#E8B4C8; border:none; color:white; border-radius:4px; font-weight:600; cursor:pointer; font-size:1rem;">
                 ${service._id ? 'Update' : 'Save'} Service
             </button>
         `;
+
         modal.classList.add('active');
     } catch (e) {
         console.error("Open Service Modal Error:", e);
         alert("Error opening service form: " + e.message);
+    }
+};
+
+window.addServiceItem = function () {
+    const container = document.getElementById('service-items-container');
+    const itemCount = container.children.length;
+    const newIndex = itemCount;
+
+    const newItemHtml = `
+        <div class="service-item" style="background:#f9f9f9; padding:20px; margin-bottom:20px; border-radius:8px; border:1px solid #e0e0e0; position:relative;">
+            <div style="position:absolute; top:10px; right:10px;">
+                <button type="button" class="btn-sm btn-danger" onclick="removeServiceItem(this)" style="padding:4px 10px; font-size:0.8rem;">✕ Remove</button>
+            </div>
+            <h5 style="margin-top:0; margin-bottom:15px; color:var(--primary-brown);">Service Item #${itemCount + 1}</h5>
+            
+            <div style="margin-bottom:15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Item Name *</label>
+                <input type="text" name="item_name_${newIndex}" placeholder="e.g. Plain Cornrows" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Duration</label>
+                    <input type="text" name="item_duration_${newIndex}" placeholder="e.g. 2 hours" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-weight:600;">Price (R) *</label>
+                    <input type="number" name="item_price_${newIndex}" placeholder="e.g. 420" step="0.01" min="0" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                </div>
+            </div>
+            
+            <div>
+                <label style="display:block; margin-bottom:5px; font-weight:600;">Description (optional)</label>
+                <input type="text" name="item_description_${newIndex}" placeholder="Brief description" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', newItemHtml);
+};
+
+window.removeServiceItem = function (button) {
+    const itemDiv = button.closest('.service-item');
+    if (document.querySelectorAll('.service-item').length > 1) {
+        itemDiv.remove();
+    } else {
+        alert('You must have at least one service item.');
     }
 };
 
