@@ -568,10 +568,17 @@ async function loadTodaySchedule() {
         `;
     }).join('');
 
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#today-schedule-table')) {
-        $('#today-schedule-table').DataTable({
+    // get table element (prefer table id; fall back to parent table of tbody)
+    const $table = $('#today-schedule').is('table') ? $('#today-schedule') : $('#today-schedule').closest('table');
+
+    if ($.fn.DataTable && $table.length && todayBookings.length > 0) {
+        if ($.fn.DataTable.isDataTable($table)) {
+            $table.DataTable().destroy();
+        }
+        $table.DataTable({
+            pageLength: 10,
             order: [[0, 'asc']],
-            pageLength: 10
+            retrieve: true
         });
     }
 }
@@ -1250,7 +1257,7 @@ window.rejectLeave = async function (id) {
 // == USER MANAGEMENT ==
 async function loadUsers() {
     const users = await getData('/api/users');
-    const tbody = document.getElementById('users-table');
+    const tbody = document.getElementById('users-table-body');
     if (!tbody || !Array.isArray(users)) return;
 
     tbody.innerHTML = users.map(u => `
@@ -1305,7 +1312,7 @@ window.resetUserPassword = function (userId) {
 // == PRODUCT MANAGEMENT ==
 async function loadProducts() {
     productsData = await getData('/api/products');
-    const tbody = document.getElementById('products-table');
+    const tbody = document.getElementById('products-table-body');
     if (!tbody) return;
 
     if (!Array.isArray(productsData)) productsData = [];
@@ -1405,7 +1412,7 @@ window.deleteProduct = async function (id) {
 // == SERVICE MANAGEMENT ==
 async function loadServices() {
     servicesData = await getData('/api/services');
-    const tbody = document.getElementById('services-table');
+    const tbody = document.getElementById('services-table-body');
     if (!tbody) return;
 
     if (!Array.isArray(servicesData)) servicesData = [];
@@ -1737,7 +1744,7 @@ window.deleteService = async function (id) {
 // == VOUCHER MANAGEMENT ==
 async function loadVouchers() {
     vouchersData = await getData('/api/vouchers');
-    const tbody = document.getElementById('vouchers-table');
+    const tbody = document.getElementById('vouchers-table-body');
     if (!tbody) return;
 
     if (!Array.isArray(vouchersData)) vouchersData = [];
@@ -1949,7 +1956,6 @@ async function initStaff() {
     }
 }
 
-// Load Staff Dashboard Data
 // Load Staff Dashboard Data
 async function loadStaffDashboard() {
     try {
