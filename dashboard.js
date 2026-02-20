@@ -304,8 +304,7 @@ async function initAdmin() {
             'bookings': 'Booking Management',
             'schedule': 'Staff Schedule',
             'staff-leave': 'Leave Requests',
-            'reports': 'Financial Reports',
-            'transactions': 'Transaction History',
+            // financial/reporting removed from admin menu
             'users': 'User Management',
             'staff-management': 'Staff Management',
             'services': 'Service Management',
@@ -331,12 +330,7 @@ async function initAdmin() {
             case 'staff-leave':
                 await loadLeaveRequests();
                 break;
-            case 'reports':
-                await loadFinancialReports('month');
-                break;
-            case 'transactions':
-                await loadTransactions();
-                break;
+            // reports/transactions removed
             case 'users':
                 await loadUsers();
                 break;
@@ -460,6 +454,49 @@ async function loadDashboardData() {
         loadBookingDistribution()
     ]);
 }
+
+// Minimal revenue chart loader (keeps dashboard charts functional)
+async function loadRevenueChart(period) {
+    try {
+        const data = await getData(`/api/revenue/trend/${period}`);
+        const ctx = document.getElementById('revenueChart')?.getContext('2d');
+        if (!ctx) return;
+        if (revenueChart) revenueChart.destroy();
+        revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data?.labels || ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                datasets: [{ label: 'Revenue (R)', data: data?.values || [0,0,0,0,0,0,0], borderColor: '#E8B4C8', backgroundColor: 'rgba(232,180,200,0.1)', tension:0.3, fill:true }]
+            },
+            options: { responsive:true, maintainAspectRatio:false }
+        });
+    } catch (e) {
+        console.warn('Revenue chart load failed, skipping', e);
+    }
+}
+
+async function loadBookingDistribution() {
+    try {
+        const data = await getData('/api/bookings/distribution');
+        const ctx = document.getElementById('bookingPieChart')?.getContext('2d');
+        if (!ctx) return;
+        if (bookingPieChart) bookingPieChart.destroy();
+        bookingPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: data?.labels || ['Completed','Pending','Confirmed','Cancelled'], datasets:[{ data: data?.values || [1,1,1,1], backgroundColor:['#4CAF50','#FFC107','#2196F3','#F44336'] }] },
+            options: { responsive:true, maintainAspectRatio:false }
+        });
+    } catch (e) {
+        console.warn('Booking distribution load failed, skipping', e);
+    }
+}
+
+window.changeRevenuePeriod = function (period) {
+    document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+    // If event exists, mark the clicked button active
+    try { if (event?.target) event.target.classList.add('active'); } catch (e) {}
+    loadRevenueChart(period);
+};
 
 async function loadKPIs() {
     const stats = await getData('/api/stats/detailed');
@@ -644,79 +681,7 @@ function timeAgo(date) {
     return 'just now';
 }
 
-// == CHARTS ==
-async function loadRevenueChart(period) {
-    const data = await getData(`/api/revenue/trend/${period}`);
-    const ctx = document.getElementById('revenueChart')?.getContext('2d');
-    if (!ctx) return;
-
-    if (revenueChart) revenueChart.destroy();
-
-    revenueChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{
-                label: 'Revenue (R)',
-                data: data.values || [1200, 1900, 3000, 2500, 4200, 3900, 4500],
-                borderColor: '#E8B4C8',
-                backgroundColor: 'rgba(232, 180, 200, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { mode: 'index', intersect: false }
-            },
-            scales: {
-                y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
-            }
-        }
-    });
-}
-
-async function loadBookingDistribution() {
-    const data = await getData('/api/bookings/distribution');
-    const ctx = document.getElementById('bookingPieChart')?.getContext('2d');
-    if (!ctx) return;
-
-    if (bookingPieChart) bookingPieChart.destroy();
-
-    bookingPieChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Completed', 'Pending', 'Confirmed', 'Cancelled'],
-            datasets: [{
-                data: [
-                    data.completed || 45,
-                    data.pending || 20,
-                    data.confirmed || 25,
-                    data.cancelled || 10
-                ],
-                backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#F44336'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' }
-            },
-            cutout: '60%'
-        }
-    });
-}
-
-window.changeRevenuePeriod = function (period) {
-    document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    loadRevenueChart(period);
-};
+// Financial reporting code removed per request.
 
 // == BOOKING MANAGEMENT ==
 async function loadAllBookings() {
@@ -927,86 +892,7 @@ function showScheduleDetails(schedule) {
     alert(`Staff: ${schedule.staffName}\nDate: ${new Date(schedule.start).toLocaleDateString()}\nHours: ${schedule.startTime} - ${schedule.endTime}`);
 }
 
-// == FINANCIAL REPORTS ==
-async function loadFinancialReports(period) {
-    const data = await getData(`/api/reports/financial/${period}`);
-
-    const statsContainer = document.getElementById('financial-stats');
-    if (statsContainer) {
-        statsContainer.innerHTML = `
-            <div class="finance-card">
-                <h4>Total Revenue</h4>
-                <div class="amount">R${data.totalRevenue?.toFixed(2) || '0.00'}</div>
-                <div class="trend">${data.revenueTrend || 0}% vs last period</div>
-            </div>
-            <div class="finance-card">
-                <h4>Expenses</h4>
-                <div class="amount">R${data.expenses?.toFixed(2) || '0.00'}</div>
-                <div class="trend">${data.expenseTrend || 0}% vs last period</div>
-            </div>
-            <div class="finance-card">
-                <h4>Net Profit</h4>
-                <div class="amount">R${data.netProfit?.toFixed(2) || '0.00'}</div>
-                <div class="trend">Margin: ${data.profitMargin || 0}%</div>
-            </div>
-            <div class="finance-card">
-                <h4>Outstanding</h4>
-                <div class="amount">R${data.outstanding?.toFixed(2) || '0.00'}</div>
-                <div class="trend">${data.outstandingCount || 0} pending payments</div>
-            </div>
-        `;
-    }
-
-    const breakdownCtx = document.getElementById('revenueBreakdownChart')?.getContext('2d');
-    if (breakdownCtx) {
-        new Chart(breakdownCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Services', 'Products', 'Vouchers', 'Deposits'],
-                datasets: [{
-                    data: [
-                        data.serviceRevenue || 0,
-                        data.productRevenue || 0,
-                        data.voucherRevenue || 0,
-                        data.deposits || 0
-                    ],
-                    backgroundColor: ['#E8B4C8', '#6B5D52', '#4CAF50', '#FF9800']
-                }]
-            },
-            options: { responsive: true }
-        });
-    }
-}
-
-window.loadFinancialReport = function () {
-    const period = document.getElementById('report-period').value;
-    loadFinancialReports(period);
-};
-
-async function loadTransactions() {
-    transactionsData = await getData('/api/transactions');
-    const tbody = document.getElementById('transactions-body');
-    if (!tbody) return;
-
-    tbody.innerHTML = transactionsData.map(t => `
-        <tr>
-            <td>${new Date(t.transactionDate).toLocaleDateString()}</td>
-            <td>${t._id ? t._id.slice(-8) : 'N/A'}</td>
-            <td>${t.userId?.name || 'N/A'}</td>
-            <td>${t.description || 'N/A'}</td>
-            <td>R${t.amount?.toFixed(2) || '0.00'}</td>
-            <td>${t.paymentMethod || 'Cash'}</td>
-            <td><span class="status-badge status-${t.status || 'completed'}">${t.status || 'completed'}</span></td>
-        </tr>
-    `).join('');
-
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#transactions-table')) {
-        $('#transactions-table').DataTable({
-            order: [[0, 'desc']],
-            pageLength: 25
-        });
-    }
-}
+// Financial reporting code removed per request.
 
 window.exportReport = function () {
     const period = document.getElementById('report-period').value;
@@ -1198,7 +1084,7 @@ window.refreshSchedule = function () {
 // == LEAVE MANAGEMENT ==
 async function loadLeaveRequests() {
     const leaves = await getData('/api/leave');
-    const tbody = document.getElementById('leave-table');
+    const tbody = document.getElementById('leave-table-body');
     if (!tbody || !Array.isArray(leaves)) return;
 
     tbody.innerHTML = leaves.map(l => `
@@ -1279,34 +1165,59 @@ async function loadUsers() {
 }
 
 window.viewUserDetails = function (userId) {
-    const user = staffData.find(s => s._id === userId) || bookingsData.find(b => b.userId?._id === userId);
-    if (!user) {
-        alert('User details not found');
-        return;
-    }
+    (async () => {
+        try {
+            const user = await getData(`/api/users/${userId}`);
+            if (!user) {
+                alert('User details not found');
+                return;
+            }
 
-    const details = `
-        <div style="padding:1rem;">
-            <h3>User Details</h3>
-            <p><strong>Name:</strong> ${user.name}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <p><strong>Role:</strong> ${user.role}</p>
-            <p><strong>Joined:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
-            <p><strong>Total Bookings:</strong> ${user.bookings?.length || 0}</p>
-        </div>
-    `;
+            const details = `
+                <div style="padding:1rem;">
+                    <h3>User Details</h3>
+                    <p><strong>Name:</strong> ${user.name}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Role:</strong> ${user.role}</p>
+                    <p><strong>Joined:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
+                    <p><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+                    <p><strong>Specialties:</strong> ${user.specialties?.join(', ') || 'N/A'}</p>
+                </div>
+            `;
 
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.style.display = 'flex';
-    modal.innerHTML = `<div class="modal-content">${details}<div style="text-align:right; margin-top:1rem;"><button class="btn btn-primary" onclick="this.closest('.modal').remove()">Close</button></div></div>`;
-    document.body.appendChild(modal);
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `<div class="modal-content">${details}<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:1rem;"><button class="btn btn-warning" onclick="resetUserPassword('${userId}')">Reset Password</button><button class="btn btn-primary" onclick="this.closest('.modal').remove()">Close</button></div></div>`;
+            document.body.appendChild(modal);
+        } catch (err) {
+            console.error('Error fetching user details:', err);
+            alert('Failed to load user details');
+        }
+    })();
 };
 
 window.resetUserPassword = function (userId) {
-    if (confirm('Reset password for this user? They will receive an email with instructions.')) {
-        alert('Password reset functionality - to be implemented with email service');
-    }
+    (async () => {
+        if (!confirm('Reset password for this user? This will generate a temporary password and attempt to email it to the user.')) return;
+        try {
+            const result = await postData(`/api/users/${userId}/reset-password`, {}, 'Password reset requested', true);
+            if (result && result.success && result.data) {
+                if (result.data.message) {
+                    alert(result.data.message);
+                }
+                // If the backend returned a tempPassword (fallback), show admin so they can copy it
+                if (result.data.tempPassword) {
+                    alert('Temporary password (fallback): ' + result.data.tempPassword + '\nPlease share securely if email delivery failed.');
+                }
+            } else {
+                alert('Password reset failed');
+            }
+        } catch (err) {
+            console.error('Reset password error:', err);
+            alert('Error resetting password');
+        }
+    })();
 };
 
 // == PRODUCT MANAGEMENT ==
@@ -1368,7 +1279,9 @@ window.openProductModal = function (productId = null) {
             </div>
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px; font-weight:600;">Category *</label>
-                <input type="text" name="category" placeholder="e.g. Hair Care" value="${product.category || ''}" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                <select name="category" id="product-category" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+                    <option value="">Select Category</option>
+                </select>
             </div>
             <div style="margin-bottom:15px;">
                 <label style="display:block; margin-bottom:5px; font-weight:600;">Stock Quantity</label>
@@ -1382,6 +1295,44 @@ window.openProductModal = function (productId = null) {
                 ${product._id ? 'Update' : 'Save'} Product
             </button>
         `;
+
+        // populate product categories dynamically
+        (async () => {
+            try {
+                // try services first for categoryDisplay mapping
+                const services = await getData('/api/services');
+                const categories = new Map();
+                if (Array.isArray(services)) {
+                    services.forEach(s => {
+                        if (s.category) categories.set(s.category, s.categoryDisplay || s.category);
+                    });
+                }
+
+                // fallback: derive from existing products if no services
+                if (categories.size === 0) {
+                    const prods = await getData('/api/products');
+                    if (Array.isArray(prods)) {
+                        prods.forEach(p => { if (p.category) categories.set(p.category, p.category); });
+                    }
+                }
+
+                const select = document.getElementById('product-category');
+                if (select) {
+                    let opts = '<option value="">Select Category</option>';
+                    if (categories.size === 0) {
+                        opts += `<option value="general" ${product.category === 'general' ? 'selected' : ''}>General</option>`;
+                    } else {
+                        for (const [key, disp] of categories.entries()) {
+                            const sel = product.category === key ? 'selected' : '';
+                            opts += `<option value="${key}" ${sel}>${disp}</option>`;
+                        }
+                    }
+                    select.innerHTML = opts;
+                }
+            } catch (e) {
+                console.warn('Could not populate product categories', e);
+            }
+        })();
         modal.classList.add('active');
     } catch (e) {
         console.error("Open Product Modal Error:", e);
@@ -1510,7 +1461,7 @@ window.showServiceItems = function (serviceId) {
     document.body.appendChild(modal);
 };
 
-window.openServiceModal = function (serviceId = null) {
+window.openServiceModal = async function (serviceId = null) {
     try {
         const form = document.getElementById('admin-form');
         const title = document.getElementById('modal-title');
@@ -1666,6 +1617,39 @@ window.openServiceModal = function (serviceId = null) {
                 ${service._id ? 'Update' : 'Save'} Service
             </button>
         `;
+
+        // Populate categories dynamically: try fetching services and derive unique categories
+        try {
+            const services = await getData('/api/services');
+            const categoriesMap = {};
+            if (Array.isArray(services)) {
+                services.forEach(s => {
+                    if (s.category) categoriesMap[s.category] = s.categoryDisplay || s.category;
+                });
+            }
+            const select = document.getElementById('service-category');
+            if (select) {
+                // build options from categoriesMap, fallback to defaults if empty
+                let opts = '<option value="">Select Category</option>';
+                if (Object.keys(categoriesMap).length === 0) {
+                    opts += `
+                        <option value="kiddies" ${service.category === 'kiddies' ? 'selected' : ''}>👧 Kiddies Hair</option>
+                        <option value="adult" ${service.category === 'adult' ? 'selected' : ''}>💇‍♀️ Adult Hair</option>
+                        <option value="nails" ${service.category === 'nails' ? 'selected' : ''}>💅 Nails</option>
+                        <option value="beauty" ${service.category === 'beauty' ? 'selected' : ''}>✨ Skin & Beauty</option>
+                    `;
+                } else {
+                    Object.keys(categoriesMap).forEach(cat => {
+                        const disp = categoriesMap[cat] || cat;
+                        const sel = service.category === cat ? 'selected' : '';
+                        opts += `<option value="${cat}" ${sel}>${disp}</option>`;
+                    });
+                }
+                select.innerHTML = opts;
+            }
+        } catch (e) {
+            console.warn('Could not load categories, using defaults', e);
+        }
 
         modal.classList.add('active');
     } catch (e) {

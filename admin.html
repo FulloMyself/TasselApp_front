@@ -583,11 +583,7 @@
                 <li><a href="#" onclick="showSection('staff-leave')"><i class="fas fa-plane-departure"></i> <span>Leave
                             Requests</span></a></li>
 
-                <div class="nav-section">FINANCIALS</div>
-                <li><a href="#" onclick="showSection('reports')"><i class="fas fa-file-invoice-dollar"></i>
-                        <span>Reports</span></a></li>
-                <li><a href="#" onclick="showSection('transactions')"><i class="fas fa-exchange-alt"></i>
-                        <span>Transactions</span></a></li>
+                <!-- Financials removed until feature is ready -->
 
                 <div class="nav-section">MANAGEMENT</div>
                 <li><a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> <span>Users</span></a></li>
@@ -770,51 +766,7 @@
             </div>
         </section>
 
-        <!-- Reports Section -->
-        <section id="sec-reports" style="display:none;">
-            <div class="content-box">
-                <div class="box-header">
-                    <h3>Financial Reports</h3>
-                    <div class="box-actions">
-                        <select id="report-period" onchange="loadFinancialReport()">
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="quarter">This Quarter</option>
-                            <option value="year">This Year</option>
-                        </select>
-                        <button class="btn-sm btn-primary" onclick="exportReport()">
-                            <i class="fas fa-download"></i> Export PDF
-                        </button>
-                    </div>
-                </div>
-                <div class="financial-stats" id="financial-stats"></div>
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>Revenue Breakdown</h3>
-                        <canvas id="revenueBreakdownChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Expenses vs Revenue</h3>
-                        <canvas id="expensesChart"></canvas>
-                    </div>
-                </div>
-                <table id="transactions-table" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Transaction ID</th>
-                            <th>Client</th>
-                            <th>Service</th>
-                            <th>Amount</th>
-                            <th>Payment Method</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactions-body"></tbody>
-                </table>
-            </div>
-        </section>
+        <!-- Financials removed -->
 
         <!-- Staff Management Section -->
         <section id="sec-staff-management" style="display:none;">
