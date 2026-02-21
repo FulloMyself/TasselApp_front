@@ -170,18 +170,21 @@ async function loadNotifications() {
 }
 
 function showNotifications() {
-    let notifHtml = '<div class="notifications-dropdown" style="position:absolute; top:100%; right:0; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px; width:300px; z-index:1000;">';
+    let notifHtml = '<div class="notifications-dropdown" style="position:absolute; top:100%; right:0; background:white; box-shadow:0 5px 15px rgba(0,0,0,0.2); border-radius:8px; width:320px; z-index:1000;">';
     notifHtml += '<h4 style="padding:1rem; margin:0; border-bottom:1px solid #eee;">Notifications</h4>';
 
     if (notificationsData.length === 0) {
         notifHtml += '<p style="padding:1rem; text-align:center;">No notifications</p>';
     } else {
         notificationsData.slice(0, 5).forEach(n => {
+            // include actionUrl (wa.me link) with an Open and Copy button when present
+            const actionHtml = n.actionUrl ? `<div style="margin-top:6px;"><a href="${n.actionUrl}" target="_blank" style="margin-right:8px;">Open</a><button class="notif-copy" data-url="${encodeURIComponent(n.actionUrl)}" style="padding:4px 8px;">Copy link</button></div>` : '';
             notifHtml += `
-                <div class="notification-item ${n.isRead ? '' : 'unread'}" onclick="markNotificationRead('${n._id}')" style="padding:1rem; border-bottom:1px solid #eee; cursor:pointer; ${!n.isRead ? 'background:#f0f7ff;' : ''}">
+                <div class="notification-item ${n.isRead ? '' : 'unread'}" data-id="${n._id}" style="padding:1rem; border-bottom:1px solid #eee; ${!n.isRead ? 'background:#f0f7ff;' : ''}">
                     <strong style="display:block; margin-bottom:0.25rem;">${n.title}</strong>
                     <p style="margin:0 0 0.25rem; font-size:0.9rem; color:#666;">${n.message}</p>
                     <small style="color:#999;">${new Date(n.createdAt).toLocaleString()}</small>
+                    ${actionHtml}
                 </div>
             `;
         });
@@ -196,6 +199,26 @@ function showNotifications() {
         div.innerHTML = notifHtml;
         document.querySelector('.notification-badge').style.position = 'relative';
         document.querySelector('.notification-badge').appendChild(div.firstChild);
+
+        // Attach handlers for marking read when clicking an item and for copy buttons
+        const dropdown = document.querySelector('.notifications-dropdown');
+        dropdown.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // avoid triggering when copy button is clicked
+                if (e.target && e.target.classList.contains('notif-copy')) return;
+                const id = item.getAttribute('data-id');
+                if (id) markNotificationRead(id);
+            });
+        });
+
+        dropdown.querySelectorAll('.notif-copy').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const url = decodeURIComponent(btn.getAttribute('data-url') || '');
+                if (!url) return;
+                try { navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard')); } catch (err) { prompt('Copy this link:', url); }
+            });
+        });
     }
 }
 
@@ -1199,20 +1222,45 @@ window.viewUserDetails = function (userId) {
 
 window.resetUserPassword = function (userId) {
     (async () => {
-        if (!confirm('Reset password for this user? This will generate a temporary password and attempt to email it to the user.')) return;
+        if (!confirm('Reset password for this user? This will generate a temporary password for Tassel to deliver via WhatsApp.')) return;
         try {
-            const result = await postData(`/api/users/${userId}/reset-password`, {}, 'Password reset requested', true);
-            if (result && result.success && result.data) {
-                if (result.data.message) {
-                    alert(result.data.message);
-                }
-                // If the backend returned a tempPassword (fallback), show admin so they can copy it
-                if (result.data.tempPassword) {
-                    alert('Temporary password (fallback): ' + result.data.tempPassword + '\nPlease share securely if email delivery failed.');
-                }
-            } else {
-                alert('Password reset failed');
+            const res = await postData(`/api/users/${userId}/reset-password`, {});
+            const data = await res.json();
+            if (!res.ok) {
+                console.error('Reset failed:', data);
+                return alert('Password reset failed: ' + (data.error || data.message || res.statusText));
             }
+
+            // Build modal showing wa.me link and temp password with copy buttons
+            const content = document.createElement('div');
+            content.className = 'modal-content';
+            const lines = [];
+            lines.push(`<p>${data.message || 'Password reset created.'}</p>`);
+            if (data.tempPassword) {
+                lines.push(`<p><strong>Temporary password:</strong> <span id="temp-pw">${data.tempPassword}</span> <button id="copy-pw" class="btn-sm">Copy</button></p>`);
+            }
+            if (data.waLink) {
+                lines.push(`<p><strong>WhatsApp (Tassel):</strong> <a id="wa-link" href="${data.waLink}" target="_blank">Open WhatsApp</a> <button id="copy-wa" class="btn-sm">Copy link</button></p>`);
+            } else {
+                lines.push(`<p>No WhatsApp contact configured. Copy the temp password and deliver manually.</p>`);
+            }
+            lines.push('<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:1rem;"><button class="btn btn-primary" id="close-modal">Close</button></div>');
+
+            content.innerHTML = lines.join('');
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            document.getElementById('close-modal').addEventListener('click', () => modal.remove());
+            const copyText = async (text) => {
+                try { await navigator.clipboard.writeText(text); alert('Copied to clipboard'); } catch (e) { prompt('Copy the text manually:', text); }
+            };
+            if (data.tempPassword) document.getElementById('copy-pw').addEventListener('click', () => copyText(data.tempPassword));
+            if (data.waLink) document.getElementById('copy-wa').addEventListener('click', () => copyText(data.waLink));
+
         } catch (err) {
             console.error('Reset password error:', err);
             alert('Error resetting password');
