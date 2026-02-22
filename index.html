@@ -26,7 +26,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="./styles.css">
-    
+
     <style>
         /* Additional styles for service details */
         .service-detail {
@@ -34,15 +34,15 @@
             background-color: var(--white);
             border-top: 1px solid var(--border-color);
         }
-        
+
         .service-detail:target {
             scroll-margin-top: 80px;
         }
-        
+
         .service-detail .section-header {
             margin-bottom: var(--spacing-xl);
         }
-        
+
         .back-to-services {
             display: inline-block;
             margin-top: var(--spacing-lg);
@@ -50,11 +50,11 @@
             font-weight: 600;
             cursor: pointer;
         }
-        
+
         .back-to-services:hover {
             color: var(--primary-brown);
         }
-        
+
         .service-category-tag {
             display: inline-block;
             background-color: var(--accent-pink);
@@ -133,10 +133,12 @@
                         <h1 class="hero-title">Where Kiddies Hair Meets<br>Luxury Family Beauty</h1>
                         <p class="hero-description">Premium Hair, Nails & Beauty — designed for families.</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-primary btn-lg" onclick="document.getElementById('book-btn').click()">
+                            <button class="btn btn-primary btn-lg"
+                                onclick="document.getElementById('book-btn').click()">
                                 <i class="fas fa-calendar-alt"></i> Book Appointment
                             </button>
-                            <a href="https://maps.google.com/?q=101+Bellairs+Drive+Glenvista" target="_blank" class="btn btn-outline-light btn-lg">
+                            <a href="https://maps.google.com/?q=101+Bellairs+Drive+Glenvista" target="_blank"
+                                class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-map-marker-alt"></i> Get Directions
                             </a>
                         </div>
@@ -156,10 +158,10 @@
     <section class="value-props">
         <div class="container">
             <p class="value-prop-text">
-                A calm, professional studio offering kiddies hair specialists, adult hair, nails, 
+                A calm, professional studio offering kiddies hair specialists, adult hair, nails,
                 skin and beauty services — all in one beautiful space.
             </p>
-            
+
             <div class="props-grid">
                 <div class="prop-item">
                     <div class="prop-icon">👧</div>
@@ -185,7 +187,8 @@
         <div class="container">
             <div class="about-wrapper">
                 <div class="about-image">
-                    <img src="./assets/images/about-salon.jpg" alt="Tassel Hair & Beauty Studio - Family friendly salon">
+                    <img src="./assets/images/about-salon.jpg"
+                        alt="Tassel Hair & Beauty Studio - Family friendly salon">
                     <div class="about-badge">
                         <span class="badge-number">10+</span>
                         <span class="badge-text">Years of Excellence</span>
@@ -195,16 +198,16 @@
                     <span class="section-label">Our Story</span>
                     <h2 class="section-title">A Family-Focused Studio</h2>
                     <p class="about-text">
-                        Tassel Hair & Beauty Studio was created to offer something different — a calm, 
+                        Tassel Hair & Beauty Studio was created to offer something different — a calm,
                         professional space where families feel welcome and cared for.
                     </p>
                     <p class="about-text">
-                        Our foundation is <strong>kiddies hair expertise</strong>, paired with professional adult 
-                        hair and beauty services, making Tassel a one-stop destination for parents who value 
+                        Our foundation is <strong>kiddies hair expertise</strong>, paired with professional adult
+                        hair and beauty services, making Tassel a one-stop destination for parents who value
                         quality and convenience.
                     </p>
                     <p class="about-text">
-                        From gentle kiddies styling to nails, skin and beauty treatments, every detail is 
+                        From gentle kiddies styling to nails, skin and beauty treatments, every detail is
                         designed to deliver a premium experience built on care, comfort and excellence.
                     </p>
                     <div class="about-features">
@@ -225,7 +228,8 @@
                             <span>Professional & Certified</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="document.getElementById('book-btn').click()">Book Your Visit</button>
+                    <button class="btn btn-primary" onclick="document.getElementById('book-btn').click()">Book Your
+                        Visit</button>
                 </div>
             </div>
         </div>
@@ -250,7 +254,7 @@
                     <p>Gentle braids, cornrows & styling for children</p>
                     <a href="#kiddies-services" class="btn btn-sm">View Services →</a>
                 </div>
-                
+
                 <!-- Adult Hair -->
                 <div class="category-card" data-category="adult">
                     <div class="category-icon">💇‍♀️</div>
@@ -258,7 +262,7 @@
                     <p>Braids, cornrows, treatments & styling</p>
                     <a href="#adult-services" class="btn btn-sm">View Services →</a>
                 </div>
-                
+
                 <!-- Nails -->
                 <div class="category-card" data-category="nails">
                     <div class="category-icon">💅</div>
@@ -266,7 +270,7 @@
                     <p>Manicure, pedicure & nail art</p>
                     <a href="#nails-services" class="btn btn-sm">View Services →</a>
                 </div>
-                
+
                 <!-- Skin & Beauty -->
                 <div class="category-card" data-category="beauty">
                     <div class="category-icon">✨</div>
@@ -274,6 +278,21 @@
                     <p>Facials, waxing & beauty treatments</p>
                     <a href="#beauty-services" class="btn btn-sm">View Services →</a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Preview Section (Public) -->
+    <section id="products-section" class="products">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Our Products</span>
+                <h2 class="section-title">Shop Our Recommended Products</h2>
+                <p class="section-description">Browse featured products available at the studio</p>
+            </div>
+
+            <div id="products-list" class="products-grid">
+                <!-- Product cards will be injected here by scripts.js -->
             </div>
         </div>
     </section>
@@ -286,19 +305,21 @@
                 <h2 class="section-title">Gentle Styling for Little Ones</h2>
                 <p class="section-description">Specialized hair care for children in a calm, patient environment</p>
             </div>
-            
+
             <div class="services-grid">
                 <!-- Benny & Betty Styles -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-kids.jpg" alt="Benny & Betty Styles">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
                         <h3 class="service-title">Benny & Betty Styles</h3>
-                        <p class="service-description">Fun and practical styles for children, gentle on little scalps</p>
+                        <p class="service-description">Fun and practical styles for children, gentle on little scalps
+                        </p>
                         <ul class="service-list">
                             <li><span>Plain Benny & Betty</span><span class="price">R260</span></li>
                             <li><span>Max 3-4 Lines</span><span class="price">R320</span></li>
@@ -306,13 +327,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Kids Braids -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-braids.jpg" alt="Kids Braids">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -327,13 +349,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Kids Cornrows -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-cornrows.jpg" alt="Kids Cornrows">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -348,13 +371,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Kids Undo Services -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-undo.jpg" alt="Undo Services">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -368,7 +392,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center">
                 <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
@@ -383,19 +407,21 @@
                 <h2 class="section-title">Professional Hair Services for Adults</h2>
                 <p class="section-description">Expert styling, braiding and treatments for beautiful, healthy hair</p>
             </div>
-            
+
             <div class="services-grid">
                 <!-- Braids -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-braids.jpg" alt="Braids">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
                         <h3 class="service-title">Braids</h3>
-                        <p class="service-description">Beautiful, intricate braid styles from classic to contemporary</p>
+                        <p class="service-description">Beautiful, intricate braid styles from classic to contemporary
+                        </p>
                         <ul class="service-list">
                             <li><span>Plain Bantu Knots</span><span class="price">R260</span></li>
                             <li><span>Bantu Knots with Hairpiece</span><span class="price">R360</span></li>
@@ -408,13 +434,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Cornrows -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-cornrows.jpg" alt="Cornrows">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -432,13 +459,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Hair Wash & Treatments -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-wash.jpg" alt="Hair Treatments">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -453,13 +481,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Undo Services -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-undo.jpg" alt="Undo Services">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -474,7 +503,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center">
                 <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
@@ -489,14 +518,15 @@
                 <h2 class="section-title">Beautiful Hands & Feet</h2>
                 <p class="section-description">Professional nail care for the whole family</p>
             </div>
-            
+
             <div class="services-grid">
                 <!-- Manicure -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-nails.jpg" alt="Manicure">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -510,13 +540,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Pedicure -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-nails.jpg" alt="Pedicure">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -530,13 +561,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Extras -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-nails.jpg" alt="Nail Extras">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -551,7 +583,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center">
                 <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
@@ -566,14 +598,15 @@
                 <h2 class="section-title">Rejuvenate and Refresh</h2>
                 <p class="section-description">Professional skincare and beauty treatments for a radiant glow</p>
             </div>
-            
+
             <div class="services-grid">
                 <!-- Facials -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-facial.jpg" alt="Facials">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -588,13 +621,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Waxing -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-waxing.jpg" alt="Waxing">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -610,13 +644,14 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Massage -->
                 <div class="service-card">
                     <div class="service-image">
                         <img src="./assets/images/service-massage.jpg" alt="Massage">
                         <div class="service-overlay">
-                            <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                            <button class="btn btn-white btn-sm"
+                                onclick="document.getElementById('book-btn').click()">Book Now</button>
                         </div>
                     </div>
                     <div class="service-content">
@@ -632,7 +667,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center">
                 <a href="#services" class="back-to-services">← Back to All Services</a>
             </div>
@@ -646,14 +681,14 @@
             <div class="location-details">
                 <p><i class="fas fa-map-marker-alt"></i> 101 Bellairs Drive, Glenvista</p>
                 <p style="margin: 1rem 0;">
-                    <a href="https://wa.me/27823456789?text=Hi%20Tassel!%20I'd%20like%20to%20book%20an%20appointment" 
-                       class="btn btn-whatsapp btn-lg">
+                    <a href="https://wa.me/27823456789?text=Hi%20Tassel!%20I'd%20like%20to%20book%20an%20appointment"
+                        class="btn btn-whatsapp btn-lg">
                         <i class="fab fa-whatsapp"></i> WhatsApp Us to Book
                     </a>
                 </p>
             </div>
             <div class="map-container">
-                <iframe 
+                <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3583.063847384384!2d28.0473!3d-26.1076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDA2JzI3LjQiUyAyOMKwMDInNTAuMyJF!5e0!3m2!1sen!2sza!4v1234567890"
                     width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
                 </iframe>
@@ -668,7 +703,7 @@
                 <div class="contact-info">
                     <span class="section-label">Get in Touch</span>
                     <h2 class="section-title">We'd Love to Hear From You</h2>
-                    
+
                     <div class="contact-details">
                         <div class="contact-item">
                             <div class="contact-icon">
@@ -733,7 +768,8 @@
                             <input type="tel" id="phone" name="phone" placeholder="Your Phone">
                         </div>
                         <div class="form-group">
-                            <textarea id="message" name="message" rows="4" placeholder="How can we help you?" required></textarea>
+                            <textarea id="message" name="message" rows="4" placeholder="How can we help you?"
+                                required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Send Message</button>
                     </form>
@@ -752,7 +788,7 @@
                         <span class="logo-subtitle">Family Hair & Beauty Studio</span>
                     </div>
                     <p class="footer-description">
-                        Where kiddies hair meets luxury family beauty. Premium hair, nails & beauty services 
+                        Where kiddies hair meets luxury family beauty. Premium hair, nails & beauty services
                         for the whole family in Glenvista.
                     </p>
                     <div class="footer-social">
@@ -785,7 +821,8 @@
                 <div class="footer-column">
                     <h4 class="footer-title">Book Now</h4>
                     <p class="footer-text">Ready to look beautiful? Book your appointment today.</p>
-                    <a href="#" onclick="document.getElementById('book-btn').click()" class="btn btn-primary" style="display: inline-block; margin-bottom: 1rem;">
+                    <a href="#" onclick="document.getElementById('book-btn').click()" class="btn btn-primary"
+                        style="display: inline-block; margin-bottom: 1rem;">
                         <i class="fas fa-calendar-alt"></i> Book Online
                     </a>
                     <a href="https://wa.me/27823456789" class="btn btn-outline-light" style="display: inline-block;">
@@ -900,6 +937,10 @@
                     <input type="text" id="reg-name" placeholder="John Doe" required>
                 </div>
                 <div class="form-group">
+                    <label for="reg-phone">Phone Number</label>
+                    <input type="tel" id="reg-phone" placeholder="+27 82 345 6789">
+                </div>
+                <div class="form-group">
                     <label for="reg-email">Email</label>
                     <input type="email" id="reg-email" placeholder="your@email.com" required>
                 </div>
@@ -922,6 +963,36 @@
         <img src="" alt="" class="lightbox-image">
         <div class="lightbox-caption"></div>
     </div>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart <span class="cart-count">0</span></h3>
+            <button class="cart-close-btn">&times;</button>
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be inserted here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount">R0.00</span>
+            </div>
+            <div class="cart-actions">
+                <button class="btn btn-primary" onclick="tasselCart.orderViaWhatsApp()">Order via WhatsApp</button>
+                <button class="btn btn-outline" onclick="tasselCart.clearCart()">Clear Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Toggle Button -->
+    <button id="cart-toggle" class="cart-toggle">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count">0</span>
+    </button>
+
+    <!-- Include cart.js -->
+    <script src="./cart.js"></script>
 
     <!-- Scripts -->
     <script src="./scripts.js"></script>

@@ -236,12 +236,13 @@ function initProfile() {
             e.preventDefault();
             const name = document.getElementById('profile-name').value;
             const email = document.getElementById('profile-email').value;
+            const phone = document.getElementById('profile-phone')?.value;
             const pass = document.getElementById('profile-pass').value;
             const passConfirm = document.getElementById('profile-pass-confirm').value;
 
             if (pass && pass !== passConfirm) return alert('Passwords do not match!');
 
-            const updateData = { name, email };
+            const updateData = { name, email, phone };
             if (pass) updateData.password = pass;
 
             try {
@@ -273,6 +274,7 @@ window.openProfileModal = function () {
 
         document.getElementById('profile-name').value = user.name || '';
         document.getElementById('profile-email').value = user.email || '';
+        if (document.getElementById('profile-phone')) document.getElementById('profile-phone').value = user.phone || '';
         document.getElementById('profile-pass').value = '';
         document.getElementById('profile-pass-confirm').value = '';
         document.getElementById('profile-modal').classList.add('active');

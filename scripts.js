@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initObservers();
     initServiceCategories();
     initSmoothScroll();
+    fetchPublicProducts(); // Load products from MongoDB
+    fetchServices(); // Load services from MongoDB
 
     // ===== Auth Status (Check Login) =====
     function checkAuthStatus() {
@@ -35,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const token = localStorage.getItem('token');
 
         if (token && user) {
-            // User IS logged in
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'inline-flex';
             
@@ -45,13 +46,159 @@ document.addEventListener('DOMContentLoaded', function () {
                 bookBtn.innerHTML = '<i class="fas fa-th-large"></i> Dashboard';
             }
         } else {
-            // User NOT logged in
             loginBtn.style.display = 'inline-flex';
             logoutBtn.style.display = 'none';
             bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
         }
     }
 
+    // ===== Fetch Services from MongoDB =====
+    async function fetchServices() {
+        try {
+            const res = await fetch(`${API_URL}/api/services/public`);
+            if (!res.ok) {
+                console.warn('Services API not available yet');
+                return;
+            }
+            const services = await res.json();
+
+            renderServiceCategory('kiddies-services', services.kiddies);
+            renderServiceCategory('adult-services', services.adult);
+            renderServiceCategory('nails-services', services.nails);
+            renderServiceCategory('beauty-services', services.beauty);
+
+        } catch (err) {
+            console.error('Failed to load services', err);
+        }
+    }
+
+    function renderServiceCategory(containerId, services) {
+        const container = document.getElementById(containerId);
+        if (!container || !services || services.length === 0) return;
+
+        const servicesGrid = container.querySelector('.services-grid');
+        if (!servicesGrid) return;
+
+        servicesGrid.innerHTML = '';
+
+        services.forEach(service => {
+            service.items.forEach(item => {
+                const serviceCard = createServiceCard(service, item);
+                servicesGrid.appendChild(serviceCard);
+            });
+        });
+    }
+
+    function createServiceCard(service, item) {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+
+        card.innerHTML = `
+            <div class="service-image">
+                <img src="${item.image || service.image || './assets/images/service-default.jpg'}" alt="${item.name}">
+                <div class="service-overlay">
+                    <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
+                </div>
+            </div>
+            <div class="service-content">
+                <h3 class="service-title">${item.name}</h3>
+                <p class="service-description">${item.description || service.description}</p>
+                <ul class="service-list">
+                    <li><span>${item.duration || '60 min'}</span><span class="price">R${item.price}</span></li>
+                </ul>
+            </div>
+        `;
+
+        return card;
+    }
+
+    // ===== Fetch Public Products (MERGE VERSION) =====
+    async function fetchPublicProducts() {
+        try {
+            const res = await fetch(`${API_URL}/api/products/public`);
+            if (!res.ok) {
+                console.warn('Products API not available yet');
+                return;
+            }
+            const products = await res.json();
+            const container = document.getElementById('products-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Show only first 4 products on homepage
+            const featuredProducts = products.slice(0, 4);
+
+            featuredProducts.forEach(p => {
+                const imageUrl = p.image ? 
+                    (p.image.startsWith('http') ? p.image : `/images/products/${p.image.split('/').pop()}`) : 
+                    './assets/images/product-default.jpg';
+
+                const onSale = p.salePrice > 0 && p.salePrice < p.price;
+                const displayPrice = onSale ? p.salePrice : p.price;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                card.innerHTML = `
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+                        ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+                    </div>
+                    <div class="product-content">
+                        <h4 class="product-name">${p.name}</h4>
+                        <div class="product-price-container">
+                            ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
+                            <span class="product-price">R${displayPrice.toFixed(2)}</span>
+                        </div>
+                        <div class="product-category">${p.category || ''}</div>
+                        <button class="btn btn-sm btn-primary" onclick="window.location.href='contact.html'">Enquire</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+        } catch (err) {
+            console.error('Failed to load products', err);
+            // Fallback to static products if API fails
+            loadStaticProducts();
+        }
+    }
+
+    // Fallback static products for development
+    function loadStaticProducts() {
+        const container = document.getElementById('products-list');
+        if (!container) return;
+        
+        const staticProducts = [
+            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare" },
+            { name: "Tassel Beard Oil", price: 299, category: "wellness" },
+            { name: "Tassel Face Wash", price: 149, category: "skincare" },
+            { name: "Tassel Eye Serum", price: 250, category: "skincare" }
+        ];
+        
+        staticProducts.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-image">
+                    <img src="./assets/images/product-default.jpg" alt="${p.name}">
+                </div>
+                <div class="product-content">
+                    <h4 class="product-name">${p.name}</h4>
+                    <div class="product-price">R${p.price}</div>
+                    <div class="product-category">${p.category}</div>
+                    <button class="btn btn-sm btn-primary" onclick="window.location.href='contact.html'">Enquire</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Rest of your functions remain exactly the same...
+    // [All your existing functions: initSliders, initGallery, initForms, etc.]
+    
     // ===== Header & Navigation =====
     window.addEventListener('scroll', () => {
         header.classList.toggle('scrolled', window.pageYOffset > 100);
@@ -104,11 +251,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Hero Slider
         const heroSlides = document.querySelectorAll('.hero-slide');
         const heroDots = document.querySelector('.hero-dots');
-        
+
         if (heroSlides.length && heroDots) {
             let currentHero = 0;
-            
-            // Create dots
+
             heroSlides.forEach((_, i) => {
                 const dot = document.createElement('div');
                 dot.className = `hero-dot${i === 0 ? ' active' : ''}`;
@@ -126,19 +272,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const prevBtn = document.querySelector('.hero-prev');
             const nextBtn = document.querySelector('.hero-next');
-            
+
             if (prevBtn) {
                 prevBtn.addEventListener('click', () => goToHero((currentHero - 1 + heroSlides.length) % heroSlides.length));
             }
-            
+
             if (nextBtn) {
                 nextBtn.addEventListener('click', () => goToHero((currentHero + 1) % heroSlides.length));
             }
 
-            // Auto-rotate
             const heroContainer = document.querySelector('.hero-slider');
             let heroInterval = setInterval(() => goToHero((currentHero + 1) % heroSlides.length), 5000);
-            
+
             if (heroContainer) {
                 heroContainer.addEventListener('mouseenter', () => clearInterval(heroInterval));
                 heroContainer.addEventListener('mouseleave', () => {
@@ -150,10 +295,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Testimonials Slider
         const testCards = document.querySelectorAll('.testimonial-card');
         const testDots = document.querySelector('.testimonial-dots');
-        
+
         if (testCards.length && testDots) {
             let currentTest = 0;
-            
+
             testCards.forEach((_, i) => {
                 const dot = document.createElement('div');
                 dot.className = `testimonial-dot${i === 0 ? ' active' : ''}`;
@@ -171,16 +316,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const prevBtn = document.querySelector('.testimonial-prev');
             const nextBtn = document.querySelector('.testimonial-next');
-            
+
             if (prevBtn) {
                 prevBtn.addEventListener('click', () => goToTest((currentTest - 1 + testCards.length) % testCards.length));
             }
-            
+
             if (nextBtn) {
                 nextBtn.addEventListener('click', () => goToTest((currentTest + 1) % testCards.length));
             }
 
-            // Auto-rotate
             setInterval(() => goToTest((currentTest + 1) % testCards.length), 6000);
         }
     }
@@ -189,33 +333,29 @@ document.addEventListener('DOMContentLoaded', function () {
     function initServiceCategories() {
         const categoryButtons = document.querySelectorAll('.category-card .btn-sm');
         const detailedServices = document.getElementById('detailed-services');
-        
+
         categoryButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const category = this.closest('.category-card').querySelector('h3').textContent.toLowerCase();
-                
-                // Show detailed services section
+
                 if (detailedServices) {
                     detailedServices.style.display = 'block';
-                    
-                    // Hide all service details first
+
                     document.querySelectorAll('.service-detail').forEach(el => {
                         el.style.display = 'none';
                     });
-                    
-                    // Show relevant service detail
+
                     let targetId = '';
                     if (category.includes('kiddies')) targetId = 'kiddies-services';
                     else if (category.includes('adult')) targetId = 'adult-services';
                     else if (category.includes('nail')) targetId = 'nails-services';
                     else if (category.includes('skin')) targetId = 'beauty-services';
-                    
+
                     const targetSection = document.getElementById(targetId);
                     if (targetSection) {
                         targetSection.style.display = 'block';
-                        
-                        // Smooth scroll to services
+
                         setTimeout(() => {
                             targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }, 100);
@@ -235,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.addEventListener('click', function () {
                     filterBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     const filter = this.dataset.filter;
                     items.forEach(item => {
                         if (filter === 'all' || item.dataset.category === filter) {
@@ -268,25 +408,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const closeBtn = document.querySelector('.lightbox-close');
             const prevBtn = document.querySelector('.lightbox-prev');
             const nextBtn = document.querySelector('.lightbox-next');
-            
+
             if (closeBtn) {
                 closeBtn.addEventListener('click', () => lightbox.classList.remove('active'));
             }
-            
+
             if (prevBtn) {
                 prevBtn.addEventListener('click', () => {
                     const currentIdx = parseInt(lightbox.dataset.idx);
                     showLightbox((currentIdx - 1 + lightboxImages.length) % lightboxImages.length);
                 });
             }
-            
+
             if (nextBtn) {
                 nextBtn.addEventListener('click', () => {
                     const currentIdx = parseInt(lightbox.dataset.idx);
                     showLightbox((currentIdx + 1) % lightboxImages.length);
                 });
             }
-            
+
             if (lightbox) {
                 lightbox.addEventListener('click', (e) => {
                     if (e.target === lightbox) lightbox.classList.remove('active');
@@ -303,14 +443,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function showLightbox(index) {
             if (!lightbox) return;
-            
+
             lightbox.dataset.idx = index;
             const imageEl = document.querySelector('.lightbox-image');
             const captionEl = document.querySelector('.lightbox-caption');
-            
+
             if (imageEl) imageEl.src = lightboxImages[index].src;
             if (captionEl) captionEl.textContent = lightboxImages[index].cap;
-            
+
             lightbox.classList.add('active');
         }
     }
@@ -322,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.style.overflow = 'hidden';
         }
     };
-    
+
     const closeModal = (modal) => {
         if (modal) {
             modal.classList.remove('active');
@@ -330,14 +470,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Event: Open Login Modal
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
             openModal(loginModal);
         });
     }
 
-    // Event: Logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('token');
@@ -348,7 +486,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Event: Open Booking Modal (Check Auth First!)
     if (bookBtn) {
         bookBtn.addEventListener('click', () => {
             const token = localStorage.getItem('token');
@@ -368,12 +505,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Modal close buttons
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => closeModal(btn.closest('.modal')));
     });
 
-    // Close modal when clicking outside
     [bookingModal, loginModal].forEach(modal => {
         if (modal) {
             modal.addEventListener('click', (e) => {
@@ -382,14 +517,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Escape key to close modals
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             [bookingModal, loginModal].forEach(modal => closeModal(modal));
         }
     });
 
-    // Service overlay book buttons
     document.querySelectorAll('.service-overlay .btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -399,8 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== Forms (API Integration) =====
     function initForms() {
-        
-        // Toggle Login/Register Forms
+
         const showRegister = document.getElementById('show-register');
         const showLogin = document.getElementById('show-login');
         const loginForm = document.getElementById('login-form');
@@ -420,7 +552,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Generic Post Helper
         const postData = async (url, data, successMsg, requiresAuth = false) => {
             const headers = { 'Content-Type': 'application/json' };
             if (requiresAuth) {
@@ -449,7 +580,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
-        // 1. Register Form
         if (registerForm) {
             registerForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -459,6 +589,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = {
                     name: this.querySelector('#reg-name').value,
+                    phone: this.querySelector('#reg-phone')?.value,
                     email: this.querySelector('#reg-email').value,
                     password: this.querySelector('#reg-password').value
                 };
@@ -475,7 +606,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // 2. Login Form
         if (loginForm) {
             loginForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -515,7 +645,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // 3. Booking Form (Requires Auth)
         const bookingForm = document.getElementById('booking-form');
         if (bookingForm) {
             bookingForm.addEventListener('submit', async function (e) {
@@ -541,7 +670,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // 4. Contact Form
         const contactForm = document.getElementById('contact-form');
         if (contactForm) {
             contactForm.addEventListener('submit', async function (e) {
@@ -558,7 +686,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // 5. Newsletter
         const newsletterForm = document.querySelector('.newsletter-form');
         if (newsletterForm) {
             newsletterForm.addEventListener('submit', async function (e) {
@@ -570,7 +697,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Helper Redirect
     function redirectToDashboard(role) {
         switch (role) {
             case 'admin': window.location.href = 'admin.html'; break;
@@ -592,32 +718,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // WhatsApp buttons
     document.querySelectorAll('.btn-whatsapp').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            // You can add tracking or analytics here if needed
+        btn.addEventListener('click', function (e) {
             console.log('WhatsApp button clicked');
         });
     });
 
-    // Location/directions buttons
     document.querySelectorAll('a[href*="maps.google.com"]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             console.log('Directions clicked');
         });
     });
 
-    // Notification System
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
-        
+
         const colors = {
             success: '#4CAF50',
             error: '#F44336',
             info: '#2196F3'
         };
-        
+
         const icons = {
             success: 'check-circle',
             error: 'exclamation-circle',
@@ -660,7 +782,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, 5000);
 
-        // Add slideOut animation
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideOut {
@@ -671,7 +792,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.head.appendChild(style);
     }
 
-    // Animate on Scroll Observer
     function initObservers() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -682,7 +802,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-        // Observe all animated elements
         const elementsToObserve = document.querySelectorAll(
             '.feature-card, .service-card, .product-card, .gift-card, ' +
             '.category-card, .prop-item, .about-image, .about-content, ' +
