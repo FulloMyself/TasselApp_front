@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (token && user) {
             loginBtn.style.display = 'none';
             logoutBtn.style.display = 'inline-flex';
-            
+
             if (user.role === 'customer') {
                 bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
             } else {
@@ -113,11 +113,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== Fetch Public Products (MERGE VERSION) =====
+    // Add this to your scripts.js - replace the existing fetchPublicProducts function
+
     async function fetchPublicProducts() {
         try {
             const res = await fetch(`${API_URL}/api/products/public`);
             if (!res.ok) {
-                console.warn('Products API not available yet');
+                console.warn('Products API not available yet, loading static products');
+                loadStaticProducts();
                 return;
             }
             const products = await res.json();
@@ -126,58 +129,342 @@ document.addEventListener('DOMContentLoaded', function () {
 
             container.innerHTML = '';
 
-            // Show only first 4 products on homepage
-            const featuredProducts = products.slice(0, 4);
+            // Show all products or limit to 8
+            const displayProducts = products.slice(0, 8);
 
-            featuredProducts.forEach(p => {
-                const imageUrl = p.image ? 
-                    (p.image.startsWith('http') ? p.image : `/images/products/${p.image.split('/').pop()}`) : 
-                    './assets/images/product-default.jpg';
+            displayProducts.forEach(p => {
+                // Fix image path - use the correct path from your server
+                let imageUrl = p.image || './assets/images/product-default.jpg';
+                if (imageUrl && !imageUrl.startsWith('http')) {
+                    // Extract filename and prepend the correct path
+                    const filename = imageUrl.split('/').pop();
+                    imageUrl = `/images/products/${filename}`;
+                }
 
-                const onSale = p.salePrice > 0 && p.salePrice < p.price;
+                const onSale = p.salePrice && p.salePrice > 0 && p.salePrice < p.price;
                 const displayPrice = onSale ? p.salePrice : p.price;
 
                 const card = document.createElement('div');
                 card.className = 'product-card';
+                card.setAttribute('data-id', p._id);
 
                 card.innerHTML = `
-                    <div class="product-image">
-                        <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
-                        ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+                    ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+                </div>
+                <div class="product-content">
+                    <h4 class="product-name">${p.name}</h4>
+                    <div class="product-price-container">
+                        ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
+                        <span class="product-price">R${displayPrice.toFixed(2)}</span>
                     </div>
-                    <div class="product-content">
-                        <h4 class="product-name">${p.name}</h4>
-                        <div class="product-price-container">
-                            ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
-                            <span class="product-price">R${displayPrice.toFixed(2)}</span>
-                        </div>
-                        <div class="product-category">${p.category || ''}</div>
-                        <button class="btn btn-sm btn-primary" onclick="window.location.href='contact.html'">Enquire</button>
-                    </div>
-                `;
+                    <div class="product-category">${p.category || ''}</div>
+                    <button class="btn btn-sm btn-primary add-to-cart-btn" 
+                            data-product='${JSON.stringify({
+                    id: p._id,
+                    name: p.name,
+                    price: p.price,
+                    salePrice: p.salePrice || 0,
+                    image: imageUrl,
+                    category: p.category || ''
+                }).replace(/'/g, '&apos;')}'>
+                        Add to Cart
+                    </button>
+                </div>
+            `;
+
+                // Add click handler for product details
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('add-to-cart-btn')) {
+                        showProductPopup(p);
+                    }
+                });
 
                 container.appendChild(card);
             });
 
+            // Add event listeners to Add to Cart buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const productData = JSON.parse(btn.dataset.product);
+                    if (window.tasselCart) {
+                        window.tasselCart.addItem(productData);
+                    } else {
+                        console.warn('Cart not initialized');
+                    }
+                });
+            });
+
         } catch (err) {
             console.error('Failed to load products', err);
-            // Fallback to static products if API fails
             loadStaticProducts();
         }
+    }
+
+    // Fallback static products
+    function loadStaticProducts() {
+        const container = document.getElementById('products-list');
+        if (!container) return;
+
+        const staticProducts = [
+            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
+            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
+            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
+            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "/images/products/Tassel_Eye_Serum.jpg" }
+        ];
+
+        container.innerHTML = '';
+        staticProducts.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+            <div class="product-image">
+                <img src="${p.image}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+            </div>
+            <div class="product-content">
+                <h4 class="product-name">${p.name}</h4>
+                <div class="product-price">R${p.price}</div>
+                <div class="product-category">${p.category}</div>
+                <button class="btn btn-sm btn-primary enquire-btn">Enquire</button>
+            </div>
+        `;
+            container.appendChild(card);
+        });
+    }
+
+    // Product popup function
+    function showProductPopup(product) {
+        // Remove existing popup
+        const existingPopup = document.querySelector('.product-popup-overlay');
+        if (existingPopup) existingPopup.remove();
+
+        const onSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
+        const displayPrice = onSale ? product.salePrice : product.price;
+        const imageUrl = product.image || './assets/images/product-default.jpg';
+
+        const popup = document.createElement('div');
+        popup.className = 'product-popup-overlay';
+        popup.innerHTML = `
+        <div class="product-popup">
+            <button class="popup-close">&times;</button>
+            <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./assets/images/product-default.jpg'">
+            <h3>${product.name}</h3>
+            <p>${product.description || 'No description available.'}</p>
+            <div class="product-price-container">
+                ${onSale ? `<span class="original-price">R${product.price.toFixed(2)}</span>` : ''}
+                <span class="product-price">R${displayPrice.toFixed(2)}</span>
+            </div>
+            <button class="btn btn-primary add-to-cart-popup">Add to Cart</button>
+        </div>
+    `;
+
+        document.body.appendChild(popup);
+
+        // Close handlers
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) popup.remove();
+        });
+
+        popup.querySelector('.popup-close').addEventListener('click', () => popup.remove());
+
+        popup.querySelector('.add-to-cart-popup').addEventListener('click', () => {
+            if (window.tasselCart) {
+                window.tasselCart.addItem({
+                    id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    salePrice: product.salePrice || 0,
+                    image: imageUrl
+                });
+                popup.remove();
+            }
+        });
+    }// Add this to your scripts.js - replace the existing fetchPublicProducts function
+
+    async function fetchPublicProducts() {
+        try {
+            const res = await fetch(`${API_URL}/api/products/public`);
+            if (!res.ok) {
+                console.warn('Products API not available yet, loading static products');
+                loadStaticProducts();
+                return;
+            }
+            const products = await res.json();
+            const container = document.getElementById('products-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Show all products or limit to 8
+            const displayProducts = products.slice(0, 8);
+
+            displayProducts.forEach(p => {
+                // Fix image path - use the correct path from your server
+                let imageUrl = p.image || './assets/images/product-default.jpg';
+                if (imageUrl && !imageUrl.startsWith('http')) {
+                    // Extract filename and prepend the correct path
+                    const filename = imageUrl.split('/').pop();
+                    imageUrl = `/images/products/${filename}`;
+                }
+
+                const onSale = p.salePrice && p.salePrice > 0 && p.salePrice < p.price;
+                const displayPrice = onSale ? p.salePrice : p.price;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.setAttribute('data-id', p._id);
+
+                card.innerHTML = `
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+                    ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+                </div>
+                <div class="product-content">
+                    <h4 class="product-name">${p.name}</h4>
+                    <div class="product-price-container">
+                        ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
+                        <span class="product-price">R${displayPrice.toFixed(2)}</span>
+                    </div>
+                    <div class="product-category">${p.category || ''}</div>
+                    <button class="btn btn-sm btn-primary add-to-cart-btn" 
+                            data-product='${JSON.stringify({
+                    id: p._id,
+                    name: p.name,
+                    price: p.price,
+                    salePrice: p.salePrice || 0,
+                    image: imageUrl,
+                    category: p.category || ''
+                }).replace(/'/g, '&apos;')}'>
+                        Add to Cart
+                    </button>
+                </div>
+            `;
+
+                // Add click handler for product details
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('add-to-cart-btn')) {
+                        showProductPopup(p);
+                    }
+                });
+
+                container.appendChild(card);
+            });
+
+            // Add event listeners to Add to Cart buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const productData = JSON.parse(btn.dataset.product);
+                    if (window.tasselCart) {
+                        window.tasselCart.addItem(productData);
+                    } else {
+                        console.warn('Cart not initialized');
+                    }
+                });
+            });
+
+        } catch (err) {
+            console.error('Failed to load products', err);
+            loadStaticProducts();
+        }
+    }
+
+    // Fallback static products
+    function loadStaticProducts() {
+        const container = document.getElementById('products-list');
+        if (!container) return;
+
+        const staticProducts = [
+            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
+            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
+            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
+            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "/images/products/Tassel_Eye_Serum.jpg" }
+        ];
+
+        container.innerHTML = '';
+        staticProducts.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+            <div class="product-image">
+                <img src="${p.image}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+            </div>
+            <div class="product-content">
+                <h4 class="product-name">${p.name}</h4>
+                <div class="product-price">R${p.price}</div>
+                <div class="product-category">${p.category}</div>
+                <button class="btn btn-sm btn-primary enquire-btn">Enquire</button>
+            </div>
+        `;
+            container.appendChild(card);
+        });
+    }
+
+    // Product popup function
+    function showProductPopup(product) {
+        // Remove existing popup
+        const existingPopup = document.querySelector('.product-popup-overlay');
+        if (existingPopup) existingPopup.remove();
+
+        const onSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
+        const displayPrice = onSale ? product.salePrice : product.price;
+        const imageUrl = product.image || './assets/images/product-default.jpg';
+
+        const popup = document.createElement('div');
+        popup.className = 'product-popup-overlay';
+        popup.innerHTML = `
+        <div class="product-popup">
+            <button class="popup-close">&times;</button>
+            <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./assets/images/product-default.jpg'">
+            <h3>${product.name}</h3>
+            <p>${product.description || 'No description available.'}</p>
+            <div class="product-price-container">
+                ${onSale ? `<span class="original-price">R${product.price.toFixed(2)}</span>` : ''}
+                <span class="product-price">R${displayPrice.toFixed(2)}</span>
+            </div>
+            <button class="btn btn-primary add-to-cart-popup">Add to Cart</button>
+        </div>
+    `;
+
+        document.body.appendChild(popup);
+
+        // Close handlers
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) popup.remove();
+        });
+
+        popup.querySelector('.popup-close').addEventListener('click', () => popup.remove());
+
+        popup.querySelector('.add-to-cart-popup').addEventListener('click', () => {
+            if (window.tasselCart) {
+                window.tasselCart.addItem({
+                    id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    salePrice: product.salePrice || 0,
+                    image: imageUrl
+                });
+                popup.remove();
+            }
+        });
     }
 
     // Fallback static products for development
     function loadStaticProducts() {
         const container = document.getElementById('products-list');
         if (!container) return;
-        
+
         const staticProducts = [
             { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare" },
             { name: "Tassel Beard Oil", price: 299, category: "wellness" },
             { name: "Tassel Face Wash", price: 149, category: "skincare" },
             { name: "Tassel Eye Serum", price: 250, category: "skincare" }
         ];
-        
+
         staticProducts.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
@@ -198,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Rest of your functions remain exactly the same...
     // [All your existing functions: initSliders, initGallery, initForms, etc.]
-    
+
     // ===== Header & Navigation =====
     window.addEventListener('scroll', () => {
         header.classList.toggle('scrolled', window.pageYOffset > 100);
