@@ -24,7 +24,7 @@ if (typeof TasselCart !== 'undefined') {
 
         addItem(product) {
             const existingItem = this.cart.find(item => item.id === product.id);
-            
+
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
@@ -37,7 +37,7 @@ if (typeof TasselCart !== 'undefined') {
                     quantity: 1
                 });
             }
-            
+
             this.saveCart();
             this.showNotification(`${product.name} added to cart`, 'success');
         }
@@ -82,7 +82,7 @@ if (typeof TasselCart !== 'undefined') {
         updateCartDisplay() {
             const cartCountElements = document.querySelectorAll('.cart-count');
             const count = this.getItemCount();
-            
+
             cartCountElements.forEach(el => {
                 el.textContent = count;
                 el.style.display = count > 0 ? 'inline' : 'none';
@@ -91,7 +91,7 @@ if (typeof TasselCart !== 'undefined') {
             // Update cart sidebar if it exists
             const cartItemsContainer = document.getElementById('cart-items');
             const cartTotalElement = document.getElementById('cart-total');
-            
+
             if (cartItemsContainer && cartTotalElement) {
                 this.renderCartItems(cartItemsContainer, cartTotalElement);
             }
@@ -107,23 +107,26 @@ if (typeof TasselCart !== 'undefined') {
             let html = '';
             this.cart.forEach(item => {
                 const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
+                // Fix: Use a flag to prevent infinite loop
                 html += `
-                    <div class="cart-item" data-id="${item.id}">
-                        <img src="${item.image || 'assets/images/product-default.jpg'}" alt="${item.name}" onerror="this.src='assets/images/product-default.jpg'">
-                        <div class="cart-item-details">
-                            <h4>${item.name}</h4>
-                            <div class="cart-item-price">R${price.toFixed(2)}</div>
-                            <div class="cart-item-quantity">
-                                <button class="quantity-btn" onclick="tasselCart.updateQuantity('${item.id}', -1)">-</button>
-                                <span>${item.quantity}</span>
-                                <button class="quantity-btn" onclick="tasselCart.updateQuantity('${item.id}', 1)">+</button>
-                                <button class="remove-btn" onclick="tasselCart.removeItem('${item.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
+            <div class="cart-item" data-id="${item.id}">
+                <img src="${item.image || './assets/images/product-default.jpg'}" 
+                     alt="${item.name}" 
+                     onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
+                <div class="cart-item-details">
+                    <h4>${item.name}</h4>
+                    <div class="cart-item-price">R${price.toFixed(2)}</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="tasselCart.updateQuantity('${item.id}', -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="tasselCart.updateQuantity('${item.id}', 1)">+</button>
+                        <button class="remove-btn" onclick="tasselCart.removeItem('${item.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                `;
+                </div>
+            </div>
+        `;
             });
 
             container.innerHTML = html;
@@ -221,15 +224,15 @@ if (typeof TasselCart !== 'undefined') {
         // WhatsApp Order
         generateWhatsAppMessage() {
             let message = "Hello Tassel Beauty! I'd like to place an order:\n\n";
-            
+
             this.cart.forEach(item => {
                 const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
                 message += `${item.name} x${item.quantity} - R${(price * item.quantity).toFixed(2)}\n`;
             });
-            
+
             message += `\nTotal: R${this.getTotal().toFixed(2)}`;
             message += `\n\n(Powered by tasselgroup.co.za/shop)`;
-            
+
             return encodeURIComponent(message);
         }
 
@@ -254,10 +257,10 @@ if (typeof TasselCart !== 'undefined') {
                 });
 
                 if (!response.ok) throw new Error('Payment initiation failed');
-                
+
                 const paymentData = await response.json();
                 this.submitPayFastForm(paymentData);
-                
+
             } catch (error) {
                 console.error('Payment error:', error);
                 this.showNotification('Payment failed. Please try again.', 'error');

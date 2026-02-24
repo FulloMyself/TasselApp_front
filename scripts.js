@@ -4,6 +4,77 @@
 
 const API_URL = 'https://tasselapp-back.onrender.com';
 
+// Global notification function - Available to all scripts
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+
+    const colors = {
+        success: '#4CAF50',
+        error: '#F44336',
+        info: '#2196F3'
+    };
+
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        info: 'info-circle'
+    };
+
+    notification.style.cssText = `
+        position: fixed; 
+        top: 100px; 
+        right: 20px; 
+        background: ${colors[type]}; 
+        color: white; 
+        padding: 1rem 1.5rem; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+        z-index: 9999; 
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    `;
+
+    notification.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.75rem">
+            <i class="fas fa-${icons[type]}"></i>
+            <span>${message}</span>
+        </div>
+        <button style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:10px">&times;</button>
+    `;
+
+    document.body.appendChild(notification);
+
+    const closeBtn = notification.querySelector('button');
+    closeBtn.addEventListener('click', () => notification.remove());
+
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 5000);
+
+    // Add slideOut animation if not exists
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ===== DOM Elements =====
@@ -20,7 +91,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const backToTop = document.getElementById('back-to-top');
 
     // ===== Initialization =====
-    window.addEventListener('load', () => setTimeout(() => loadingScreen.classList.add('hidden'), 1500));
+    window.addEventListener('load', () => {
+        console.log('Page loaded, hiding loading screen');
+        setTimeout(() => {
+            if (loadingScreen) {
+                loadingScreen.classList.add('hidden');
+                console.log('Loading screen hidden');
+            }
+        }, 1500);
+    });
+    
     checkAuthStatus();
     initSliders();
     initGallery();
@@ -37,18 +117,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const token = localStorage.getItem('token');
 
         if (token && user) {
-            loginBtn.style.display = 'none';
-            logoutBtn.style.display = 'inline-flex';
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
 
             if (user.role === 'customer') {
-                bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
+                if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
             } else {
-                bookBtn.innerHTML = '<i class="fas fa-th-large"></i> Dashboard';
+                if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-th-large"></i> Dashboard';
             }
         } else {
-            loginBtn.style.display = 'inline-flex';
-            logoutBtn.style.display = 'none';
-            bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
+            if (loginBtn) loginBtn.style.display = 'inline-flex';
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
         }
     }
 
@@ -112,178 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return card;
     }
 
-    // ===== Fetch Public Products (MERGE VERSION) =====
-    // Add this to your scripts.js - replace the existing fetchPublicProducts function
-
-    async function fetchPublicProducts() {
-        try {
-            const res = await fetch(`${API_URL}/api/products/public`);
-            if (!res.ok) {
-                console.warn('Products API not available yet, loading static products');
-                loadStaticProducts();
-                return;
-            }
-            const products = await res.json();
-            const container = document.getElementById('products-list');
-            if (!container) return;
-
-            container.innerHTML = '';
-
-            // Show all products or limit to 8
-            const displayProducts = products.slice(0, 8);
-
-            displayProducts.forEach(p => {
-                // Fix image path - use the correct path from your server
-                let imageUrl = p.image || './assets/images/product-default.jpg';
-                if (imageUrl && !imageUrl.startsWith('http')) {
-                    // Extract filename and prepend the correct path
-                    const filename = imageUrl.split('/').pop();
-                    imageUrl = `/images/products/${filename}`;
-                }
-
-                const onSale = p.salePrice && p.salePrice > 0 && p.salePrice < p.price;
-                const displayPrice = onSale ? p.salePrice : p.price;
-
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.setAttribute('data-id', p._id);
-
-                card.innerHTML = `
-                <div class="product-image">
-                    <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
-                    ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
-                </div>
-                <div class="product-content">
-                    <h4 class="product-name">${p.name}</h4>
-                    <div class="product-price-container">
-                        ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
-                        <span class="product-price">R${displayPrice.toFixed(2)}</span>
-                    </div>
-                    <div class="product-category">${p.category || ''}</div>
-                    <button class="btn btn-sm btn-primary add-to-cart-btn" 
-                            data-product='${JSON.stringify({
-                    id: p._id,
-                    name: p.name,
-                    price: p.price,
-                    salePrice: p.salePrice || 0,
-                    image: imageUrl,
-                    category: p.category || ''
-                }).replace(/'/g, '&apos;')}'>
-                        Add to Cart
-                    </button>
-                </div>
-            `;
-
-                // Add click handler for product details
-                card.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('add-to-cart-btn')) {
-                        showProductPopup(p);
-                    }
-                });
-
-                container.appendChild(card);
-            });
-
-            // Add event listeners to Add to Cart buttons
-            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const productData = JSON.parse(btn.dataset.product);
-                    if (window.tasselCart) {
-                        window.tasselCart.addItem(productData);
-                    } else {
-                        console.warn('Cart not initialized');
-                    }
-                });
-            });
-
-        } catch (err) {
-            console.error('Failed to load products', err);
-            loadStaticProducts();
-        }
-    }
-
-    // Fallback static products
-    function loadStaticProducts() {
-        const container = document.getElementById('products-list');
-        if (!container) return;
-
-        const staticProducts = [
-            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
-            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
-            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
-            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "/images/products/Tassel_Eye_Serum.jpg" }
-        ];
-
-        container.innerHTML = '';
-        staticProducts.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-            <div class="product-image">
-                <img src="${p.image}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
-            </div>
-            <div class="product-content">
-                <h4 class="product-name">${p.name}</h4>
-                <div class="product-price">R${p.price}</div>
-                <div class="product-category">${p.category}</div>
-                <button class="btn btn-sm btn-primary enquire-btn">Enquire</button>
-            </div>
-        `;
-            container.appendChild(card);
-        });
-    }
-
-    // Product popup function
-    function showProductPopup(product) {
-        // Remove existing popup
-        const existingPopup = document.querySelector('.product-popup-overlay');
-        if (existingPopup) existingPopup.remove();
-
-        const onSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
-        const displayPrice = onSale ? product.salePrice : product.price;
-        const imageUrl = product.image || './assets/images/product-default.jpg';
-
-        const popup = document.createElement('div');
-        popup.className = 'product-popup-overlay';
-        popup.innerHTML = `
-        <div class="product-popup">
-            <button class="popup-close">&times;</button>
-            <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./assets/images/product-default.jpg'">
-            <h3>${product.name}</h3>
-            <p>${product.description || 'No description available.'}</p>
-            <div class="product-price-container">
-                ${onSale ? `<span class="original-price">R${product.price.toFixed(2)}</span>` : ''}
-                <span class="product-price">R${displayPrice.toFixed(2)}</span>
-            </div>
-            <button class="btn btn-primary add-to-cart-popup">Add to Cart</button>
-        </div>
-    `;
-
-        document.body.appendChild(popup);
-
-        // Close handlers
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) popup.remove();
-        });
-
-        popup.querySelector('.popup-close').addEventListener('click', () => popup.remove());
-
-        popup.querySelector('.add-to-cart-popup').addEventListener('click', () => {
-            if (window.tasselCart) {
-                window.tasselCart.addItem({
-                    id: product._id,
-                    name: product.name,
-                    price: product.price,
-                    salePrice: product.salePrice || 0,
-                    image: imageUrl
-                });
-                popup.remove();
-            }
-        });
-    }// Add this to your scripts.js - replace the existing fetchPublicProducts function
-
+    // ===== Fetch Public Products =====
     async function fetchPublicProducts() {
         try {
             const res = await fetch(`${API_URL}/api/products/public`);
@@ -452,43 +361,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Fallback static products for development
-    function loadStaticProducts() {
-        const container = document.getElementById('products-list');
-        if (!container) return;
-
-        const staticProducts = [
-            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare" },
-            { name: "Tassel Beard Oil", price: 299, category: "wellness" },
-            { name: "Tassel Face Wash", price: 149, category: "skincare" },
-            { name: "Tassel Eye Serum", price: 250, category: "skincare" }
-        ];
-
-        staticProducts.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="product-image">
-                    <img src="./assets/images/product-default.jpg" alt="${p.name}">
-                </div>
-                <div class="product-content">
-                    <h4 class="product-name">${p.name}</h4>
-                    <div class="product-price">R${p.price}</div>
-                    <div class="product-category">${p.category}</div>
-                    <button class="btn btn-sm btn-primary" onclick="window.location.href='contact.html'">Enquire</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    // Rest of your functions remain exactly the same...
-    // [All your existing functions: initSliders, initGallery, initForms, etc.]
 
     // ===== Header & Navigation =====
     window.addEventListener('scroll', () => {
-        header.classList.toggle('scrolled', window.pageYOffset > 100);
+        if (header) header.classList.toggle('scrolled', window.pageYOffset > 100);
         if (backToTop) {
             backToTop.classList.toggle('visible', window.pageYOffset > 300);
         }
@@ -497,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (mobileToggle) {
         mobileToggle.addEventListener('click', () => {
             mobileToggle.classList.toggle('active');
-            navMenu.classList.toggle('active');
+            if (navMenu) navMenu.classList.toggle('active');
         });
     }
 
@@ -507,14 +383,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (this.getAttribute('href').startsWith('#')) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
+                if (target && header) {
                     const headerHeight = header.offsetHeight;
                     const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
                     window.scrollTo({ top: targetPosition, behavior: 'smooth' });
                 }
             }
-            navMenu.classList.remove('active');
-            mobileToggle.classList.remove('active');
+            if (navMenu) navMenu.classList.remove('active');
+            if (mobileToggle) mobileToggle.classList.remove('active');
         });
     });
 
@@ -524,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
+                if (target && header) {
                     const headerHeight = header.offsetHeight;
                     const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
                     window.scrollTo({ top: targetPosition, behavior: 'smooth' });
@@ -687,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        if (lightboxImages.length) {
+        if (lightboxImages.length && lightbox) {
             items.forEach((item, i) => {
                 item.addEventListener('click', () => showLightbox(i));
             });
@@ -714,11 +590,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            if (lightbox) {
-                lightbox.addEventListener('click', (e) => {
-                    if (e.target === lightbox) lightbox.classList.remove('active');
-                });
-            }
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) lightbox.classList.remove('active');
+            });
 
             document.addEventListener('keydown', (e) => {
                 if (!lightbox.classList.contains('active')) return;
@@ -813,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.service-overlay .btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            bookBtn.click();
+            if (bookBtn) bookBtn.click();
         });
     });
 
@@ -965,7 +839,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     name: this.querySelector('#name').value,
                     email: this.querySelector('#email').value,
                     phone: this.querySelector('#phone').value,
-                    subject: this.querySelector('#subject').value,
+                    subject: this.querySelector('#subject')?.value || '',
                     message: this.querySelector('#message').value
                 };
                 const success = await postData('/api/contact', data, 'Message sent successfully!');
@@ -1016,68 +890,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Directions clicked');
         });
     });
-
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-
-        const colors = {
-            success: '#4CAF50',
-            error: '#F44336',
-            info: '#2196F3'
-        };
-
-        const icons = {
-            success: 'check-circle',
-            error: 'exclamation-circle',
-            info: 'info-circle'
-        };
-
-        notification.style.cssText = `
-            position: fixed; 
-            top: 100px; 
-            right: 20px; 
-            background: ${colors[type]}; 
-            color: white; 
-            padding: 1rem 1.5rem; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-            z-index: 9999; 
-            animation: slideIn 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        `;
-
-        notification.innerHTML = `
-            <div style="display:flex;align-items:center;gap:0.75rem">
-                <i class="fas fa-${icons[type]}"></i>
-                <span>${message}</span>
-            </div>
-            <button style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:10px">&times;</button>
-        `;
-
-        document.body.appendChild(notification);
-
-        const closeBtn = notification.querySelector('button');
-        closeBtn.addEventListener('click', () => notification.remove());
-
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }
-        }, 5000);
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
 
     function initObservers() {
         const observer = new IntersectionObserver((entries) => {
