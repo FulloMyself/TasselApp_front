@@ -238,7 +238,7 @@ if (typeof TasselCart !== 'undefined') {
 
         orderViaWhatsApp() {
             const message = this.generateWhatsAppMessage();
-            const whatsappNumber = "27632462802"; // Your business number
+            const whatsappNumber = "27729605153"; // Your business number
             window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
         }
 
