@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, 1500);
     });
-    
+
     checkAuthStatus();
     initSliders();
     initGallery();
@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== Fetch Public Products =====
+    // ===== Fetch Public Products =====
     async function fetchPublicProducts() {
         try {
             const res = await fetch(`${API_URL}/api/products/public`);
@@ -207,16 +208,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
             container.innerHTML = '';
 
-            // Show all products or limit to 8
-            const displayProducts = products.slice(0, 8);
+            // FIXED: Show ALL products, not just 8
+            // const displayProducts = products.slice(0, 8); // REMOVE THIS LINE
+            const displayProducts = products; // Show all products
 
             displayProducts.forEach(p => {
-                // Fix image path - use the correct path from your server
+                // Use the image path directly from the database
                 let imageUrl = p.image || './assets/images/product-default.jpg';
-                if (imageUrl && !imageUrl.startsWith('http')) {
-                    // Extract filename and prepend the correct path
-                    const filename = imageUrl.split('/').pop();
-                    imageUrl = `/images/products/${filename}`;
+
+                // Ensure the path starts with ./ for relative paths
+                if (imageUrl && !imageUrl.startsWith('./') && !imageUrl.startsWith('http')) {
+                    if (imageUrl.startsWith('/')) {
+                        imageUrl = '.' + imageUrl;
+                    } else {
+                        imageUrl = './' + imageUrl;
+                    }
                 }
 
                 const onSale = p.salePrice && p.salePrice > 0 && p.salePrice < p.price;
@@ -227,19 +233,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.setAttribute('data-id', p._id);
 
                 card.innerHTML = `
-                <div class="product-image">
-                    <img src="${imageUrl}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
-                    ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+            <div class="product-image">
+                <img src="${imageUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
+                ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+            </div>
+            <div class="product-content">
+                <h4 class="product-name">${p.name}</h4>
+                <div class="product-price-container">
+                    ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
+                    <span class="product-price">R${displayPrice.toFixed(2)}</span>
                 </div>
-                <div class="product-content">
-                    <h4 class="product-name">${p.name}</h4>
-                    <div class="product-price-container">
-                        ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
-                        <span class="product-price">R${displayPrice.toFixed(2)}</span>
-                    </div>
-                    <div class="product-category">${p.category || ''}</div>
-                    <button class="btn btn-sm btn-primary add-to-cart-btn" 
-                            data-product='${JSON.stringify({
+                <div class="product-category">${p.category || ''}</div>
+                <button class="btn btn-sm btn-primary add-to-cart-btn" 
+                        data-product='${JSON.stringify({
                     id: p._id,
                     name: p.name,
                     price: p.price,
@@ -247,10 +253,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     image: imageUrl,
                     category: p.category || ''
                 }).replace(/'/g, '&apos;')}'>
-                        Add to Cart
-                    </button>
-                </div>
-            `;
+                    Add to Cart
+                </button>
+            </div>
+        `;
 
                 // Add click handler for product details
                 card.addEventListener('click', (e) => {
@@ -288,10 +294,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!container) return;
 
         const staticProducts = [
-            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
-            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
-            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
-            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "/images/products/Tassel_Eye_Serum.jpg" }
+            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "./assets/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
+            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "./assets/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
+            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "./assets/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
+            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "./assets/images/products/Tassel_Eye_Serum.jpg" }
         ];
 
         container.innerHTML = '';
@@ -300,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'product-card';
             card.innerHTML = `
             <div class="product-image">
-                <img src="${p.image}" alt="${p.name}" onerror="this.src='./assets/images/product-default.jpg'">
+                <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
             </div>
             <div class="product-content">
                 <h4 class="product-name">${p.name}</h4>
@@ -321,14 +327,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const onSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
         const displayPrice = onSale ? product.salePrice : product.price;
-        const imageUrl = product.image || './assets/images/product-default.jpg';
+
+        // FIXED: Use the same image path logic as the card
+        let imageUrl = product.image || './assets/images/product-default.jpg';
+        if (imageUrl && !imageUrl.startsWith('./') && !imageUrl.startsWith('http')) {
+            if (imageUrl.startsWith('/')) {
+                imageUrl = '.' + imageUrl;
+            } else {
+                imageUrl = './' + imageUrl;
+            }
+        }
 
         const popup = document.createElement('div');
         popup.className = 'product-popup-overlay';
         popup.innerHTML = `
         <div class="product-popup">
             <button class="popup-close">&times;</button>
-            <img src="${imageUrl}" alt="${product.name}" onerror="this.src='./assets/images/product-default.jpg'">
+            <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
             <h3>${product.name}</h3>
             <p>${product.description || 'No description available.'}</p>
             <div class="product-price-container">
