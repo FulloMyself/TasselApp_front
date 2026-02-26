@@ -160,6 +160,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Protect shop links - redirect to login if not authenticated
+    document.querySelectorAll('a[href="shop.html"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (!token || !user) {
+                e.preventDefault();
+                e.stopPropagation();
+                showNotification('Please log in to access the shop', 'error');
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) {
+                    loginModal.classList.add('active');
+                }
+                return false;
+            }
+        });
+    });
+
     // ===== Fetch Services from MongoDB =====
     async function fetchServices() {
         try {
@@ -236,8 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             container.innerHTML = '';
 
-            // FIXED: Show ALL products, not just 8
-            // const displayProducts = products.slice(0, 8); // REMOVE THIS LINE
             const displayProducts = products; // Show all products
 
             displayProducts.forEach(p => {

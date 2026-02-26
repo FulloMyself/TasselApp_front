@@ -1,50 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Shop premium beauty products at Tassel Beauty & Wellness - Exclusive for members">
     <title>Shop | Tassel Beauty & Wellness</title>
-    
+
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💇</text></svg>">
-    
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💇</text></svg>">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
-    
+
+    <script src="./shop-auth.js"></script>
+
     <style>
         /* Shop specific styles */
         .shop-header {
-            background: linear-gradient(rgba(107, 93, 82, 0.8), rgba(107, 93, 82, 0.9)), url('./assets/images/shop-banner.jpg');
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(135deg, var(--primary-brown) 0%, var(--accent-pink) 100%);
             padding: 4rem 0;
             margin-bottom: 3rem;
             text-align: center;
             color: white;
         }
-        
+
         .shop-header h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
             font-family: var(--font-heading);
         }
-        
+
         .shop-header p {
             font-size: 1.2rem;
             opacity: 0.9;
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
         .shop-filters {
             display: flex;
             justify-content: space-between;
@@ -53,13 +57,13 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        
+
         .category-filters {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
         }
-        
+
         .filter-btn {
             padding: 0.5rem 1.5rem;
             border: 1px solid var(--border-color);
@@ -69,14 +73,14 @@
             transition: all 0.3s ease;
             font-size: 0.9rem;
         }
-        
+
         .filter-btn.active,
         .filter-btn:hover {
             background: var(--primary-brown);
             color: white;
             border-color: var(--primary-brown);
         }
-        
+
         .search-box {
             display: flex;
             align-items: center;
@@ -84,14 +88,14 @@
             border-radius: var(--radius-full);
             overflow: hidden;
         }
-        
+
         .search-box input {
             padding: 0.5rem 1rem;
             border: none;
             outline: none;
             width: 250px;
         }
-        
+
         .search-box button {
             padding: 0.5rem 1rem;
             background: var(--primary-brown);
@@ -99,25 +103,26 @@
             border: none;
             cursor: pointer;
         }
-        
+
         .products-count {
             margin-bottom: 1rem;
             color: var(--text-light);
             font-size: 0.9rem;
         }
-        
+
         @media (max-width: 768px) {
             .shop-filters {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .search-box input {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Loading Screen -->
     <div id="loading-screen">
@@ -172,7 +177,7 @@
     </header>
 
     <!-- Shop Header -->
-    <section class="shop-header">
+    <section class="shop-header" style="background: var(--primary-brown);">
         <div class="container">
             <h1>Our Premium Collection</h1>
             <p>Discover luxury beauty products crafted for your self-care ritual</p>
@@ -190,16 +195,16 @@
                     <button class="filter-btn" data-category="bodycare">Body Care</button>
                     <button class="filter-btn" data-category="wellness">Wellness</button>
                 </div>
-                
+
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="Search products...">
                     <button id="search-btn"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-            
+
             <!-- Products Count -->
             <div class="products-count" id="products-count">Loading products...</div>
-            
+
             <!-- Products Grid -->
             <div id="products-list" class="products-grid">
                 <!-- Products will be loaded dynamically -->
@@ -280,4 +285,5 @@
     <script src="./cart.js"></script>
     <script src="./shop.js"></script>
 </body>
+
 </html>

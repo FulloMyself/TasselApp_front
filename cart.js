@@ -22,7 +22,22 @@ if (typeof TasselCart !== 'undefined') {
             this.updateCartNotification();
         }
 
+        // In cart.js, update the addItem method
         addItem(product) {
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (!token || !user) {
+                this.showNotification('Please log in to add items to cart', 'error');
+                // Open login modal
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) {
+                    loginModal.classList.add('active');
+                }
+                return;
+            }
+
             const existingItem = this.cart.find(item => item.id === product.id);
 
             if (existingItem) {
@@ -243,30 +258,54 @@ if (typeof TasselCart !== 'undefined') {
         }
 
         // PayFast Payment
+        // In cart.js - Replace the processPayFastPayment method
+
         async processPayFastPayment(email, deliveryDetails = null) {
             try {
-                const response = await fetch('https://your-payment-portal.com/create-order', {
+                // Show loading state
+                this.showNotification('Processing payment...', 'info');
+
+                // Prepare order data
+                const orderData = {
+                    items: this.cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price
+                    })),
+                    total: this.getTotal(),
+                    email: email,
+                    deliveryDetails: deliveryDetails,
+                    customerName: deliveryDetails?.fullname || 'Customer',
+                    phone: deliveryDetails?.phone || ''
+                };
+
+                // Call your backend to create PayFast order
+                const response = await fetch(`${API_URL}/api/payments/create-payfast-order`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        items: this.cart,
-                        total: this.getTotal(),
-                        email,
-                        deliveryDetails
-                    })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(orderData)
                 });
 
-                if (!response.ok) throw new Error('Payment initiation failed');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to create payment');
+                }
 
                 const paymentData = await response.json();
-                this.submitPayFastForm(paymentData);
+
+                // Submit PayFast form with data from backend
+                this.submitPayFastForm(paymentData.fields, paymentData.payfastUrl);
 
             } catch (error) {
                 console.error('Payment error:', error);
-                this.showNotification('Payment failed. Please try again.', 'error');
+                this.showNotification(error.message || 'Payment failed. Please try again or use WhatsApp ordering.', 'error');
+                throw error;
             }
         }
-
         submitPayFastForm(fields) {
             const form = document.createElement('form');
             form.method = 'POST';
