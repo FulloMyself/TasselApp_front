@@ -1,54 +1,148 @@
 // front/checkout.js
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if cart exists
+    if (!window.tasselCart) {
+        console.error('Cart not initialized');
+        showCheckoutError('Cart not loaded. Please return to the shop and try again.');
+        return;
+    }
+    
     loadOrderSummary();
     
-    document.getElementById('delivery-option').addEventListener('change', function(e) {
-        const addressSection = document.getElementById('delivery-address');
-        addressSection.style.display = e.target.value === 'delivery' ? 'block' : 'none';
-        updateTotal();
-    });
+    const deliveryOption = document.getElementById('delivery-option');
+    if (deliveryOption) {
+        deliveryOption.addEventListener('change', function(e) {
+            const addressSection = document.getElementById('delivery-address');
+            if (addressSection) {
+                addressSection.style.display = e.target.value === 'delivery' ? 'block' : 'none';
+            }
+            updateTotal();
+        });
+    }
 });
 
+function showCheckoutError(message) {
+    const container = document.querySelector('.checkout-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="error-message" style="text-align: center; padding: 3rem;">
+                <h2>⚠️ Oops!</h2>
+                <p>${message}</p>
+                <a href="index.html#products-section" class="btn btn-primary" style="margin-top: 1rem;">Return to Shop</a>
+            </div>
+        `;
+    }
+}
+
 function loadOrderSummary() {
+    // Safety check
+    if (!window.tasselCart || !window.tasselCart.cart) {
+        console.error('Cart not available');
+        return;
+    }
+    
     const cart = window.tasselCart;
     const itemsContainer = document.getElementById('order-items');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
     
     if (!itemsContainer) return;
     
+    // Check if cart is empty
+    if (!cart.cart || cart.cart.length === 0) {
+        if (itemsContainer) {
+            itemsContainer.innerHTML = '<p class="empty-cart">Your cart is empty. <a href="index.html#products-section">Continue shopping</a></p>';
+        }
+        if (emptyCartMessage) {
+            emptyCartMessage.style.display = 'block';
+        }
+        // Hide checkout button
+        const checkoutBtn = document.querySelector('button[onclick="processPayFastPayment()"], button[onclick="processWhatsAppOrder()"]');
+        if (checkoutBtn) checkoutBtn.disabled = true;
+        return;
+    }
+    
     itemsContainer.innerHTML = '';
+    
     cart.cart.forEach(item => {
         const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
-        itemsContainer.innerHTML += `
-            <div class="order-item">
-                <span>${item.name} x${item.quantity}</span>
-                <span>R${(price * item.quantity).toFixed(2)}</span>
-            </div>
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'order-item';
+        itemDiv.innerHTML = `
+            <span>${item.name} x${item.quantity}</span>
+            <span>R${(price * item.quantity).toFixed(2)}</span>
         `;
+        itemsContainer.appendChild(itemDiv);
     });
     
     updateTotal();
 }
 
 function updateTotal() {
+    // Safety check
+    if (!window.tasselCart || !window.tasselCart.cart) {
+        return;
+    }
+    
     const cart = window.tasselCart;
-    const subtotal = cart.getSubtotal();
+    
+    // Calculate subtotal safely
+    let subtotal = 0;
+    if (cart.cart && cart.cart.length > 0) {
+        subtotal = cart.cart.reduce((sum, item) => {
+            const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
+            return sum + (price * (item.quantity || 1));
+        }, 0);
+    }
+    
     const deliveryOption = document.getElementById('delivery-option')?.value;
     const deliveryFee = deliveryOption === 'delivery' ? 200 : 0;
     const total = subtotal + deliveryFee;
     
-    document.getElementById('subtotal').textContent = `R${subtotal.toFixed(2)}`;
-    document.getElementById('delivery-fee').textContent = deliveryFee > 0 ? `R${deliveryFee}.00` : 'Free';
-    document.getElementById('total').textContent = `R${total.toFixed(2)}`;
+    const subtotalEl = document.getElementById('subtotal');
+    const deliveryFeeEl = document.getElementById('delivery-fee');
+    const totalEl = document.getElementById('total');
+    
+    if (subtotalEl) subtotalEl.textContent = `R${subtotal.toFixed(2)}`;
+    if (deliveryFeeEl) deliveryFeeEl.textContent = deliveryFee > 0 ? `R${deliveryFee}.00` : 'Free';
+    if (totalEl) totalEl.textContent = `R${total.toFixed(2)}`;
 }
 
 function validateCheckout() {
+    // Safety check - redirect if cart is empty
+    if (!window.tasselCart || !window.tasselCart.cart || window.tasselCart.cart.length === 0) {
+        alert('Your cart is empty. Please add items before checkout.');
+        window.location.href = 'index.html#products-section';
+        return false;
+    }
+    
     const fullname = document.getElementById('fullname')?.value;
     const email = document.getElementById('email')?.value;
     const phone = document.getElementById('phone')?.value;
     const terms = document.getElementById('terms')?.checked;
     
-    if (!fullname || !email || !phone) {
-        alert('Please fill in all required fields');
+    if (!fullname || !fullname.trim()) {
+        alert('Please enter your full name');
+        document.getElementById('fullname')?.focus();
+        return false;
+    }
+    
+    if (!email || !email.trim()) {
+        alert('Please enter your email address');
+        document.getElementById('email')?.focus();
+        return false;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        document.getElementById('email')?.focus();
+        return false;
+    }
+    
+    if (!phone || !phone.trim()) {
+        alert('Please enter your phone number');
+        document.getElementById('phone')?.focus();
         return false;
     }
     
@@ -61,8 +155,16 @@ function validateCheckout() {
     if (deliveryOption === 'delivery') {
         const address = document.getElementById('address')?.value;
         const city = document.getElementById('city')?.value;
-        if (!address || !city) {
-            alert('Please fill in delivery address');
+        
+        if (!address || !address.trim()) {
+            alert('Please enter your delivery address');
+            document.getElementById('address')?.focus();
+            return false;
+        }
+        
+        if (!city || !city.trim()) {
+            alert('Please enter your city');
+            document.getElementById('city')?.focus();
             return false;
         }
     }
@@ -73,43 +175,116 @@ function validateCheckout() {
 async function processPayFastPayment() {
     if (!validateCheckout()) return;
     
+    // Safety check
+    if (!window.tasselCart) {
+        alert('Cart not available. Please refresh the page.');
+        return;
+    }
+    
     const cart = window.tasselCart;
     const email = document.getElementById('email').value;
     const deliveryOption = document.getElementById('delivery-option').value;
+    
+    // Show loading state
+    const payBtn = document.querySelector('[onclick="processPayFastPayment()"]');
+    if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.textContent = 'Processing...';
+    }
     
     let deliveryDetails = null;
     if (deliveryOption === 'delivery') {
         deliveryDetails = {
             address: document.getElementById('address').value,
             city: document.getElementById('city').value,
-            postal: document.getElementById('postal').value
+            postal: document.getElementById('postal')?.value || ''
         };
     }
     
-    await cart.processPayFastPayment(email, deliveryDetails);
+    try {
+        await cart.processPayFastPayment(email, deliveryDetails);
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert('Payment processing failed. Please try again.');
+        if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.textContent = 'Pay with PayFast';
+        }
+    }
 }
 
 function processWhatsAppOrder() {
     if (!validateCheckout()) return;
     
+    // Safety check
+    if (!window.tasselCart) {
+        alert('Cart not available. Please refresh the page.');
+        return;
+    }
+    
     const cart = window.tasselCart;
     
-    // Add delivery info to message
+    // Check if cart is empty
+    if (!cart.cart || cart.cart.length === 0) {
+        alert('Your cart is empty. Please add items before checking out.');
+        return;
+    }
+    
     const deliveryOption = document.getElementById('delivery-option').value;
     const fullname = document.getElementById('fullname').value;
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
     
-    let message = cart.generateWhatsAppMessage();
-    message += `%0A%0ADelivery Options: ${deliveryOption === 'delivery' ? 'Delivery' : 'Collection'}`;
-    message += `%0AName: ${fullname}`;
-    message += `%0AEmail: ${email}`;
-    message += `%0APhone: ${phone}`;
+    // Generate order summary
+    let orderSummary = '';
+    cart.cart.forEach(item => {
+        const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
+        orderSummary += `${item.name} x${item.quantity} - R${(price * item.quantity).toFixed(2)}%0A`;
+    });
+    
+    const subtotal = cart.cart.reduce((sum, item) => {
+        const price = item.salePrice > 0 && item.salePrice < item.price ? item.salePrice : item.price;
+        return sum + (price * item.quantity);
+    }, 0);
+    
+    const deliveryFee = deliveryOption === 'delivery' ? 200 : 0;
+    const total = subtotal + deliveryFee;
+    
+    let message = `*NEW ORDER FROM TASSEL STUDIO*%0A%0A`;
+    message += `*CUSTOMER DETAILS*%0A`;
+    message += `Name: ${fullname}%0A`;
+    message += `Email: ${email}%0A`;
+    message += `Phone: ${phone}%0A%0A`;
+    
+    message += `*ORDER DETAILS*%0A`;
+    message += orderSummary;
+    message += `%0A`;
+    message += `Subtotal: R${subtotal.toFixed(2)}%0A`;
+    message += `Delivery: ${deliveryFee > 0 ? 'R' + deliveryFee.toFixed(2) : 'Free'}%0A`;
+    message += `*TOTAL: R${total.toFixed(2)}*%0A%0A`;
+    
+    message += `*DELIVERY OPTION*%0A`;
+    message += `${deliveryOption === 'delivery' ? 'Delivery' : 'Collection'}%0A`;
     
     if (deliveryOption === 'delivery') {
-        message += `%0AAddress: ${document.getElementById('address').value}, ${document.getElementById('city').value}`;
+        message += `%0A*DELIVERY ADDRESS*%0A`;
+        message += `${document.getElementById('address').value}%0A`;
+        message += `${document.getElementById('city').value}`;
+        if (document.getElementById('postal')?.value) {
+            message += `%0A${document.getElementById('postal').value}`;
+        }
     }
+    
+    message += `%0A%0A_Powered by tasselgroup.co.za_`;
     
     const whatsappNumber = "27729605153";
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
 }
+
+// Add this to your checkout.html to handle back navigation
+window.addEventListener('pageshow', function(event) {
+    // Reload order summary when page is shown (including when using back button)
+    if (event.persisted || window.performance && window.performance.navigation.type === 2) {
+        location.reload();
+    }
+});

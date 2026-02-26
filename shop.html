@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shop premium beauty products at Tassel Beauty & Wellness - Exclusive for members">
+    <title>Shop | Tassel Beauty & Wellness</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💇</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Shop specific styles */
+        .shop-header {
+            background: linear-gradient(rgba(107, 93, 82, 0.8), rgba(107, 93, 82, 0.9)), url('./assets/images/shop-banner.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .shop-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-heading);
+        }
+        
+        .shop-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .shop-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary-brown);
+            color: white;
+            border-color: var(--primary-brown);
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .search-box input {
+            padding: 0.5rem 1rem;
+            border: none;
+            outline: none;
+            width: 250px;
+        }
+        
+        .search-box button {
+            padding: 0.5rem 1rem;
+            background: var(--primary-brown);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .products-count {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .shop-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">TASSEL</div>
+            <div class="loading-text">Beauty & Wellness</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header id="main-header" class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <!-- Logo -->
+                    <a href="index.html" class="logo">
+                        <span class="logo-text">TASSEL</span>
+                        <span class="logo-subtitle">Beauty & Wellness</span>
+                    </a>
+
+                    <!-- Desktop Navigation -->
+                    <ul class="nav-menu" id="nav-menu">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="shop.html" class="nav-link active">Shop</a></li>
+                        <li><a href="index.html#services" class="nav-link">Services</a></li>
+                        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+                    </ul>
+
+                    <!-- CTA Buttons -->
+                    <div class="nav-actions">
+                        <button class="btn btn-outline" id="login-btn">
+                            <i class="fas fa-user"></i> Login
+                        </button>
+                        <button class="btn btn-outline" id="logout-btn" style="display: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                        <button class="btn btn-primary" id="dashboard-btn" style="display: none;">
+                            <i class="fas fa-th-large"></i> Dashboard
+                        </button>
+                    </div>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button class="mobile-toggle" id="mobile-toggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Shop Header -->
+    <section class="shop-header">
+        <div class="container">
+            <h1>Our Premium Collection</h1>
+            <p>Discover luxury beauty products crafted for your self-care ritual</p>
+        </div>
+    </section>
+
+    <!-- Shop Section -->
+    <section class="shop-section">
+        <div class="container">
+            <!-- Filters -->
+            <div class="shop-filters">
+                <div class="category-filters">
+                    <button class="filter-btn active" data-category="all">All Products</button>
+                    <button class="filter-btn" data-category="skincare">Skincare</button>
+                    <button class="filter-btn" data-category="bodycare">Body Care</button>
+                    <button class="filter-btn" data-category="wellness">Wellness</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search products...">
+                    <button id="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- Products Count -->
+            <div class="products-count" id="products-count">Loading products...</div>
+            
+            <!-- Products Grid -->
+            <div id="products-list" class="products-grid">
+                <!-- Products will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart <span class="cart-count">0</span></h3>
+            <button id="cart-close" class="cart-close-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">R0.00</span>
+            </div>
+            <div class="cart-actions">
+                <button id="checkout-btn" class="btn btn-primary">Proceed to Checkout</button>
+                <button id="cart-whatsapp" class="btn btn-outline">Order via WhatsApp</button>
+                <button class="btn btn-outline" onclick="window.tasselCart?.clearCart()">Clear Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Toggle Button -->
+    <button id="cart-toggle" class="cart-toggle">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count">0</span>
+    </button>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content modal-small">
+            <button class="modal-close">&times;</button>
+            <form id="login-form" class="login-form">
+                <h2 class="modal-title">Welcome Back</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <div class="form-divider"><span>or</span></div>
+                <button type="button" class="btn btn-outline btn-block" id="show-register">Create Account</button>
+            </form>
+            <form id="register-form" class="login-form" style="display: none;">
+                <h2 class="modal-title">Create Account</h2>
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-phone">Phone Number</label>
+                    <input type="tel" id="reg-phone" placeholder="+27 82 345 6789">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Choose a password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                <div class="form-divider"><span>or</span></div>
+                <button type="button" class="btn btn-outline btn-block" id="show-login">Back to Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./cart.js"></script>
+    <script src="./shop.js"></script>
+</body>
+</html>

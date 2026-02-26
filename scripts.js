@@ -112,23 +112,51 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchServices(); // Load services from MongoDB
 
     // ===== Auth Status (Check Login) =====
+    // Update the checkAuthStatus function
     function checkAuthStatus() {
         const user = JSON.parse(localStorage.getItem('user'));
         const token = localStorage.getItem('token');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const dashboardBtn = document.getElementById('dashboard-btn');
+        const bookBtn = document.getElementById('book-btn');
 
         if (token && user) {
+            // User is logged in
             if (loginBtn) loginBtn.style.display = 'none';
             if (logoutBtn) logoutBtn.style.display = 'inline-flex';
-
-            if (user.role === 'customer') {
-                if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
-            } else {
-                if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-th-large"></i> Dashboard';
+            if (dashboardBtn) {
+                dashboardBtn.style.display = 'inline-flex';
+                // Update dashboard button text based on role
+                if (user.role === 'admin') {
+                    dashboardBtn.innerHTML = '<i class="fas fa-cog"></i> Admin';
+                    dashboardBtn.onclick = () => window.location.href = 'admin.html';
+                } else if (user.role === 'staff') {
+                    dashboardBtn.innerHTML = '<i class="fas fa-clock"></i> Staff';
+                    dashboardBtn.onclick = () => window.location.href = 'staff.html';
+                } else {
+                    dashboardBtn.innerHTML = '<i class="fas fa-user"></i> My Account';
+                    dashboardBtn.onclick = () => window.location.href = 'customer.html';
+                }
+            }
+            if (bookBtn) {
+                if (user.role === 'customer') {
+                    bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
+                    bookBtn.onclick = () => document.getElementById('booking-modal')?.classList.add('active');
+                }
             }
         } else {
+            // User is logged out
             if (loginBtn) loginBtn.style.display = 'inline-flex';
             if (logoutBtn) logoutBtn.style.display = 'none';
-            if (bookBtn) bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
+            if (dashboardBtn) dashboardBtn.style.display = 'none';
+            if (bookBtn) {
+                bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
+                bookBtn.onclick = () => {
+                    showNotification('Please login to book an appointment.', 'error');
+                    document.getElementById('login-modal')?.classList.add('active');
+                };
+            }
         }
     }
 
