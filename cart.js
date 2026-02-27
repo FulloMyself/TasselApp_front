@@ -1,5 +1,8 @@
 // cart.js - Shopping Cart Functionality
 
+// Add this at the very top of cart.js
+const API_URL = 'https://tasselapp-back.onrender.com';
+
 // Check if TasselCart already exists to prevent duplicate declaration errors
 if (typeof TasselCart !== 'undefined') {
     console.warn('TasselCart already defined, skipping re-declaration');
@@ -258,8 +261,6 @@ if (typeof TasselCart !== 'undefined') {
         }
 
         // PayFast Payment
-        // In cart.js - Replace the processPayFastPayment method
-
         async processPayFastPayment(email, deliveryDetails = null) {
             try {
                 // Show loading state
@@ -306,18 +307,20 @@ if (typeof TasselCart !== 'undefined') {
                 throw error;
             }
         }
-        submitPayFastForm(fields) {
+
+        submitPayFastForm(fields, payfastUrl) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = fields.payfast_url;
+            form.action = payfastUrl;
             form.style.display = 'none';
 
+            // Add all fields to form
             Object.entries(fields).forEach(([key, value]) => {
-                if (key !== 'payfast_url') {
+                if (value !== null && value !== undefined) {
                     const input = document.createElement('input');
                     input.type = 'hidden';
                     input.name = key;
-                    input.value = value;
+                    input.value = value.toString();
                     form.appendChild(input);
                 }
             });

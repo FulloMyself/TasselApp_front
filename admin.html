@@ -7,6 +7,8 @@
     <title>Admin Dashboard | Tassel Studio</title>
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/png" href="./favicon.png">
+    <!-- Add this in the header where you want to show user name -->
+    <span id="user-name-display" style="display: none;"></span>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Statistics -->
@@ -357,16 +359,50 @@
             display: inline-block;
         }
 
-        .status-pending { background: #FFF3CD; color: #856404; }
-        .status-confirmed { background: #D4EDDA; color: #155724; }
-        .status-in-progress { background: #B3E5FC; color: #01579B; }
-        .status-completed { background: #C8E6C9; color: #1B5E20; }
-        .status-cancelled { background: #F8D7DA; color: #721C24; }
-        .status-no-show { background: #E0E0E0; color: #424242; }
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
 
-        .payment-paid { background: #D4EDDA; color: #155724; }
-        .payment-unpaid { background: #F8D7DA; color: #721C24; }
-        .payment-deposit { background: #FFF3CD; color: #856404; }
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-in-progress {
+            background: #B3E5FC;
+            color: #01579B;
+        }
+
+        .status-completed {
+            background: #C8E6C9;
+            color: #1B5E20;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .status-no-show {
+            background: #E0E0E0;
+            color: #424242;
+        }
+
+        .payment-paid {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .payment-unpaid {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .payment-deposit {
+            background: #FFF3CD;
+            color: #856404;
+        }
 
         .btn-sm {
             padding: 6px 12px;
@@ -378,11 +414,30 @@
             transition: 0.2s;
         }
 
-        .btn-success { background: #28a745; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-primary { background: #E8B4C8; color: #4A4139; }
-        .btn-warning { background: #ffc107; color: #212529; }
-        .btn-info { background: #17a2b8; color: white; }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #E8B4C8;
+            color: #4A4139;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
 
         .btn-sm:hover {
             transform: translateY(-1px);
@@ -414,9 +469,17 @@
             border-radius: 10px;
         }
 
-        .finance-card:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .finance-card:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .finance-card:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .finance-card:nth-child(2) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .finance-card:nth-child(3) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .finance-card:nth-child(4) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
 
         .finance-card h4 {
             margin: 0 0 0.5rem;
@@ -469,6 +532,7 @@
                 transform: translateY(50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -547,6 +611,7 @@
             .charts-grid {
                 grid-template-columns: 1fr;
             }
+
             .financial-stats {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -556,9 +621,11 @@
             .dash-sidebar {
                 width: 70px;
             }
+
             .dash-sidebar span {
                 display: none;
             }
+
             .dash-logo {
                 font-size: 0.9rem;
             }
@@ -826,7 +893,8 @@
                         <i class="fas fa-plus"></i> Add Service
                     </button>
                 </div>
-                <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                <div
+                    style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
                     <button class="filter-btn active" onclick="filterServices('all')">All Services</button>
                     <button class="filter-btn" onclick="filterServices('kiddies')">👧 Kiddies Hair</button>
                     <button class="filter-btn" onclick="filterServices('adult')">💇‍♀️ Adult Hair</button>
@@ -994,7 +1062,8 @@
                         <input type="email" id="profile-email" required>
                     </div>
                     <hr>
-                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current password</p>
+                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
+                        current password</p>
                     <div class="form-group">
                         <label>New Password</label>
                         <input type="password" id="profile-pass" placeholder="Enter new password">
@@ -1021,6 +1090,7 @@
 
     </main>
 
+    <script src="./auth-nav.js"></script>
     <script src="dashboard.js"></script>
 </body>
 

@@ -3,7 +3,30 @@
 const API_URL = 'https://tasselapp-back.onrender.com';
 let allProducts = [];
 
+// Hide loading screen
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        console.log('Loading screen hidden');
+    }
+}
+
+// Notification function that won't cause recursion
+function showNotification(message, type = 'info') {
+    // Use the global notification function from scripts.js if available
+    if (window.showNotification && window.showNotification !== showNotification) {
+        window.showNotification(message, type);
+    } else {
+        // Fallback alert
+        alert(message);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Hide loading screen immediately
+    hideLoadingScreen();
+
     console.log('Shop page loaded');
 
     // Check login status
@@ -16,31 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupShopFilters();
 
     // Initialize cart if not already initialized
-    if (!window.tasselCart) {
-        console.log('Initializing cart...');
-        window.tasselCart = new TasselCart();
-    }
-});
-
-// Hide loading screen
-function hideLoadingScreen() {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-        loadingScreen.classList.add('hidden');
-        console.log('Loading screen hidden');
-    }
-}
-
-// Call it when page is ready
-document.addEventListener('DOMContentLoaded', function () {
-    // Hide loading screen immediately
-    hideLoadingScreen();
-
-    console.log('Shop page loaded');
-    checkShopAuthStatus();
-    loadAllProducts();
-    setupShopFilters();
-
     if (!window.tasselCart) {
         console.log('Initializing cart...');
         window.tasselCart = new TasselCart();
@@ -342,12 +340,4 @@ function showProductPopup(product) {
             popup.remove();
         }
     });
-}
-
-function showNotification(message, type = 'info') {
-    if (window.showNotification) {
-        window.showNotification(message, type);
-    } else {
-        alert(message);
-    }
 }

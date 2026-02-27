@@ -5,6 +5,8 @@
     <title>Staff Portal | Tassel Studio</title>
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/png" href="./favicon.png">
+    <!-- Add this in the header where you want to show user name -->
+    <span id="user-name-display" style="display: none;"></span>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- DataTables for better tables -->
@@ -459,10 +461,10 @@
                         <input type="email" id="profile-email" class="form-control"
                             style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
                     </div>
-                        <div class="form-group">
-                            <label>Phone Number</label>
-                            <input type="tel" id="profile-phone" class="form-control" placeholder="+27 82 345 6789">
-                        </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="profile-phone" class="form-control" placeholder="+27 82 345 6789">
+                    </div>
                     <hr style="margin:1.5rem 0; border:0; border-top:1px solid #eee;">
                     <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
                         current password</p>
@@ -485,6 +487,7 @@
         </div>
     </main>
 
+    <script src="./auth-nav.js"></script>
     <script src="dashboard.js"></script>
     <!-- FullCalendar for staff schedule -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />

@@ -5,13 +5,15 @@
     <title>My Account | Tassel Studio</title>
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
     <link rel="icon" type="image/png" href="./favicon.png">
+    <!-- Add this in the header where you want to show user name -->
+    <span id="user-name-display" style="display: none;"></span>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- DataTables for better tables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    
+
     <style>
         body {
             margin: 0;
@@ -28,7 +30,7 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .dash-logo {
@@ -37,7 +39,7 @@
             font-weight: 700;
             text-align: center;
             color: #E8B4C8;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             letter-spacing: 2px;
         }
 
@@ -64,7 +66,7 @@
 
         .dash-nav a:hover,
         .dash-nav a.active {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
         }
 
@@ -87,7 +89,7 @@
             background: white;
             padding: 1rem 2rem;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .dash-header h1 {
@@ -156,7 +158,7 @@
 
         .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
@@ -245,10 +247,25 @@
             display: inline-block;
         }
 
-        .status-pending { background: #FFF3CD; color: #856404; }
-        .status-confirmed { background: #D4EDDA; color: #155724; }
-        .status-completed { background: #C8E6C9; color: #1B5E20; }
-        .status-cancelled { background: #F8D7DA; color: #721C24; }
+        .status-pending {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #C8E6C9;
+            color: #1B5E20;
+        }
+
+        .status-cancelled {
+            background: #F8D7DA;
+            color: #721C24;
+        }
 
         .btn {
             display: inline-flex;
@@ -272,7 +289,7 @@
         .btn-primary:hover {
             background: #d89eb5;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .btn-outline-light {
@@ -298,7 +315,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -325,6 +342,7 @@
                 transform: translateY(50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -426,8 +444,10 @@
         <div class="dash-logo">MY TASSEL</div>
         <nav>
             <ul class="dash-nav">
-                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-alt"></i> My Bookings</a></li>
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i>
+                        Dashboard</a></li>
+                <li><a href="#" onclick="showSection('bookings')"><i class="fas fa-calendar-alt"></i> My Bookings</a>
+                </li>
                 <li><a href="#" onclick="showSection('favourites')"><i class="fas fa-heart"></i> Favourites</a></li>
                 <li><a href="#" onclick="showSection('rewards')"><i class="fas fa-gift"></i> Rewards</a></li>
                 <li><a href="#" onclick="openProfileModal()"><i class="fas fa-user-circle"></i> My Profile</a></li>
@@ -527,17 +547,20 @@
                     <div style="text-align: center; padding: 1rem;">
                         <div style="font-size: 2rem; margin-bottom: 0.5rem;">👧</div>
                         <h4>Kiddies Braids</h4>
-                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="window.location.href='index.html#services'">Book</button>
                     </div>
                     <div style="text-align: center; padding: 1rem;">
                         <div style="font-size: 2rem; margin-bottom: 0.5rem;">💅</div>
                         <h4>Gel Manicure</h4>
-                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="window.location.href='index.html#services'">Book</button>
                     </div>
                     <div style="text-align: center; padding: 1rem;">
                         <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
                         <h4>Facial Treatment</h4>
-                        <button class="btn btn-primary btn-sm" onclick="window.location.href='index.html#services'">Book</button>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="window.location.href='index.html#services'">Book</button>
                     </div>
                 </div>
             </div>
@@ -578,7 +601,8 @@
                 <div style="text-align: center; padding: 3rem; color: #888;">
                     <i class="fas fa-heart" style="font-size: 3rem; margin-bottom: 1rem; color: #E8B4C8;"></i>
                     <p>You haven't added any favourites yet.</p>
-                    <button class="btn btn-primary" onclick="window.location.href='index.html#services'">Browse Services</button>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html#services'">Browse
+                        Services</button>
                 </div>
             </div>
         </section>
@@ -589,7 +613,8 @@
                 <div class="box-header">
                     <h3>My Rewards</h3>
                 </div>
-                <div style="background: linear-gradient(135deg, #6B5D52, #4A4139); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                <div
+                    style="background: linear-gradient(135deg, #6B5D52, #4A4139); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h4 style="margin: 0; color: #E8B4C8;">Tassel Rewards</h4>
@@ -601,7 +626,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <h4>How to earn more points</h4>
                 <ul style="list-style: none; padding: 0;">
                     <li style="display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eee;">
@@ -648,14 +673,16 @@
                         <input type="tel" id="profile-phone" class="form-control" placeholder="+27 82 345 6789">
                     </div>
                     <hr>
-                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep current password</p>
+                    <p style="font-size:0.9rem; color:#888; margin-bottom:1rem;">Leave password fields blank to keep
+                        current password</p>
                     <div class="form-group">
                         <label>New Password</label>
                         <input type="password" id="profile-pass" class="form-control" placeholder="Enter new password">
                     </div>
                     <div class="form-group">
                         <label>Confirm New Password</label>
-                        <input type="password" id="profile-pass-confirm" class="form-control" placeholder="Confirm new password">
+                        <input type="password" id="profile-pass-confirm" class="form-control"
+                            placeholder="Confirm new password">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
                 </form>
@@ -664,29 +691,30 @@
 
     </main>
 
+    <script src="./auth-nav.js"></script>
     <script src="dashboard.js"></script>
     <script>
         // Override initCustomer function to enhance the customer dashboard
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Store the original initCustomer function
             const originalInitCustomer = window.initCustomer;
-            
+
             // Override it
-            window.initCustomer = async function() {
+            window.initCustomer = async function () {
                 if (originalInitCustomer) {
                     await originalInitCustomer();
                 }
-                
+
                 // Additional enhancements
                 const userName = document.getElementById('user-name')?.textContent || 'Guest';
                 document.getElementById('welcome-name').textContent = userName;
-                
+
                 // Load rewards points
                 const user = JSON.parse(localStorage.getItem('user'));
                 if (user) {
                     document.getElementById('stat-points').textContent = user.points || '150';
                 }
-                
+
                 // Setup DataTable for bookings history
                 if ($.fn.DataTable && document.getElementById('bookings-history-table')) {
                     $('#bookings-history-table').DataTable({
@@ -698,34 +726,34 @@
                     });
                 }
             };
-            
+
             // Call the enhanced function
             if (window.initCustomer) {
                 window.initCustomer();
             }
         });
-        
+
         // Section show function
-        window.showSection = function(sectionId) {
+        window.showSection = function (sectionId) {
             document.querySelectorAll('main > section').forEach(el => el.style.display = 'none');
             const section = document.getElementById(`sec-${sectionId}`);
             if (section) section.style.display = 'block';
-            
+
             const titles = {
                 'dashboard': 'My Dashboard',
                 'bookings': 'My Bookings',
                 'favourites': 'My Favourites',
                 'rewards': 'My Rewards'
             };
-            
+
             const titleEl = document.getElementById('page-title');
             if (titleEl) titleEl.textContent = titles[sectionId] || 'My Account';
-            
+
             // Update active state in sidebar
             document.querySelectorAll('.dash-nav a').forEach(link => {
                 link.classList.remove('active');
             });
-            
+
             // Find and activate the clicked link
             document.querySelectorAll('.dash-nav a').forEach(link => {
                 if (link.getAttribute('onclick')?.includes(sectionId)) {

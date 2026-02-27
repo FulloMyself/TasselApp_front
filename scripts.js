@@ -112,22 +112,32 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchServices(); // Load services from MongoDB
 
     // ===== Auth Status (Check Login) =====
-    // Update the checkAuthStatus function
+    // Replace the existing checkAuthStatus function with this enhanced version
     function checkAuthStatus() {
         const user = JSON.parse(localStorage.getItem('user'));
         const token = localStorage.getItem('token');
+        const isLoggedIn = !!(token && user);
+
+        console.log('Auth Status - Logged in:', isLoggedIn, 'User:', user);
+
+        // Update all UI elements
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const dashboardBtn = document.getElementById('dashboard-btn');
+        const registerBtn = document.getElementById('register-nav-btn');
+        const shopNavBtn = document.getElementById('shop-nav-btn');
         const bookBtn = document.getElementById('book-btn');
 
-        if (token && user) {
+        if (isLoggedIn) {
             // User is logged in
             if (loginBtn) loginBtn.style.display = 'none';
+            if (registerBtn) registerBtn.style.display = 'none';
             if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+            if (shopNavBtn) shopNavBtn.style.display = 'inline-flex';
+
+            // Dashboard button
             if (dashboardBtn) {
                 dashboardBtn.style.display = 'inline-flex';
-                // Update dashboard button text based on role
                 if (user.role === 'admin') {
                     dashboardBtn.innerHTML = '<i class="fas fa-cog"></i> Admin';
                     dashboardBtn.onclick = () => window.location.href = 'admin.html';
@@ -139,17 +149,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     dashboardBtn.onclick = () => window.location.href = 'customer.html';
                 }
             }
+
+            // Book button
             if (bookBtn) {
                 if (user.role === 'customer') {
                     bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
                     bookBtn.onclick = () => document.getElementById('booking-modal')?.classList.add('active');
+                } else {
+                    bookBtn.innerHTML = '<i class="fas fa-th-large"></i> Dashboard';
+                    bookBtn.onclick = () => {
+                        if (user.role === 'admin') window.location.href = 'admin.html';
+                        else if (user.role === 'staff') window.location.href = 'staff.html';
+                    };
                 }
             }
+
+            // Update shop link
+            const shopLink = document.getElementById('shop-nav-link');
+            if (shopLink) {
+                shopLink.href = 'shop.html';
+                shopLink.onclick = null;
+            }
+
+            // Update user greeting
+            const userNameDisplay = document.getElementById('user-name-display');
+            if (userNameDisplay) {
+                userNameDisplay.textContent = user.name || 'User';
+            }
+
+            // Store user role for other functions
+            window.currentUserRole = user.role;
+
         } else {
             // User is logged out
             if (loginBtn) loginBtn.style.display = 'inline-flex';
+            if (registerBtn) registerBtn.style.display = 'inline-flex';
             if (logoutBtn) logoutBtn.style.display = 'none';
             if (dashboardBtn) dashboardBtn.style.display = 'none';
+            if (shopNavBtn) shopNavBtn.style.display = 'none';
+
             if (bookBtn) {
                 bookBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> Book Now';
                 bookBtn.onclick = () => {
@@ -157,27 +195,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('login-modal')?.classList.add('active');
                 };
             }
-        }
-    }
 
-    // Protect shop links - redirect to login if not authenticated
-    document.querySelectorAll('a[href="shop.html"]').forEach(link => {
-        link.addEventListener('click', function (e) {
-            const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user'));
-
-            if (!token || !user) {
-                e.preventDefault();
-                e.stopPropagation();
-                showNotification('Please log in to access the shop', 'error');
-                const loginModal = document.getElementById('login-modal');
-                if (loginModal) {
-                    loginModal.classList.add('active');
-                }
-                return false;
+            // Shop link prompts login
+            const shopLink = document.getElementById('shop-nav-link');
+            if (shopLink) {
+                shopLink.href = '#';
+                shopLink.onclick = function (e) {
+                    e.preventDefault();
+                    showNotification('Please log in to access the shop', 'error');
+                    document.getElementById('login-modal')?.classList.add('active');
+                };
             }
-        });
-    });
+        }
+
+        // Dispatch event for other scripts
+        window.dispatchEvent(new CustomEvent('authChange', {
+            detail: { isLoggedIn, user, token }
+        }));
+    }
 
     // ===== Fetch Services from MongoDB =====
     async function fetchServices() {
