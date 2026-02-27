@@ -108,11 +108,10 @@ document.addEventListener('DOMContentLoaded', function () {
     initObservers();
     initServiceCategories();
     initSmoothScroll();
-    fetchPublicProducts(); // Load products from MongoDB
-    fetchServices(); // Load services from MongoDB
+    fetchPublicProducts();
+    fetchServices();
 
     // ===== Auth Status (Check Login) =====
-    // Replace the existing checkAuthStatus function with this enhanced version
     function checkAuthStatus() {
         const user = JSON.parse(localStorage.getItem('user'));
         const token = localStorage.getItem('token');
@@ -120,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log('Auth Status - Logged in:', isLoggedIn, 'User:', user);
 
-        // Update all UI elements
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const dashboardBtn = document.getElementById('dashboard-btn');
@@ -129,13 +127,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const bookBtn = document.getElementById('book-btn');
 
         if (isLoggedIn) {
-            // User is logged in
             if (loginBtn) loginBtn.style.display = 'none';
             if (registerBtn) registerBtn.style.display = 'none';
             if (logoutBtn) logoutBtn.style.display = 'inline-flex';
             if (shopNavBtn) shopNavBtn.style.display = 'inline-flex';
 
-            // Dashboard button
             if (dashboardBtn) {
                 dashboardBtn.style.display = 'inline-flex';
                 if (user.role === 'admin') {
@@ -150,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Book button
             if (bookBtn) {
                 if (user.role === 'customer') {
                     bookBtn.innerHTML = '<i class="fas fa-calendar-plus"></i> Book Now';
@@ -164,24 +159,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Update shop link
             const shopLink = document.getElementById('shop-nav-link');
             if (shopLink) {
                 shopLink.href = 'shop.html';
                 shopLink.onclick = null;
             }
 
-            // Update user greeting
             const userNameDisplay = document.getElementById('user-name-display');
             if (userNameDisplay) {
                 userNameDisplay.textContent = user.name || 'User';
             }
 
-            // Store user role for other functions
             window.currentUserRole = user.role;
 
         } else {
-            // User is logged out
             if (loginBtn) loginBtn.style.display = 'inline-flex';
             if (registerBtn) registerBtn.style.display = 'inline-flex';
             if (logoutBtn) logoutBtn.style.display = 'none';
@@ -196,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
             }
 
-            // Shop link prompts login
             const shopLink = document.getElementById('shop-nav-link');
             if (shopLink) {
                 shopLink.href = '#';
@@ -208,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Dispatch event for other scripts
         window.dispatchEvent(new CustomEvent('authChange', {
             detail: { isLoggedIn, user, token }
         }));
@@ -257,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         card.innerHTML = `
             <div class="service-image">
-                <img src="${item.image || service.image || './assets/images/service-default.jpg'}" alt="${item.name}">
+                <img src="${item.image || service.image || './assets/images/service-default.jpg'}" alt="${item.name}" onerror="this.onerror=null; this.src='./assets/images/service-default.jpg';">
                 <div class="service-overlay">
                     <button class="btn btn-white btn-sm" onclick="document.getElementById('book-btn').click()">Book Now</button>
                 </div>
@@ -275,7 +264,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== Fetch Public Products =====
-    // ===== Fetch Public Products =====
     async function fetchPublicProducts() {
         try {
             const res = await fetch(`${API_URL}/api/products/public`);
@@ -290,13 +278,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             container.innerHTML = '';
 
-            const displayProducts = products; // Show all products
+            const displayProducts = products.slice(0, 4); // Show first 4 products
 
             displayProducts.forEach(p => {
-                // Use the image path directly from the database
                 let imageUrl = p.image || './assets/images/product-default.jpg';
 
-                // Ensure the path starts with ./ for relative paths
                 if (imageUrl && !imageUrl.startsWith('./') && !imageUrl.startsWith('http')) {
                     if (imageUrl.startsWith('/')) {
                         imageUrl = '.' + imageUrl;
@@ -313,19 +299,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.setAttribute('data-id', p._id);
 
                 card.innerHTML = `
-            <div class="product-image">
-                <img src="${imageUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
-                ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
-            </div>
-            <div class="product-content">
-                <h4 class="product-name">${p.name}</h4>
-                <div class="product-price-container">
-                    ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
-                    <span class="product-price">R${displayPrice.toFixed(2)}</span>
-                </div>
-                <div class="product-category">${p.category || ''}</div>
-                <button class="btn btn-sm btn-primary add-to-cart-btn" 
-                        data-product='${JSON.stringify({
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
+                        ${onSale ? '<div class="sale-badge">SALE</div>' : ''}
+                    </div>
+                    <div class="product-content">
+                        <h4 class="product-name">${p.name}</h4>
+                        <div class="product-price-container">
+                            ${onSale ? `<span class="original-price">R${p.price.toFixed(2)}</span>` : ''}
+                            <span class="product-price">R${displayPrice.toFixed(2)}</span>
+                        </div>
+                        <div class="product-category">${p.category || ''}</div>
+                        <button class="btn btn-sm btn-primary add-to-cart-btn" 
+                                data-product='${JSON.stringify({
                     id: p._id,
                     name: p.name,
                     price: p.price,
@@ -333,12 +319,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     image: imageUrl,
                     category: p.category || ''
                 }).replace(/'/g, '&apos;')}'>
-                    Add to Cart
-                </button>
-            </div>
-        `;
+                            Add to Cart
+                        </button>
+                    </div>
+                `;
 
-                // Add click handler for product details
                 card.addEventListener('click', (e) => {
                     if (!e.target.classList.contains('add-to-cart-btn')) {
                         showProductPopup(p);
@@ -348,7 +333,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 container.appendChild(card);
             });
 
-            // Add event listeners to Add to Cart buttons
             document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -374,10 +358,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!container) return;
 
         const staticProducts = [
-            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "./assets/images/products/Tassel_12_Hour_Concentrated_Skin_Balm.jpg" },
-            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "./assets/images/products/Tassel_Beard_&_Hair_Oil.jpg" },
-            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "./assets/images/products/Tassel_Deep_Cleanse_Face_Wash.jpg" },
-            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "./assets/images/products/Tassel_Eye_Serum.jpg" }
+            { name: "Tassel 12 Hour Skin Balm", price: 199, category: "skincare", image: "./assets/images/product-default.jpg" },
+            { name: "Tassel Beard Oil", price: 299, category: "wellness", image: "./assets/images/product-default.jpg" },
+            { name: "Tassel Face Wash", price: 149, category: "skincare", image: "./assets/images/product-default.jpg" },
+            { name: "Tassel Eye Serum", price: 250, category: "skincare", image: "./assets/images/product-default.jpg" }
         ];
 
         container.innerHTML = '';
@@ -385,30 +369,28 @@ document.addEventListener('DOMContentLoaded', function () {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-            <div class="product-image">
-                <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
-            </div>
-            <div class="product-content">
-                <h4 class="product-name">${p.name}</h4>
-                <div class="product-price">R${p.price}</div>
-                <div class="product-category">${p.category}</div>
-                <button class="btn btn-sm btn-primary enquire-btn">Enquire</button>
-            </div>
-        `;
+                <div class="product-image">
+                    <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
+                </div>
+                <div class="product-content">
+                    <h4 class="product-name">${p.name}</h4>
+                    <div class="product-price">R${p.price}</div>
+                    <div class="product-category">${p.category}</div>
+                    <button class="btn btn-sm btn-primary enquire-btn">Enquire</button>
+                </div>
+            `;
             container.appendChild(card);
         });
     }
 
     // Product popup function
     function showProductPopup(product) {
-        // Remove existing popup
         const existingPopup = document.querySelector('.product-popup-overlay');
         if (existingPopup) existingPopup.remove();
 
         const onSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
         const displayPrice = onSale ? product.salePrice : product.price;
 
-        // FIXED: Use the same image path logic as the card
         let imageUrl = product.image || './assets/images/product-default.jpg';
         if (imageUrl && !imageUrl.startsWith('./') && !imageUrl.startsWith('http')) {
             if (imageUrl.startsWith('/')) {
@@ -421,22 +403,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const popup = document.createElement('div');
         popup.className = 'product-popup-overlay';
         popup.innerHTML = `
-        <div class="product-popup">
-            <button class="popup-close">&times;</button>
-            <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
-            <h3>${product.name}</h3>
-            <p>${product.description || 'No description available.'}</p>
-            <div class="product-price-container">
-                ${onSale ? `<span class="original-price">R${product.price.toFixed(2)}</span>` : ''}
-                <span class="product-price">R${displayPrice.toFixed(2)}</span>
+            <div class="product-popup">
+                <button class="popup-close">&times;</button>
+                <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='./assets/images/product-default.jpg';">
+                <h3>${product.name}</h3>
+                <p>${product.description || 'No description available.'}</p>
+                <div class="product-price-container">
+                    ${onSale ? `<span class="original-price">R${product.price.toFixed(2)}</span>` : ''}
+                    <span class="product-price">R${displayPrice.toFixed(2)}</span>
+                </div>
+                <button class="btn btn-primary add-to-cart-popup">Add to Cart</button>
             </div>
-            <button class="btn btn-primary add-to-cart-popup">Add to Cart</button>
-        </div>
-    `;
+        `;
 
         document.body.appendChild(popup);
 
-        // Close handlers
         popup.addEventListener('click', (e) => {
             if (e.target === popup) popup.remove();
         });
@@ -472,7 +453,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close mobile menu when clicking a link
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function (e) {
             if (this.getAttribute('href').startsWith('#')) {
@@ -489,7 +469,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ===== Smooth Scroll for All Anchor Links =====
     function initSmoothScroll() {
         document.querySelectorAll('a[href^="#"]:not(.nav-link)').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -504,7 +483,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ===== Sliders (Hero & Testimonials) =====
     function initSliders() {
         // Hero Slider
         const heroSlides = document.querySelectorAll('.hero-slide');
@@ -587,7 +565,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ===== Service Categories Interaction =====
     function initServiceCategories() {
         const categoryButtons = document.querySelectorAll('.category-card .btn-sm');
         const detailedServices = document.getElementById('detailed-services');
@@ -623,7 +600,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ===== Gallery =====
     function initGallery() {
         const filterBtns = document.querySelectorAll('.filter-btn');
         const items = document.querySelectorAll('.gallery-item');
