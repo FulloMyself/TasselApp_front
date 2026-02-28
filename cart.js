@@ -1,8 +1,5 @@
 // cart.js - Shopping Cart Functionality
 
-// Add this at the very top of cart.js
-const API_URL = 'https://tasselapp-back.onrender.com';
-
 // Check if TasselCart already exists to prevent duplicate declaration errors
 if (typeof TasselCart !== 'undefined') {
     console.warn('TasselCart already defined, skipping re-declaration');
